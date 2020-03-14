@@ -1,0 +1,713 @@
+/*------------------------- Generic content -------------------------*/
+
+@import url('https://fonts.googleapis.com/css?family=Rubik&display=swap');
+
+html {
+    direction: ltr;
+    height: 100%;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    /* ^ a defualt value, in case the google fonts are not working */
+    font-family: 'Rubik', sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    max-height: 100%;
+    background: -webkit-linear-gradient(to bottom, #90D6F4, #FFFFFF) no-repeat center center fixed;
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to bottom, #90D6F4, #FFFFFF) no-repeat center center fixed;
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    flex-direction: column;
+}
+
+.hide_link {
+    color: unset;
+    text-decoration: none;
+}
+
+.flex_me {
+    display: flex;
+}
+
+.not_allowed {
+    cursor: not-allowed;
+}
+
+.quick_trans {
+    transition: 0.5s;
+}
+
+.center_text {
+    text-align: center;
+}
+
+#hamburger a:hover,
+.nav_btn:hover,
+.option_button a:hover,
+#report_summary:hover,
+.guide_btn:hover {
+    color: #659cef;
+    text-decoration: none;
+}
+
+/*----------- Scrollbar design -----------*/
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/*------------------------- Header -------------------------*/
+header {
+    background-color: white;
+    padding: 6px;
+    border-bottom: 1px solid black;
+    justify-content: space-between;
+}
+
+.user_type {
+    height: 40px;
+}
+
+.nav_btn {
+    background-color: white;
+    border: none;
+    font-size: 25px;
+    cursor: pointer;
+    color: black;
+    padding-left: 10px;
+}
+
+/*------------------------- NAV -------------------------*/
+#hamburger {
+    height: 100%;
+    width: 0px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    background-color: white;
+    overflow-x: hidden;
+    border-left: 1px solid black;
+    box-shadow: 4px 0px 30px black;
+}
+
+#nav_logo {
+    width: 190px;
+    height: 50px;
+    margin: 6px auto;
+}
+
+#hamburger a {
+    padding: 6px 0px 10px 0px;
+    text-decoration: none;
+    font-size: 28px;
+    color: black;
+    display: block;
+    border: none;
+    background: none;
+    width: 95%;
+    text-align: right;
+    outline: none;
+}
+
+#hamburger a img {
+    padding: 0px 0px 0px 15px;
+    height: 50px;
+    vertical-align: middle;
+}
+
+#hamburger hr {
+    width: 100%;
+    margin: 8px 0px;
+}
+
+/*------------------------- Main content -------------------------*/
+#subtitle_container {
+    text-align: center;
+}
+
+main {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.unified_layout {
+    direction: rtl;
+    width: 95%;
+    margin: auto;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid black;
+    justify-content: center;
+}
+
+/*----------- Create Report ------------*/
+.unified_layout .report_form {
+    margin: auto;
+    padding: 1% 0%;
+    padding-top: 4%;
+    width: 70%;
+    text-align: right;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+}
+
+.control_buttons {
+    margin-top: 2%;
+}
+
+.control_buttons a {
+    padding: 1px;
+}
+
+
+/*----------- Reports ------------*/
+.options {
+    width: 40%;
+    margin: auto;
+    margin-top: 2%;
+    /* shorter */
+    justify-content: space-evenly;
+}
+
+.option_button {
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+.option_button:hover {
+    opacity: 0.7;
+    transform: scale(1.3);
+    transition: 1s;
+}
+
+.option_button img {
+    height: 80px;
+}
+
+.boxes_container {
+    padding-top: 3%;
+    height: 70%;
+    justify-content: space-evenly;
+}
+
+.custom-radio {
+    width: 45%;
+}
+
+.box {
+    width: 35%;
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px outset gray;
+    padding: 19px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#search form {
+    width: 120%;
+    padding: 1.5% 13% 0px 0px;
+    text-align: right;
+}
+
+ul {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+#report_list li {
+    border: 1px solid #dddddd;
+    background-color: #ffffff;
+    list-style: none;
+    margin: 2px;
+    display: flex;
+    /* I wrote this despite the flex class, so we won't copy the class for each and every li */
+    justify-content: flex-start;
+}
+
+li:hover {
+    transform: scale(1.05);
+    transition: 0.4s;
+}
+
+#report_summary {
+    font-family: 'Arial Regular', 'Arial';
+    text-align: right;
+    margin: 0px 6px;
+}
+
+#report_list img {
+    padding: 5px 4px;
+}
+
+/*----------- First steps ------------*/
+.slide-container {
+    display: none;
+    width: 100%;
+    height: 300px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+
+.slideshow-container {
+    position: relative;
+    margin: auto;
+}
+
+.fade-animation {
+    -webkit-animation-name: fade;
+    -webkit-animation-duration: 1.5s;
+    animation-name: fade;
+    animation-duration: 1.5s;
+}
+
+.first-steps .content-container {
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.first-steps .content-container {
+    justify-content: space-between;
+    width: 100%;
+}
+
+.first-steps .content-container .content {
+    padding-left: 1em;
+}
+
+.video {
+    width: 560px;
+    height: 315px;
+    border: 1px solid black;
+    border-radius: 15px;
+}
+
+.sponsers {
+    margin-bottom: 1em;
+}
+
+.sponsers img {
+	transition: 0.5s;
+}
+
+.sponsers img:hover {
+    transform: scale(1.2);
+}
+
+
+.sponsers .horizontal-logo {
+    width: 200px;
+    margin-left: 1em;
+}
+
+.sponsers .square-logo {
+    height: 100px;
+    margin-left: 1em;
+}
+
+.start-btn-wrapper {
+    margin: 1.6em auto;
+}
+
+
+@-webkit-keyframes fade {
+    from {
+        opacity: 0.4;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fade {
+    from {
+        opacity: 0.4;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+
+/*----------- Donation ------------*/
+#btnShow {
+    position: relative;
+    left: 0.4%;
+    top: 1%;
+}
+
+.guide_btn {
+    background-color: unset;
+    border: none;
+    font-size: 25px;
+    cursor: pointer;
+    color: black;
+}
+
+#guide_box{
+    display: none;
+    direction: rtl;
+    text-align: justify;
+}
+
+.ctrl {
+    align-items: center;
+    background-color: #fff;
+    height: 30%;
+    width: 15%;
+    font-size: 350%;
+    margin: 1% auto;
+    border: 1px solid black;
+}
+
+.ctrl__button--decrement,
+.ctrl__button--increment {
+    width: 500PX;
+    height: 80px;
+    line-height: 85px;
+    color: #fff;
+    cursor: pointer;
+    background-color: #8498a7;
+    -webkit-transition: background-color 100ms ease-in;
+    transition: background-color 100ms ease-in;
+    border-radius: 5px 0 0 5px;
+    position: relative;
+    right: 80px;
+}
+
+.ctrl__button--increment {
+    border-radius: 0 5px 5px 0;
+    right: -79px;
+}
+
+.ctrl__counter {
+    position: relative;
+    width: 1000px;
+    height: 100px;
+    color: #333C48;
+    overflow: hidden;
+}
+
+.ctrl__counter.is-input .ctrl__counter-num,
+.ctrl__counter.is-input .ctrl__counter-input {
+    opacity: 0;
+    -webkit-transition: opacity 100ms ease-in;
+    transition: opacity 100ms ease-in;
+}
+
+.ctrl__counter.is-input .ctrl__counter-input {
+    opacity: 1;
+    font-size: 40px;
+}
+
+.ctrl__counter-input {
+    width: 100%;
+    position: relative;
+    z-index: 2;
+    box-shadow: none;
+    outline: none;
+    border: none;
+    color: #333C48;
+    opacity: 0;
+    -webkit-transition: opacity 100ms ease-in;
+    transition: opacity 100ms ease-in;
+}
+
+.ctrl__counter-num {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    line-height: 100px;
+    opacity: 1;
+    -webkit-transition: opacity 100ms ease-in;
+    transition: opacity 100ms ease-in;
+}
+
+.ctrl__button--decrement:hover,
+.ctrl__button--increment:hover {
+    background-color: #dd0e1f;
+    -webkit-transition: background-color 200ms ease-in;
+    transition: background-color 200ms ease-in;
+}
+
+.ctrl__button--increment:hover {
+    background-color: #21e20f;
+}
+
+.payment_choice {
+    width: 60%;
+    margin: 4% auto 4%;
+    flex-direction: row ltr;
+    flex-wrap: wrap;
+}
+
+.payment_option {
+    font-size: 1.5em;
+    font-weight: bold;
+    flex-grow: 2;
+    margin: 10px;
+}
+
+.payment_option img {
+    height: 85px;
+}
+
+.payment_option img:hover {
+    opacity: 0.7;
+    transform: scale(1.2);
+    transition: 1s;
+}
+
+#mail {
+    margin: auto;
+    width: 50%;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.finish_btn {
+    justify-content: center;
+    padding: 10px;
+}
+
+.finish_btn button {
+    width: 20%;
+}
+
+/*------------------------- Footer -------------------------*/
+
+#unified_footer {
+    width: 100%;
+    padding-bottom: 5px;
+}
+
+hr {
+    border-top: 1px solid #C7CACB;
+    width: 75%;
+}
+#unified_footer a img {
+    margin-right: 25px;
+}
+
+#unified_footer img {
+    margin: 5px;
+}
+
+/*------------------------- Media Queries -------------------------*/
+
+@media only screen and (max-width : 1260px) {
+    .box {
+        margin: auto 20px;
+        height: 100%;
+    }
+
+    .boxes_container {
+        justify-content: center;
+    }
+
+    /* Donation */
+    .ctrl {
+        width: 27%;
+        height: 35%;
+    }
+
+    .payment_choice {
+        width: 75%;
+        margin: 7% auto;
+    }
+
+    .custom-radio {
+        width: 30%;
+        font-size: 13px;
+    }
+}
+
+@media screen and (max-width: 900px) {
+
+    .box {
+        width: 50%;
+    }
+
+    /* Donation */
+    .ctrl {
+        width: 35%;
+    }
+
+    .payment_choice {
+        margin: 12% auto;
+    }
+
+    .payment_option img {
+        height: 56px;
+    }
+
+    .form-row {
+        width: 80%;
+    }
+
+    /* first steps */
+    .first-steps .content-container {
+        flex-wrap: wrap;
+    }
+
+    .sponsers-wrapper {
+        display: none;
+    }
+
+    .slide-container {
+        height: 250px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+
+    /* reports */
+    #search {
+        display: none;
+    }
+
+    .option_button {
+        margin: 10% 20% 0%;
+    }
+
+    .box {
+        width: 100%;
+        background: none;
+        border: none;
+        overflow-y: auto;
+        margin: 0px 4px;
+    }
+
+    /* Create report */
+    .unified_layout .report_form {
+        margin-top: 10%;
+    }
+
+    /* Donation */
+    .ctrl {
+        width: 46%;
+    }
+
+    .payment_choice {
+        margin: 8% auto;
+    }
+
+    .payment_option img {
+        margin: 0px 20px;
+    }
+
+    #mail {
+        width: 100%;
+    }
+
+    /* first steps */
+    .video {
+        display: none;
+    }
+
+    .first-steps .content-container .content h4 {
+        text-align: center;
+    }
+
+    .first-steps .content-container .content p {
+        text-align: justify;
+    }
+
+    .slide-container {
+        height: 150px;
+    }
+
+    /* collective */
+    #subtitle_container {
+        display: none;
+    }
+
+    .unified_layout {
+        margin-top: 10px;
+    }
+
+    .header {
+        margin-bottom: 5px;
+    }
+
+}
+
+@media screen and (max-width: 360px) {
+    .option_button {
+        text-align: center;
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+
+    .option_button img {
+        height: 50px;
+    }
+
+    .boxes_container {
+        height: 80%;
+    }
+
+    h3 {
+        display: none;
+    }
+
+    /* Donation */
+    .ctrl {
+        height: 25%;
+        margin-top: 9%;
+    }
+
+    .ctrl__button--decrement {
+        right: 50px;
+    }
+
+    .ctrl__button--increment {
+        right: -50px;
+    }
+
+    .payment_choice {
+        width: 80%;
+        margin: 10% auto;
+    }
+
+    .payment_option img {
+        height: 56px;
+        margin: 0px 2px 20px;
+    }
+
+    .finish_btn button {
+        width: 50%;
+    }
+    /* first steps */
+    .text {
+        font-size: 11px;
+    }
+
+    .slide-container {
+        height: 120px;
+    }
+}
