@@ -1,4 +1,4 @@
-<?php include 'header.php';?>
+{% include "header.html" %}
   <div id="subtitle_container">
     <h3>תרומה</h3>
   </div>
@@ -27,7 +27,7 @@
         <strong>ניתן לקבל סיוע או הדרכה נוספת דרך כפתור "צור קשר" בעמוד הדיווחים</strong>
       </p>
     </div>
-    <form style="all:unset" onsubmit="return donationValidation()" action="index.php">
+    <form style="all:unset" onsubmit="return donationValidation()" action="{{ url_for('home') }}">
       <section class='ctrl flex_me center_text'>
         <div class=' ctrl__button--increment'>+</div>
         <div class='ctrl__counter'>
@@ -66,4 +66,4 @@
     donation();
     activate_box();
   </script>
-<?php include 'footer.php';?>
+{% include "footer.html" %}

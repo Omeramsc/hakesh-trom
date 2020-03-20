@@ -12,12 +12,12 @@
 
 <body class="flex_me center_text">
   <div class="push_notification">
-    <a class="hide_link" href="report.php"><u><strong>דיווח חדש התקבל</strong></u><br>
+    <a class="hide_link" href="{{ url_for('reports') }}"><u><strong>דיווח חדש התקבל</strong></u><br>
       לחץ כאן בכדי לצפות בו</a>
   </div>
   <header class="flex_me">
     <img class="user_type" src="http://u.cubeupload.com/Chibameta/TEAM8.png">
-    <a href="index.php" class="logo"><img src="http://u.cubeupload.com/Chibameta/HEADERLOGOCENTERPNGF.png"
+    <a href="{{ url_for('home') }}" class="logo"><img src="http://u.cubeupload.com/Chibameta/HEADERLOGOCENTERPNGF.png"
         alt="חזור לעמוד הראשי"></a>
     <button class="nav_btn" onclick="toggleSideNav()"><i class="fa fa-bars"></i></button>
   </header>
@@ -27,8 +27,8 @@
       <img id="nav_logo" src="http://u.cubeupload.com/Chibameta/HEADERLOGOCENTERPNGF.png"
         style="width:190px; height: 50px; margin:6px auto;">
       <hr>
-      <a href="first_steps.php">תרומות<img src="http://u.cubeupload.com/Chibameta/FUNDIcoFix5.png" alt="תרומות"></a>
-      <a href="report.php">דיווחים<img src="http://u.cubeupload.com/Chibameta/RepIcoFix.png" alt="דיווחים"></a>
+      <a href="{{url_for('first_steps') }}">תרומות<img src="http://u.cubeupload.com/Chibameta/FUNDIcoFix5.png" alt="תרומות"></a>
+      <a href="{{url_for('reports') }}">דיווחים<img src="http://u.cubeupload.com/Chibameta/RepIcoFix.png" alt="דיווחים"></a>
       <a class="not_allowed" href="#">הצוות שלי<img src="http://u.cubeupload.com/Chibameta/pplIcoFix.png"
           alt="לא פעיל בכוונה"></a>
       <a class="not_allowed" href="#">לוח הישגים<img src="http://u.cubeupload.com/Chibameta/LBIcoFix.png"
@@ -56,7 +56,7 @@
     </section>
     <section class="buttons flex_me">
       <div class="icon">
-        <a class="hide_link" href="first_steps.php"> <img src="http://u.cubeupload.com/Chibameta/FUNDIcoFix5.png"
+        <a class="hide_link" href="{{ url_for('first_steps') }}"> <img src="http://u.cubeupload.com/Chibameta/FUNDIcoFix5.png"
             alt="תרומות"><br>
           תרומות</a>
       </div>
@@ -71,7 +71,7 @@
           לוח הישגים</a>
       </div>
       <div class="icon">
-        <a class="hide_link" href="report.php"><img src="http://u.cubeupload.com/Chibameta/RepIcoFix.png"
+        <a class="hide_link" href="{{ url_for('reports') }}"><img src="http://u.cubeupload.com/Chibameta/RepIcoFix.png"
             alt="דיווחים"><br>
           דיווחים</a>
       </div>
@@ -83,4 +83,4 @@
       </div>
     </section>
   </main>
-  <?php include 'footer.php';?>
+{% include "footer.html" %}
