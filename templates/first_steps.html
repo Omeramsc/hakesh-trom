@@ -1,4 +1,4 @@
-<?php include 'header.php';?>
+{% include "header.html" %}
   <div id="subtitle_container">
     <h3>צעדים ראשונים</h3>
   </div>
@@ -71,7 +71,7 @@
       </div>
     </section>
     <section class="start-btn-wrapper center_text">
-      <a href="donation.php"><button class="btn btn-primary btn-lg">התחל איסוף</button></a>
+      <a href="{{ url_for('donation') }}"><button class="btn btn-primary btn-lg">התחל איסוף</button></a>
     </section>
   </main>
-<?php include 'footer.php';?>
+{% include "footer.html" %}

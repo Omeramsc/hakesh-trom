@@ -17,7 +17,7 @@
 <body class="flex_me" onload="onLoad()">
     <header class="flex_me">
         <img class="user_type" src="http://u.cubeupload.com/Chibameta/TEAM8.png">
-        <a href="index.php" class="logo"><img src="http://u.cubeupload.com/Chibameta/HEADERLOGOCENTERPNGF.png"
+        <a href="{{ url_for('home') }}" class="logo"><img src="http://u.cubeupload.com/Chibameta/HEADERLOGOCENTERPNGF.png"
             alt="חזור לעמוד הראשי"></a>
         <button class="nav_btn" onclick="toggleSideNav()"><i class="fa fa-bars"></i></button>
     </header>
@@ -27,8 +27,8 @@
             <img id="nav_logo" src="http://u.cubeupload.com/Chibameta/HEADERLOGOCENTERPNGF.png"
                 style="width:190px; height: 50px; margin:6px auto;">
             <hr>
-            <a href="first_steps.php">תרומות<img src="http://u.cubeupload.com/Chibameta/FUNDIcoFix5.png" alt="תרומות"></a>
-            <a href="report.php">דיווחים<img src="http://u.cubeupload.com/Chibameta/RepIcoFix.png" alt="דיווחים"></a>
+            <a href="{{ url_for('first_steps') }}">תרומות<img src="http://u.cubeupload.com/Chibameta/FUNDIcoFix5.png" alt="תרומות"></a>
+            <a href="{{ url_for('reports') }}">דיווחים<img src="http://u.cubeupload.com/Chibameta/RepIcoFix.png" alt="דיווחים"></a>
             <a class="not_allowed" href="#">הצוות שלי<img src="http://u.cubeupload.com/Chibameta/pplIcoFix.png"
                 alt="לא פעיל בכוונה"></a>
             <a class="not_allowed" href="#">לוח הישגים<img src="http://u.cubeupload.com/Chibameta/LBIcoFix.png"

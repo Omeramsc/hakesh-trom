@@ -1,9 +1,9 @@
-<?php include 'header.php';?>
+{% include "header.html" %}
   <div id="subtitle_container">
     <h3>יצירת דיווח</h3>
   </div>
   <main id="main_layout" class="unified_layout">
-    <form class="report_form" method="GET" action="post_report.php">
+    <form class="report_form" method="GET" action="{{ url_for('reports') }}">
       <div class="form-group">
         <label for="inputAddress">*עיר:</label>
         <input type="text" class="form-control" id="inputAddress" placeholder="הכנס עיר" name="city" maxlength="25"
@@ -34,8 +34,8 @@
       </div>
       <div class="control_buttons">
         <button type="submit" class="btn btn-primary btn-lg btn-block">שלח</button>
-        <a href="report.php"><button type="button" class="btn btn-secondary btn-lg btn-block">בטל</button></a>
+        <a href="{{ url_for('report') }}"><button type="button" class="btn btn-secondary btn-lg btn-block">בטל</button></a>
       </div>
     </form>
   </main>
-  <?php include 'footer.php';?>
+{% include "footer.html" %}
