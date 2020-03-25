@@ -12,6 +12,10 @@ def home():
 def first_steps():
     return render_template('/first_steps.html')
 
+@app.route('/manage_campaign')
+def manage_campaign():
+    return render_template('/manage_campaign.html')
+
 
 @app.route('/donation', methods=['GET', 'POST'])
 def donation():

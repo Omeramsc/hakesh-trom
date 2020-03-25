@@ -1,0 +1,39 @@
+{% include "header.html" %}
+  <div id="subtitle_container">
+    <h3>ניהול קמפיין</h3>
+  </div>
+  <main id="main_layout" class="unified_layout">
+    <section class="boxes_container flex_me">
+      <section class="box search manage_search">
+        <h3 class=center_text> <u>חיפוש קמפייניים:</u></h3>
+        <form>
+          <div class="form-row">
+            <div class="col-md-8 mb-3">
+              <label for="validationDefault01">עיר</label>
+              <input type="text" class="form-control" id="validationDefault03">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col-md-8 mb-3">
+              <label for="validationDefault03">שכונה</label>
+              <input type="text" class="form-control" id="validationDefault03">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="custom-control custom-radio custom-control-inline">
+              <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input">
+              <label class="custom-control-label" for="customRadioInline1">הסתיים</label>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-lg" onclick=version_error() style="width: 66%;" type="submit">בצע חיפוש</button>
+        </form>
+      </section>
+      <section class="box report_list manage_box">
+        <h3 class=center_text> <u> בחר קמפיין:</u></h3>
+        <ul>
+<!--        SHOW CAMPAIGNS FROM DB HERE             -->
+        </ul>
+      </section>
+  </main>
+{% include "footer.html" %}
+
