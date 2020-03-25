@@ -47,6 +47,10 @@ body {
     text-align: center;
 }
 
+.no_deco{
+    list-style: none;
+}
+
 #hamburger a:hover,
 .nav_btn:hover,
 .option_button a:hover,

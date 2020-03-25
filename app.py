@@ -17,6 +17,11 @@ def manage_campaign():
     return render_template('/manage_campaign.html')
 
 
+@app.route('/manage_campaign/campaign_control_panel')
+def campaign_control_panel():
+    return render_template('/campaign_control_panel.html')
+
+
 @app.route('/donation', methods=['GET', 'POST'])
 def donation():
     # if request.method == 'GET':
