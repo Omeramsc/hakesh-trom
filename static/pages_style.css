@@ -221,7 +221,7 @@ main {
     overflow-x: hidden;
 }
 
-#search form {
+.search form {
     width: 120%;
     padding: 1.5% 13% 0px 0px;
     text-align: right;
@@ -233,7 +233,7 @@ ul {
     padding: 0;
 }
 
-#report_list li {
+.report_list li {
     border: 1px solid #dddddd;
     background-color: #ffffff;
     list-style: none;
@@ -254,7 +254,7 @@ li:hover {
     margin: 0px 6px;
 }
 
-#report_list img {
+.report_list img {
     padding: 5px 4px;
 }
 
@@ -498,6 +498,16 @@ li:hover {
     width: 20%;
 }
 
+/*------------------------- Manage Campaign -------------------------*/
+.manage_box{
+    height: 140%;
+}
+
+.manage_search{
+    padding: 30px 10px 50px 0px;
+    margin: auto 0px;
+}
+
 /*------------------------- Footer -------------------------*/
 
 #unified_footer {
@@ -586,7 +596,7 @@ hr {
 @media screen and (max-width: 600px) {
 
     /* reports */
-    #search {
+    .search {
         display: none;
     }
 
