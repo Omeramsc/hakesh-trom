@@ -32,9 +32,15 @@ heroku local web -f Procfile.windows
 
 ## Local DB
 
-## Fix issues
+### Common issues
+#### pyscopg2 failed to install
 * Use py3.7
 * Add pg to PATH
+
+### Create local database
+```bash
+createdb -U postgres hakes_trom
+```
 
 ### Create new migration
 ```bash
