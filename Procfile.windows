@@ -1,1 +1,1 @@
-web: python app.py
+web: set "APP_SETTINGS=config.DevelopmentConfig" && set "DATABASE_URL=postgresql://localhost/hakes_trom?user=postgres&password=Aa123456" && python app.py

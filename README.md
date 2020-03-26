@@ -30,3 +30,29 @@ Make sure you installed [Heroku](https://cli-assets.heroku.com/heroku-x64.exe) b
 heroku local web -f Procfile.windows
 ```
 
+## Local DB
+
+### Common issues
+#### pyscopg2 failed to install
+* Use py3.7
+* Add pg to PATH
+
+### Create local database
+```bash
+createdb -U postgres hakes_trom
+```
+
+### Create new migration
+```bash
+set "APP_SETTINGS=config.DevelopmentConfig" && set "DATABASE_URL=postgresql://localhost/hakes_trom?user=postgres&password=Aa123456" && python manage.py db migrate
+```
+
+### Update local DB
+```bash
+set "APP_SETTINGS=config.DevelopmentConfig" && set "DATABASE_URL=postgresql://localhost/hakes_trom?user=postgres&password=Aa123456" && python manage.py db upgrade 
+```
+
+### View local DB
+```bash
+psql -U postgres
+```

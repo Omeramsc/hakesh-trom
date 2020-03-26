@@ -1,6 +1,15 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import render_template, jsonify
+from app_init import app
+from models import Campaign
 
-app = Flask(__name__)
+
+@app.route('/campaigns_test')
+def campaigns_test():
+    try:
+        campaigns = Campaign.query.all()
+        return jsonify([e.serialize() for e in campaigns])
+    except Exception as e:
+        return str(e)
 
 
 @app.route('/')

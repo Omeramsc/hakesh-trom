@@ -24,6 +24,7 @@ instance/
 .venv
 env/
 venv/
+venv-37/
 ENV/
 env.bak/
 venv.bak/
