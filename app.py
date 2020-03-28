@@ -33,8 +33,8 @@ def create_campaign():
                             goal=form.goal.data)
         Campaign.db.session.add(campaign)  # THIS IS PROBABLY WRONG
         Campaign.db.session.commit()
-        flash(f'Campaign {form.name} Created successfully!',
-              'success')  # sucess is for bootstrap |
+        # flash(f'Campaign {form.name} Created successfully!',
+        #       'success')  # sucess is for bootstrap |
         # need to add the flash (with messages = get_flashed_messages() to the header
         return redirect(url_for('home'))
     return render_template('/create_campaign.html', form=form)

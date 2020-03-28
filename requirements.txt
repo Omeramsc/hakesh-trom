@@ -1,4 +1,4 @@
-flask
+Flask==1.1.1
 gunicorn
 Flask-SQLAlchemy===2.4.1
 Flask-Migrate==2.5.3
