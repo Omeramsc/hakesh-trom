@@ -1,0 +1,77 @@
+{
+  "sizes": [
+    6,
+    3,
+    1
+  ],
+  "layers": [
+    {
+      "ms_komot": {},
+      "gova_simplex_2019": {},
+      "max_height": {},
+      "min_height": {},
+      "lastYearEarnings": {},
+      "neighborhoodName": {}
+    },
+    {
+      "0": {
+        "bias": 0.3118414282798767,
+        "weights": {
+          "ms_komot": -0.06175046041607857,
+          "gova_simplex_2019": -0.12143169343471527,
+          "max_height": -0.1294941008090973,
+          "min_height": -0.05359852686524391,
+          "lastYearEarnings": -0.11746559292078018,
+          "neighborhoodName": -0.12090834975242615
+        }
+      },
+      "1": {
+        "bias": 0.2548244893550873,
+        "weights": {
+          "ms_komot": -0.09427276253700256,
+          "gova_simplex_2019": -0.015076762065291405,
+          "max_height": -0.10666026175022125,
+          "min_height": 0.18008171021938324,
+          "lastYearEarnings": 0.17584741115570068,
+          "neighborhoodName": -0.028014127165079117
+        }
+      },
+      "2": {
+        "bias": 0.06065519526600838,
+        "weights": {
+          "ms_komot": 0.18726776540279388,
+          "gova_simplex_2019": 0.11450470238924026,
+          "max_height": 0.18315723538398743,
+          "min_height": 0.07287807762622833,
+          "lastYearEarnings": 0.07901662588119507,
+          "neighborhoodName": -0.012060752138495445
+        }
+      }
+    },
+    {
+      "currentYearEarnings": {
+        "bias": -1.6070295572280884,
+        "weights": {
+          "0": -1.1739145517349243,
+          "1": -0.9719932675361633,
+          "2": -0.9556945562362671
+        }
+      }
+    }
+  ],
+  "outputLookup": true,
+  "inputLookup": true,
+  "activation": "sigmoid",
+  "trainOpts": {
+    "iterations": 20000,
+    "errorThresh": 0.005,
+    "log": false,
+    "logPeriod": 10,
+    "learningRate": 0.3,
+    "momentum": 0.1,
+    "callbackPeriod": 10,
+    "beta1": 0.9,
+    "beta2": 0.999,
+    "epsilon": 1e-8
+  }
+}
