@@ -100,35 +100,6 @@ const buildNetworkRecord = record => {
     };
 };
 
-// FAKERS -------------------------
-const neighborhoodNames = Object.keys(STANDARDIZE_NEIGHBORHOOD);
-
-const createFakeBuilding = () => {
-    return {
-        gova_simplex_2019: Math.floor(Math.random() * 50 + 1),
-        ms_komot: Math.floor(Math.random() * 50 + 1),
-        max_height: Math.floor(Math.random() * 50 + 1),
-        min_height: Math.floor(Math.random() * 50 + 1),
-        lastYearEarnings: Math.floor(Math.random() * 1000 + 1),
-        currentYearEarnings: Math.floor(Math.random() * 1000 + 1),
-        oid_mivne: "justAttribute",
-        neighborhoodName:
-            neighborhoodNames[Math.floor(Math.random() * neighborhoodNames.length)]
-    };
-};
-
-const createFakeBuildings = () => {
-    const buildings = [];
-
-    for (let i = 0; i < 1000; i++) {
-        buildings.push(createFakeBuilding());
-    }
-
-    return buildings;
-};
-// ---------------------------------
-
-// const rawData = createFakeBuildings();
 const rawData = parse(fs.readFileSync("../tlv_data/datatlv.csv"), {
     columns: true,
     skip_empty_lines: true
