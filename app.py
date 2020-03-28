@@ -1,5 +1,6 @@
-from flask import render_template, jsonify
+from flask import render_template, jsonify, flash, redirect, url_for
 from app_init import app
+from forms import CreateCampaignForm
 from models import Campaign
 
 
@@ -20,6 +21,24 @@ def home():
 @app.route('/first_steps')
 def first_steps():
     return render_template('/first_steps.html')
+
+
+@app.route('/create_campaign', methods=['GET', 'POST'])
+def create_campaign():
+    form = CreateCampaignForm()
+    if form.validate_on_submit():
+        campaign = Campaign(name=form.name.data,
+                            city=form.city.data,
+                            start_date=form.start_date.data,
+                            goal=form.goal.data)
+        Campaign.db.session.add(campaign)  # THIS IS PROBABLY WRONG
+        Campaign.db.session.commit()
+        flash(f'Campaign {form.name} Created successfully!',
+              'success')  # sucess is for bootstrap |
+        # need to add the flash (with messages = get_flashed_messages() to the header
+        return redirect(url_for('home'))
+    return render_template('/create_campaign.html', form=form)
+
 
 @app.route('/manage_campaign')
 def manage_campaign():
