@@ -19,12 +19,16 @@ def run_network(input):
     total_layers = 0
 
     for layer_key in modal["layers"][1].keys():
+        # Goes thru the layers and calculating the result
         relevant_layer = modal["layers"][1][layer_key]
         relevant_layer_total = relevant_layer["bias"] + functools.reduce(
             lambda prv, curr: prv + relevant_layer["weights"][curr] * input[curr],
             known_layers_keys, 0)
+
+        # Adding the calculation of the layer with it's weight
         total_layers += current_year_layer["weights"][layer_key] / (1 + 1 / math.exp(relevant_layer_total))
 
+    # Predict the current_year_earnings!
     current_year_earnings = 1 / (1 + 1 / math.exp(current_year_layer["bias"] + total_layers))
     return {'currentYearEarnings': current_year_earnings}
 
