@@ -77,8 +77,8 @@
             error_content += "* אנא הקש סכום הגבוה מאפס.\n";
             isValid = false;
         }
-        if (!(payment[2].checked)) {
-            error_content += "* בגרסא זו ניתן לשלם במזומן בלבד, אנא בחר באפשרות זו.\n";
+        if (((!payment[0].checked)&&(!payment[1].checked)&&(!payment[2].checked))) {
+            error_content += "* אנא בחר באחת מאופציות התשלום .\n";
             isValid = false;
         }
         if (isValid) {
