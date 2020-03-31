@@ -5,6 +5,9 @@ from flask_migrate import Migrate, MigrateCommand
 from app_init import app
 from db import db
 
+# Force models registers
+import models
+
 app.config.from_object(os.environ['APP_SETTINGS'])
 
 migrate = Migrate(app, db)
