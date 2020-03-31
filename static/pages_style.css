@@ -51,6 +51,10 @@ body {
     list-style: none;
 }
 
+.date_field{
+    text-align: right;
+}
+
 #hamburger a:hover,
 .nav_btn:hover,
 .option_button a:hover,

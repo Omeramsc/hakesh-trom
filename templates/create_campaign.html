@@ -1,95 +1,69 @@
-<!DOCTYPE html>
-<html lang="en" ng-app="datepickerDemo">
-<head>
-	<meta charset="UTF-8">
-	
-	<link rel="stylesheet" href="..\static\campaign\create_campaign.css">
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link href="..\static\pages_style.css" rel="stylesheet" type="text/css" />
-
-</head>
-
-<body class="flex_me">
-	<header class="flex_me">
-	  <img class="user_type" src="http://u.cubeupload.com/Chibameta/TEAM8.png">
-	  <a href="index.html" class="logo"><img src="http://u.cubeupload.com/Chibameta/HEADERLOGOCENTERPNGF.png"
-		  alt="חזור לעמוד הראשי"></a>
-	  <button class="nav_btn" onclick="toggleSideNav()"><i class="fa fa-bars"></i></button>
-	</header>
-
-
-	<div id="subtitle_container">
-		<h3>יצירת קמפיין</h3>
-	  </div>
-
-	  <main id="main_layout" class="unified_layout">
-		<form class="report_form" method="GET" action="post_report.php">
-		  <div class="form-group">
-			<label for="inputAddress">*שם הקמפיין:</label>
-			<input type="text" class="form-control"  placeholder="הכנס שם לקמפיין" name="city" maxlength="25" required>
-		  </div>
-
-
-
-		  <div >
-			<label for="inputAddress">*תאריך:</label>
-			<input     type="text" onclick="(this.type='date')" placeholder="בחר תאריך" callback="dateChange()" format="MM-YYY-DD" autohide="true"   class="form-control" required >
-		</div>
-
-		  <div class="form-group">
-			<label for="inputAddress">*יעד כספי:</label>
-			<input type="text" class="form-control" id="inputAddress" placeholder="הכנס יעד" name="address" maxlength="50" required>
-		  </div>
-
-		  <div class="form-group">
-			<label for="inputAddress">*בחר עיר:</label>
-	
-			<input list="cities" class="custom-select custom-select" name="type" required>
-			<datalist id="cities" >
-			  <option value="תל אביב">
-			  <option value="ראשון לציון ">
-			  <option value="נתניה">
-			  <option value="ירושלים">
-			  <option value="חיפה">
-			 <option value="רמת גן">
-			  <option value="הרצליה">
-				<option value="באר שבע">
-				  <option value="פתח תקווה">
-					<option value="בני ברק">
-					  <option value="חולון">
-						<option value="אשקלון">
-						  <option value="רחובות">
-							<option value="בת ים">
-								 <option value="אשדוד"></option>
-			</datalist>
-	
-	
-	
-	
-		  </div>
-
-
-
-	      <div class="control_buttons">
-			<!-- SUBMIT BUTTON DOES NOT REDIRECT!!!! -->
-			<button type="submit" class="btn btn-primary btn-lg btn-block">שלח</button>
-			<a href="#"><button type="button" class="btn btn-secondary btn-lg btn-block">בטל</button></a>
-		  </div>
-		</form>
-	  </main>
-	
-
-	
-	 
-	  <script src="../static/script.js"></script>
-	
- 	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.0-beta.2/angular.min.js"></script>
-	<script src="..\static\campaign\datepicker.js"></script>
-	<script src="..\static\campaign\demo.js"></script>
-</body>
-</html>
+{% extends "layout.html" %}
+{% block content %}
+<div id="subtitle_container">
+    <h3>יצירת קמפיין</h3>
+</div>
+<main id="main_layout" class="unified_layout">
+    <form class="report_form" method="POST" action="{{ url_for('create_campaign') }}">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.name.label(class="form-control-label") }}
+            {% if form.name.errors %}
+                {{ form.name(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.name.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.name(class="form-control") }}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.start_date.label(class="form-control-label") }}
+            {% if form.start_date.errors %}
+                {{ form.start_date(class="form-control date_field is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.start_date.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.start_date(class="form-control date_field") }}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.goal.label(class="form-control-label") }}
+            {% if form.goal.errors %}
+                {{ form.goal(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.goal.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.goal(class="form-control") }}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.city.label(class="form-control-label") }}
+            {% if form.city.errors %}
+                {{ form.city(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.city.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.city(class="form-control") }}
+            {% endif %}
+        </div>
+        <div class="control_buttons">
+            {{ form.submit(class="btn btn-primary btn-lg btn-block") }}
+            <a href="#">
+                <button type="button" class="btn btn-secondary btn-lg btn-block">בטל</button>
+            </a>
+        </div>
+    </form>
+</main>
+{% endblock content %}

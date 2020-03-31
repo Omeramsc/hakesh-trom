@@ -2,6 +2,7 @@ from flask import render_template, jsonify, flash, redirect, url_for
 from app_init import app
 from forms import CreateCampaignForm
 from models import Campaign
+from db import db
 
 
 @app.route('/campaigns_test')
@@ -31,11 +32,9 @@ def create_campaign():
                             city=form.city.data,
                             start_date=form.start_date.data,
                             goal=form.goal.data)
-        Campaign.db.session.add(campaign)  # THIS IS PROBABLY WRONG
-        Campaign.db.session.commit()
-        # flash(f'Campaign {form.name} Created successfully!',
-        #       'success')  # sucess is for bootstrap |
-        # need to add the flash (with messages = get_flashed_messages() to the header
+        flash(f'!קמפיין "{campaign.name}" נוצר בהצלחה', 'success')
+        db.session.add(campaign)
+        db.session.commit()
         return redirect(url_for('home'))
     return render_template('/create_campaign.html', form=form)
 
@@ -68,7 +67,7 @@ def reports():
 def create_report():
     # if request.method == 'GET':
     # INSERT INTO DB
-    # return redirect(url_for('report'))
+    # return redirect(url_for('create_report'))
     return render_template('/create_report.html')
 
 

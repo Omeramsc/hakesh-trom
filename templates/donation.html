@@ -1,4 +1,5 @@
- {% include "header.html" %} 
+{% extends "layout.html" %}
+{% block content %}
 <div id="subtitle_container">
   <h3>תרומה</h3>
 </div>
@@ -62,4 +63,4 @@
   donation();
   activate_box();
 </script>
- {% include "footer.html" %} 
+{% endblock content %}
