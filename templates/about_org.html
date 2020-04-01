@@ -1,6 +1,7 @@
-{% include "header.html" %}
+{% extends "layout.html" %}
+{% block content %}
   <div id="subtitle_container">
-    <h3>צעדים ראשונים</h3>
+    <h3>על הארגון</h3>
   </div>
   <main id="main_layout" class="unified_layout first-steps" style="text-align: right;">
     <section>
@@ -33,7 +34,6 @@
         <section>
           <h4>הנחיות לצוות</h4>
           <p>
-
             עליכם לפעול לפי המסלול שקיבלתם מהמורה שלכם ולתעד באמצעות
             האפליקציה כל בניין בו ביקרתם. על כל תרומה שנאספה יש לתעד
             באפליקציה ולסמן מה סכום התרומה, אמצעי התשלום שהתקבל ואיזו קבלה
@@ -71,7 +71,7 @@
       </div>
     </section>
     <section class="start-btn-wrapper center_text">
-      <a href="{{ url_for('donation') }}"><button class="btn btn-primary btn-lg">התחל איסוף</button></a>
+      <a href="javascript:window.history.go(-1);"><button class="btn btn-primary btn-lg">חזור</button></a>
     </section>
   </main>
-{% include "footer.html" %}
+{% endblock content %}

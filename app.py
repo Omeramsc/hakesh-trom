@@ -1,6 +1,8 @@
-from flask import render_template, jsonify
+from flask import render_template, jsonify, flash, redirect, url_for
 from app_init import app
+from forms import CreateCampaignForm
 from models import Campaign
+from db import db
 
 
 @app.route('/campaigns_test')
@@ -17,9 +19,25 @@ def home():
     return render_template('/index.html')
 
 
-@app.route('/first_steps')
-def first_steps():
-    return render_template('/first_steps.html')
+@app.route('/about_org')
+def about_org():
+    return render_template('/about_org.html')
+
+
+@app.route('/create_campaign', methods=['GET', 'POST'])
+def create_campaign():
+    form = CreateCampaignForm()
+    if form.validate_on_submit():
+        campaign = Campaign(name=form.name.data,
+                            city=form.city.data,
+                            start_date=form.start_date.data,
+                            goal=form.goal.data)
+        flash(f'!קמפיין "{campaign.name}" נוצר בהצלחה', 'success')
+        db.session.add(campaign)
+        db.session.commit()
+        return redirect(url_for('home'))
+    return render_template('/create_campaign.html', form=form)
+
 
 @app.route('/manage_campaign')
 def manage_campaign():
@@ -49,7 +67,7 @@ def reports():
 def create_report():
     # if request.method == 'GET':
     # INSERT INTO DB
-    # return redirect(url_for('report'))
+    # return redirect(url_for('create_report'))
     return render_template('/create_report.html')
 
 

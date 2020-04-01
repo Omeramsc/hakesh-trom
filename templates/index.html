@@ -1,50 +1,6 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <title>Hakesh&Trom</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link href="..\static\pages_style.css" rel="stylesheet" type="text/css" />
-  <link href="..\static\main_page.css" rel="stylesheet" type="text/css" />
-</head>
-
-<body class="flex_me center_text">
-  <div class="push_notification">
-    <a class="hide_link" href="{{ url_for('reports') }}"><u><strong>דיווח חדש התקבל</strong></u><br>
-      לחץ כאן בכדי לצפות בו</a>
-  </div>
-  <header class="flex_me">
-    <img class="user_type" src="http://u.cubeupload.com/Chibameta/TEAM8.png">
-    <a href="{{ url_for('home') }}" class="logo"><img src="http://u.cubeupload.com/Chibameta/HEADERLOGOCENTERPNGF.png"
-        alt="חזור לעמוד הראשי"></a>
-    <button class="nav_btn" onclick="toggleSideNav()"><i class="fa fa-bars"></i></button>
-  </header>
-  <aside>
-    <nav id="hamburger" class="quick_trans hide_link">
-      <button class="nav_btn" onclick="toggleSideNav()"><i class="fa fa-times"></i></button>
-      <img id="nav_logo" src="http://u.cubeupload.com/Chibameta/HEADERLOGOCENTERPNGF.png"
-        style="width:190px; height: 50px; margin:6px auto;">
-      <hr>
-      <a href="{{url_for('first_steps') }}">תרומות<img src="http://u.cubeupload.com/Chibameta/FUNDIcoFix5.png" alt="תרומות"></a>
-      <a href="{{url_for('reports') }}">דיווחים<img src="http://u.cubeupload.com/Chibameta/RepIcoFix.png" alt="דיווחים"></a>
-      <a class="not_allowed" href="#">הצוות שלי<img src="http://u.cubeupload.com/Chibameta/pplIcoFix.png"
-          alt="לא פעיל בכוונה"></a>
-      <a class="not_allowed" href="#">לוח הישגים<img src="http://u.cubeupload.com/Chibameta/LBIcoFix.png"
-          alt="לא פעיל בכוונה"></a>
-      <a class="not_allowed" href="#">התראות<img src="http://u.cubeupload.com/Chibameta/BellIcofix.png"
-          alt="לא פעיל בכוונה"></a>
-      <hr>
-      <a class="not_allowed" href="#">החלף שפה<img src="http://u.cubeupload.com/Chibameta/LangIcoFix.png"
-          alt="לא פעיל בכוונה"></a>
-      <a class="not_allowed" href="#">נגישות<img src="http://u.cubeupload.com/Chibameta/DisIcoFix.png"
-          alt="לא פעיל בכוונה"></a>
-      <a class="not_allowed" href="#">התנתקות<img src="http://u.cubeupload.com/Chibameta/DDISicofix.png"
-          alt="לא פעיל בכוונה"></a>
-    </nav>
-  </aside>
-  <main id="main_layout" class="quick_trans">
+{% extends "layout.html" %}
+{% block content %}
+  <main id="main_layout" class="quick_trans  center_text">
     <section class="user_info">
       <div class="user">
         <img class="flex_me" src="http://u.cubeupload.com/Chibameta/TeamGif.gif" alt="Team photo">
@@ -56,7 +12,7 @@
     </section>
     <section class="buttons flex_me">
       <div class="icon">
-        <a class="hide_link" href="{{ url_for('first_steps') }}"> <img src="http://u.cubeupload.com/Chibameta/FUNDIcoFix5.png"
+        <a class="hide_link" href="{{ url_for('donation') }}"> <img src="http://u.cubeupload.com/Chibameta/FUNDIcoFix5.png"
             alt="תרומות"><br>
           תרומות</a>
       </div>
@@ -75,6 +31,11 @@
             alt="דיווחים"><br>
           דיווחים</a>
       </div>
+      <div class="icon">
+        <a class="hide_link" href="{{ url_for('create_campaign') }}"><img src="static/CreateCamp.png"
+            alt="צור קמפיין"><br>
+          צור קמפיין</a>
+      </div>
     </section>
     <section class="progress">
       <span id="earned_money"></span>
@@ -83,4 +44,4 @@
       </div>
     </section>
   </main>
-{% include "footer.html" %}
+{% endblock content %}
