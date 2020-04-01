@@ -6,19 +6,31 @@ from models import Campaign
 import json
 
 
+def memoize_dropdown(func):
+    """Checks if the dropdown list has already been created.
+    If it did, it returns the cached list. otherwise, it creates one.
+    """
+
+    dropdown_cache = []
+
+    def wrapper():
+        if not dropdown_cache:
+            for city in func():
+                dropdown_cache.append((city, city))
+        return dropdown_cache
+
+    return wrapper
+
+
+@memoize_dropdown
 def read_cities():
+    """Reads the city-list files, while putting 'Tel-Aviv' first and ignoring tribes & settlement."""
     with open('static/israel-cities.json', 'r', encoding="utf8") as data:
         data = json.load(data)
+    yield 'תל - אביב - יפו'
     for line in data:
         if ")" not in line.get('name'):
             yield line.get('name')
-
-
-def get_cities():
-    cities = [(['תל - אביב - יפו', 'תל אביב - יפו'])]
-    for city in read_cities():
-        cities.append(tuple([city, city]))
-    return cities
 
 
 class CreateCampaignForm(FlaskForm):
@@ -26,7 +38,7 @@ class CreateCampaignForm(FlaskForm):
                        validators=[DataRequired(), Length(min=3, max=50)], render_kw={"placeholder": "הכנס שם לקמפיין"})
     start_date = DateField('*תאריך:', validators=[DataRequired()], format='%Y-%m-%d')
     goal = FloatField('ייעד כספי', render_kw={"placeholder": "הכנס יעד"})
-    city = SelectField('*עיר:', choices=get_cities(), validators=[DataRequired()])
+    city = SelectField('*עיר:', choices=read_cities(), validators=[DataRequired()])
 
     submit = SubmitField('צור קמפיין')
 
