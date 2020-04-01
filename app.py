@@ -19,9 +19,9 @@ def home():
     return render_template('/index.html')
 
 
-@app.route('/first_steps')
-def first_steps():
-    return render_template('/first_steps.html')
+@app.route('/about_org')
+def about_org():
+    return render_template('/about_org.html')
 
 
 @app.route('/create_campaign', methods=['GET', 'POST'])
