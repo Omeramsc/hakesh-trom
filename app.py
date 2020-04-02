@@ -5,6 +5,7 @@ from models import Campaign
 from db import db
 
 
+
 @app.route('/campaigns_test')
 def campaigns_test():
     try:
