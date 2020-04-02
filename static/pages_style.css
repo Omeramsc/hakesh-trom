@@ -516,6 +516,10 @@ li:hover {
     margin: auto 0px;
 }
 
+.big_src{
+    width: 66%;
+}
+
 /*------------------------- Footer -------------------------*/
 
 #unified_footer {

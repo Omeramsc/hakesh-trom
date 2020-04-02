@@ -7,32 +7,47 @@
     <section class="boxes_container flex_me">
       <section class="box search manage_search">
         <h3 class=center_text> <u>חיפוש קמפייניים:</u></h3>
-        <form>
+        <form method="POST" action="{{ url_for('manage_campaign') }}">
+          {{ form.hidden_tag() }}
           <div class="form-row">
             <div class="col-md-8 mb-3">
-              <label for="validationDefault01">עיר</label>
-              <input type="text" class="form-control" id="validationDefault03">
+            {{ form.name.label() }}
+            {{ form.name(class="form-control")}}
             </div>
           </div>
           <div class="form-row">
             <div class="col-md-8 mb-3">
-              <label for="validationDefault03">שכונה</label>
-              <input type="text" class="form-control" id="validationDefault03">
+              {{ form.city.label() }}
+              {{ form.city(class="form-control")}}
             </div>
           </div>
           <div class="form-group">
             <div class="custom-control custom-radio custom-control-inline">
-              <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input">
-              <label class="custom-control-label" for="customRadioInline1">הסתיים</label>
+              {% for subfield in form.status %}
+                <tr>
+                  <td>{{ subfield }}</td>
+                  <td>{{ subfield.label }}</td>
+                </tr>
+              {% endfor %}
             </div>
           </div>
-          <button class="btn btn-primary btn-lg" onclick=version_error() style="width: 66%;" type="submit">בצע חיפוש</button>
+          {{ form.submit(class="btn btn-primary btn-lg big_src") }}
+          <input type="reset" class="btn btn-secondary btn-lg" value="אפס טופס">
         </form>
       </section>
       <section class="box report_list manage_box">
         <h3 class=center_text> <u> בחר קמפיין:</u></h3>
         <ul>
-<!--        SHOW CAMPAIGNS FROM DB HERE             -->
+            {% for campaign in campaigns: %}
+              <li>
+                <img src="{{ func(campaign.start_date) }}">
+                <a id='report_summary'
+                class='hide_link' href="{{ url_for('campaign_control_panel', campaign_id=campaign.id) }}">
+                {{ campaign.start_date }}<br><strong>{{ campaign.name }}
+                </strong><br>{{ campaign.city }} || יעד: {{ "₪{:,.0f}".format(campaign.goal) }}
+                </a>
+              </li>
+            {% endfor %}
         </ul>
       </section>
     </section>
