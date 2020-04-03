@@ -64,8 +64,8 @@ html{
 
 .buttons {
   width: 80%;
-  margin: 4.5% auto;
-  flex-direction: row ltr;
+  margin: 3.5% auto;
+  flex-direction: row;
   flex-wrap: wrap;
 }
 
@@ -85,16 +85,15 @@ html{
   transition: 1s;
 }
 
-.progress {
+.usr_progress {
   font-size: 21px;
   bottom: 5%;
   width: 80%;
   padding: 0px 10%;
-  margin: 5% auto 0%;
+  margin: 0% auto 0%;
 }
 
-
-.bar {
+.usr_bar {
   width: 100%;
   background-color: #e0e0e0;
   padding: 3px;
@@ -103,7 +102,7 @@ html{
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, .2);
 }
 
-.bar>span {
+.usr_bar>span {
   display: block;
   height: 22px;
   background-color: #659cef;
@@ -165,7 +164,7 @@ html{
 
   .user_info,
   .usernames,
-  .progress {
+  .usr_progress {
     display: none;
   }
 }
