@@ -22,21 +22,23 @@
         </a>
       </div>
     </section>
-    <section class="boxes_container flex_me">
+    <section class="boxes_container flex_me ctrl_box">
       <section class="box">
         <h3 class="center_text"><u>{{ campaign.name }}</u></h3>
         <p>
           <ul class="center_text no_deco">
-            <li>מועד הקמפיין: {{ campaign.start_date }}</li>
-            <li>עיר משתתפת: {{ campaign.city }}</li>
-            <li>יעוד כספי: {{ "₪{:,.0f}".format(campaign.goal) }}</li>
-            <li>תרומות שהתקבלו:</li>
-            <li>מספר צוותי תרומה:</li>
-            <li>מועד יצירה: {{ campaign.creation_date }}</li>
+            <li><b>מועד הקמפיין:</b> {{ campaign.start_date }}</li>
+            <li><b>עיר משתתפת:</b> {{ campaign.city }}</li>
+            <li><b>יעוד כספי:</b> {{ "₪{:,.0f}".format(campaign.goal) }}</li>
+            <li><b>תרומות שהתקבלו:</b></li>
+            <li><b>מספר צוותי תרומה:</b></li>
+            <li><b>מועד יצירה:</b> {{ campaign.creation_date }}</li>
           </ul>
         </p>
       </section>
     </section>
+    <a class="finish_btn flex_me" href="{{ url_for('manage_campaign') }}">
+      <button type=submit class="btn btn-secondary btn-lg" type="button">חזרה</button> </a>
   </main>
 {% endblock content %}
 
