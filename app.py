@@ -15,7 +15,6 @@ def get_icon(d1):
     return "static/in_progress.png"
 
 
-
 @app.route('/campaigns_test')
 def campaigns_test():
     try:
@@ -53,27 +52,29 @@ def create_campaign():
 @app.route('/manage_campaign', methods=['GET', 'POST'])
 def manage_campaign():
     form = SearchCampaignForm()
-    campaigns = Campaign.query.all()
+    # Start with an empty query
+    campaigns_query = Campaign.query
+
     if form.submit():
+        # If the user added campaign name, add it to the query
         if form.name.data:
-            if form.city.data:
-                campaigns = Campaign.query.filter(Campaign.name.like('%' + form.name.data + '%'),
-                                                  Campaign.city == form.city.data).all()
-            else:
-                campaigns = Campaign.query.filter(Campaign.name.like('%' + form.name.data + '%')).all()
-        elif form.city.data:
-            campaigns = Campaign.query.filter(Campaign.city == form.city.data).all()
-        elif form.status.data:  # For some reason, this statement never works. it is always true. and so,
-            # It's impossible to clear selection.
+            campaigns_query = campaigns_query.filter(Campaign.name.like('%' + form.name.data + '%'))
+
+        # If the user added city name, add it to the query
+        if form.city.data:
+            campaigns_query = campaigns_query.filter(Campaign.city == form.city.data)
+
+        # If the user selected status
+        if form.status.data:
             today = datetime.date.today()
             if form.status.data == "present":
-                campaigns = Campaign.query.filter(Campaign.start_date == today)
+                campaigns_query = campaigns_query.filter(Campaign.start_date == today)
             elif form.status.data == "past":
-                campaigns = Campaign.query.filter(Campaign.start_date < today)
+                campaigns_query = campaigns_query.filter(Campaign.start_date < today)
             elif form.status.data == "future":
-                campaigns = Campaign.query.filter(Campaign.start_date > today)
-
-    return render_template('/manage_campaign.html', campaigns=campaigns, func=get_icon, form=form)
+                campaigns_query = campaigns_query.filter(Campaign.start_date > today)
+    # Preforming the fetch from the DB now
+    return render_template('/manage_campaign.html', campaigns=campaigns_query.all(), get_icon=get_icon, form=form)
 
 
 @app.route('/manage_campaign/campaign_control_panel/<int:campaign_id>')
