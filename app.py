@@ -1,9 +1,18 @@
 from flask import render_template, jsonify, flash, redirect, url_for
 from app_init import app
-from forms import CreateCampaignForm
+from forms import CreateCampaignForm, SearchCampaignForm
 from models import Campaign
 from db import db
+import datetime
 
+
+def get_icon(d1):
+    d2 = datetime.date.today()
+    if d1 > d2:
+        return "static/didnt_begin.png"
+    elif d2 > d1:
+        return "static/done.png"
+    return "static/in_progress.png"
 
 
 @app.route('/campaigns_test')
@@ -40,13 +49,37 @@ def create_campaign():
     return render_template('/create_campaign.html', form=form)
 
 
-@app.route('/manage_campaign')
+@app.route('/manage_campaign', methods=['GET', 'POST'])
 def manage_campaign():
-    return render_template('/manage_campaign.html')
+    form = SearchCampaignForm()
+    # Start with an empty query
+    campaigns_query = Campaign.query
+
+    if form.submit():
+        # If the user added campaign name, add it to the query
+        if form.name.data:
+            campaigns_query = campaigns_query.filter(Campaign.name.like('%' + form.name.data + '%'))
+
+        # If the user added city name, add it to the query
+        if form.city.data:
+            campaigns_query = campaigns_query.filter(Campaign.city == form.city.data)
+
+        # If the user selected status
+        if form.status.data:
+            today = datetime.date.today()
+            if form.status.data == "present":
+                campaigns_query = campaigns_query.filter(Campaign.start_date == today)
+            elif form.status.data == "past":
+                campaigns_query = campaigns_query.filter(Campaign.start_date < today)
+            elif form.status.data == "future":
+                campaigns_query = campaigns_query.filter(Campaign.start_date > today)
+    # Preforming the fetch from the DB now
+    return render_template('/manage_campaign.html', campaigns=campaigns_query.all(), get_icon=get_icon, form=form)
 
 
-@app.route('/manage_campaign/campaign_control_panel')
-def campaign_control_panel():
+@app.route('/manage_campaign/campaign_control_panel/<int:campaign_id>')
+def campaign_control_panel(campaign_id):
+    campaign = Campaign.query.get_or_404(campaign_id)
     return render_template('/campaign_control_panel.html')
 
 

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, FloatField, SelectField
+from wtforms import StringField, SubmitField, FloatField, SelectField, RadioField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, Length, ValidationError
 from models import Campaign
@@ -46,3 +46,11 @@ class CreateCampaignForm(FlaskForm):
         campaign_name = Campaign.query.filter_by(name=name.data).first()
         if campaign_name:
             raise ValidationError('קמפיין בשם הזה כבר קיים, אנא בחר שם אחר.')
+
+
+class SearchCampaignForm(FlaskForm):
+    name = StringField('שם הקמפיין:', render_kw={"placeholder": "הכנס את שם הקמפיין"})
+    city = SelectField('עיר:', choices=[("", "בחר עיר")] + read_cities(), default="")
+    status = RadioField(choices=[("past", 'הסתיים'), ("present", 'מתרחש'), ("future", 'עתידי')])
+
+    submit = SubmitField('בצע חיפוש')
