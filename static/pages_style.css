@@ -55,6 +55,14 @@ body {
     text-align: right;
 }
 
+.center_marg{
+    margin: auto;
+}
+
+.font_rub{
+    font-family: Rubik;
+}
+
 #hamburger a:hover,
 .nav_btn:hover,
 .option_button a:hover,
@@ -164,6 +172,19 @@ main {
     background: rgba(255, 255, 255, 0.5);
     border: 1px solid black;
     justify-content: center;
+}
+/*----------- Login ------------*/
+.login_layout {
+    width: 23%;
+    border-radius: 8px;
+    margin-top: 1%;
+}
+
+.app_logo {
+    width: 35%;
+    max-height: 5%;
+    display: block;
+    margin: 5% auto;
 }
 
 /*----------- Create Report ------------*/
@@ -556,6 +577,11 @@ hr {
         justify-content: center;
     }
 
+    /* Login */
+    .login_layout {
+        width: 50%;
+    }
+
     /* Donation */
     .ctrl {
         width: 27%;
@@ -611,7 +637,10 @@ hr {
 }
 
 @media screen and (max-width: 600px) {
-
+    /* Login */
+    .login_layout {
+        width: 90%;
+    }
     /* reports */
     .search {
         display: none;
