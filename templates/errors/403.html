@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+  <div id="subtitle_container">
+    <h3>403 - אין גישה</h3>
+  </div>
+  <main id="main_layout" class="unified_layout">
+      <img src="/static/403_error.png" class="error_pic">
+      <p class="center_text">
+      אין לך גישה לעמוד שהתבקש.<br>
+      <a href="{{ url_for('home') }}">חזרה לעמוד הראשי</a>
+      </p>
+    </p>
+  </main>
+{% endblock %}

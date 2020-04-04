@@ -554,6 +554,7 @@ li:hover {
     width: 66%;
 }
 
+
 /*------------------------- Campaign Control Panel -------------------------*/
 .ctrl_box {
     height: 60%;
@@ -606,6 +607,13 @@ li:hover {
 #team-user-dialog {
     text-align: right;
     direction: rtl;
+
+/*------------------------- Errors -------------------------*/
+.error_pic {
+    width: 35%;
+    display: block;
+    margin: 4% auto;
+>>> >>> > Created a distinction between different users
 }
 
 /*------------------------- Footer -------------------------*/
@@ -774,6 +782,11 @@ hr {
         margin-bottom: 5px;
     }
 
+    .error_pic {
+        width: 70%;
+        margin: 10% auto;
+    }
+
 }
 
 @media screen and (max-width: 360px) {
@@ -830,5 +843,10 @@ hr {
 
     .slide-container {
         height: 120px;
+    }
+
+    .error_pic {
+        width: 80%;
+        margin: 10% auto;
     }
 }

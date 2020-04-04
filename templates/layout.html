@@ -27,10 +27,14 @@
 {% endif %}
 {% endwith %}
 <header class="flex_me">
+    {% if current_user.is_authenticated %}
     <img class="user_type" src="{{ url_for('static', filename='default_team.png') }}">
+    {% endif %}
     <a href="{{ url_for('home') }}" class="logo"><img src="{{ url_for('static', filename='header_logo.png') }}"
                                                       alt="חזור לעמוד הראשי"></a>
+    {% if current_user.is_authenticated %}
     <button class="nav_btn" onclick="toggleSideNav()"><i class="fa fa-bars"></i></button>
+    {% endif %}
 </header>
 <aside>
     <nav id="hamburger" class="quick_trans hide_link">
@@ -38,12 +42,19 @@
         <img id="nav_logo" src="{{ url_for('static', filename='header_logo.png') }}"
              style="width:190px; height: 50px; margin:6px auto;">
         <hr>
+        {% if current_user.is_admin %}
+        <a href="{{ url_for('create_campaign') }}">צור קמפיין<img src="static/CreateCamp.png"
+                                                                  alt="צור קמפיין"></a>
+        <a href="{{ url_for('manage_campaign') }}">נהל קמפיין<img src="static/management.png"
+                                                                  alt="נהל קמפיין"></a>
+        {% else %}
         <a href="{{ url_for('donation') }}">תרומות<img src="{{ url_for('static', filename='donation.png') }}"
                                                        alt="תרומות"></a>
-        <a href="{{ url_for('reports') }}">דיווחים<img src="{{ url_for('static', filename='report_ico.png') }}"
-                                                       alt="דיווחים"></a>
         <a class="not_allowed" href="#">הצוות שלי<img src="{{ url_for('static', filename='teams.png') }}"
                                                       alt="הצוות שלי"></a>
+        {% endif %}
+        <a href="{{ url_for('reports') }}">דיווחים<img src="{{ url_for('static', filename='report_ico.png') }}"
+                                                       alt="דיווחים"></a>
         <a class="not_allowed" href="#">לוח הישגים<img src="{{ url_for('static', filename='leaderboard.png') }}"
                                                        alt="לוח הישגים"></a>
         <a href="{{ url_for('about_org') }}">על הארגון<img src="{{ url_for('static', filename='about_org.png') }}"
