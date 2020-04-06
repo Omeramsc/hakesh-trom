@@ -7,13 +7,13 @@
 
     <section class="options flex_me center_text">
       <div class="option_button">
-        <a class="hide_link not_allowed" href=#><img src="http://u.cubeupload.com/Chibameta/ContactusIco.png"
+        <a class="hide_link not_allowed" href=#><img src="{{ url_for('static', filename='contact_us.png') }}"
             alt="לא פעיל בכוונה"><br>
           צור קשר
         </a>
       </div>
       <div class="option_button">
-        <a class="hide_link" href="{{ url_for('create_report') }}"><img src="http://u.cubeupload.com/Chibameta/CreateNewIco1.png"><br>
+        <a class="hide_link" href="{{ url_for('create_report') }}"><img src="{{ url_for('static', filename='reports.png') }}"><br>
           צור דיווח
         </a>
       </div>

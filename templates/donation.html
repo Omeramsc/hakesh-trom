@@ -39,15 +39,15 @@
     </section>
     <section class="payment_choice flex_me center_text">
       <div class="payment_option">
-        <img class="not_allowed" src="http://u.cubeupload.com/Chibameta/payplIcoFix.png" alt="לא פעיל בכוונה"><br>
+        <img class="not_allowed" src="{{ url_for('static', filename='paypal.png') }}" alt="לא פעיל בכוונה"><br>
         <input type="radio" name="payment" value="paypal"> PayPal
       </div>
       <div class="payment_option">
-        <img src="http://u.cubeupload.com/Chibameta/mnymzumniIcoFix.png" alt="תשלום במזומן"> <br>
+        <img src="{{ url_for('static', filename='cash.png') }}" alt="תשלום במזומן"> <br>
         <input type="radio" name="payment" value="cash"> מזומן
       </div>
       <div class="payment_option">
-        <img class="not_allowed" src="http://u.cubeupload.com/Chibameta/BITicoFIx.png" alt="לא פעיל בכוונה"><br>
+        <img class="not_allowed" src="{{ url_for('static', filename='bit.png') }}" alt="לא פעיל בכוונה"><br>
         <input type="radio" name="payment" value="bit"> bit
       </div>
     </section>
