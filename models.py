@@ -4,11 +4,6 @@ from app_init import login_manager
 from flask_login import UserMixin
 
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
-
 class Campaign(db.Model):
     __tablename__ = 'campaigns'
 
@@ -45,13 +40,25 @@ class User(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
-    password = db.Column(db.String(100), nullable=False)
+    password = db.Column(db.String(), nullable=False)
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
+    is_active = db.Column(db.Boolean, default=False, nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False, default=strftime("%d-%m-%Y %H:%M:%S", localtime()))
 
+    def __init__(self, username, password, is_admin=False, is_active=False):
+        self.username = username
+        self.password = password
+        self.is_admin = is_admin
+        self.is_active = is_active
+
     def __repr__(self):
-        return f'id: {self.id}\nusername: {self.username}\nactive: {self.active}\ntype: {self.self.is_admin}\n ' \
+        return f'id: {self.id}\nusername: {self.username}\nis_active: {self.is_active}\nis_admin: {self.is_admin}\n ' \
                f'creation_date: {self.creation_date} '
+
+    @staticmethod
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
 
     def serialize(self):
         return {
