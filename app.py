@@ -1,7 +1,8 @@
-from flask import render_template, jsonify, flash, redirect, url_for
-from app_init import app
-from forms import CreateCampaignForm, SearchCampaignForm
-from models import Campaign
+from flask import render_template, jsonify, flash, redirect, url_for, request
+from flask_login import login_user, current_user, logout_user, login_required
+from forms import CreateCampaignForm, SearchCampaignForm, LoginForm
+from app_init import app, bcrypt
+from models import Campaign, User
 from db import db
 import datetime
 
@@ -25,16 +26,42 @@ def campaigns_test():
 
 
 @app.route('/')
+@app.route('/home')
+@login_required
 def home():
     return render_template('/index.html')
 
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+            login_user(user, remember=form.remember.data)
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for('home'))
+        else:
+            flash('התחברות נכשלה. אנא בדוק את שם המשתמש והסיסמא', 'danger')
+    return render_template('/login.html', form=form)
+
+
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+
 @app.route('/about_org')
+@login_required
 def about_org():
     return render_template('/about_org.html')
 
 
 @app.route('/create_campaign', methods=['GET', 'POST'])
+@login_required
 def create_campaign():
     form = CreateCampaignForm()
     if form.validate_on_submit():
@@ -50,6 +77,7 @@ def create_campaign():
 
 
 @app.route('/manage_campaign', methods=['GET', 'POST'])
+@login_required
 def manage_campaign():
     form = SearchCampaignForm()
     # Start with an empty query
@@ -78,12 +106,14 @@ def manage_campaign():
 
 
 @app.route('/manage_campaign/campaign_control_panel/<int:campaign_id>')
+@login_required
 def campaign_control_panel(campaign_id):
     campaign = Campaign.query.get_or_404(campaign_id)
     return render_template('/campaign_control_panel.html', campaign=campaign)
 
 
 @app.route('/donation', methods=['GET', 'POST'])
+@login_required
 def donation():
     # if request.method == 'GET':
     # INSERT INTO DB / MOVE TO PP/bit
@@ -92,12 +122,14 @@ def donation():
 
 
 @app.route('/reports', methods=['GET', 'POST'])
+@login_required
 def reports():
     # GET REPORTS FROM DB
     return render_template('/reports.html')
 
 
 @app.route('/create_report', methods=['GET', 'POST'])
+@login_required
 def create_report():
     # if request.method == 'GET':
     # INSERT INTO DB

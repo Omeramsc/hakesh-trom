@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, FloatField, SelectField, RadioField
+from wtforms import StringField, SubmitField, FloatField, SelectField, RadioField, PasswordField, BooleanField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, Length, ValidationError
 from models import Campaign
@@ -54,3 +54,11 @@ class SearchCampaignForm(FlaskForm):
     status = RadioField(choices=[("past", 'הסתיים'), ("present", 'מתרחש'), ("future", 'עתידי')])
 
     submit = SubmitField('בצע חיפוש')
+
+
+class LoginForm(FlaskForm):
+    username = StringField('שם משתמש:', validators=[DataRequired(), Length(min=2, max=20)],
+                           render_kw={"placeholder": "הזן שם משתמש"})
+    password = PasswordField('סיסמא:', validators=[DataRequired()], render_kw={"placeholder": "הזן סיסמא"})
+    remember = BooleanField('זכור אותי')
+    submit = SubmitField('התחבר')
