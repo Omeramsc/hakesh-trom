@@ -705,6 +705,10 @@ hr {
     .slide-container {
         height: 250px;
     }
+
+    .error_pic {
+        width: 70%;
+    }
 }
 
 @media screen and (max-width: 600px) {
@@ -783,7 +787,7 @@ hr {
     }
 
     .error_pic {
-        width: 70%;
+        width: 50%;
         margin: 10% auto;
     }
 
