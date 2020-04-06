@@ -6,36 +6,39 @@
   <main id="main_layout" class="unified_layout">
     <section class="options flex_me center_text">
       <div class="option_button">
-        <a class="hide_link not_allowed" href=#><img src="http://u.cubeupload.com/Chibameta/CreateNewIco1.png"
-            alt="לא פעיל בכוונה"><br>
+        <a class="hide_link not_allowed" href=#><img src="{{ url_for('static', filename='edit.png') }}"
+            alt="לא פעיל"><br>
           עריכת פרטים
         </a>
       </div>
       <div class="option_button">
-        <a class="hide_link" href="#"><img src="http://u.cubeupload.com/Chibameta/CreateNewIco1.png"><br>
+        <a class="hide_link" href="#"><img src="{{ url_for('static', filename='reports.png') }}" alt="לא פעיל"><br>
           הנפקת דוחות
         </a>
       </div>
       <div class="option_button">
-        <a class="hide_link" href="#"><img src="http://u.cubeupload.com/Chibameta/CreateNewIco1.png"><br>
+        <a class="hide_link" href="#"><img src="{{ url_for('static', filename='routes.png') }}" alt="לא פעיל"><br>
           שכונות ומסלולים
         </a>
       </div>
     </section>
-    <section class="boxes_container flex_me">
+    <section class="boxes_container flex_me ctrl_box">
       <section class="box">
-        <h3 class="center_text">שם הקמפיין</h3>
+        <h3 class="center_text"><u>{{ campaign.name }}</u></h3>
         <p>
           <ul class="center_text no_deco">
-            <li>מועד הקמפיין: </li>
-            <li>עיר משתתפת:</li>
-            <li>יעד כספי:</li>
-            <li>תרומות שהתקבלו:</li>
-            <li>מספר צוותי תרומה:</li>
+            <li><b>מועד הקמפיין:</b> {{ campaign.start_date }}</li>
+            <li><b>עיר משתתפת:</b> {{ campaign.city }}</li>
+            <li><b>יעוד כספי:</b> {{ "₪{:,.0f}".format(campaign.goal) }}</li>
+            <li><b>תרומות שהתקבלו:</b></li>
+            <li><b>מספר צוותי תרומה:</b></li>
+            <li><b>מועד יצירה:</b> {{ campaign.creation_date }}</li>
           </ul>
         </p>
       </section>
     </section>
+    <a class="finish_btn flex_me" href="{{ url_for('manage_campaign') }}">
+      <button type=submit class="btn btn-secondary btn-lg" type="button">חזרה</button> </a>
   </main>
 {% endblock content %}
 

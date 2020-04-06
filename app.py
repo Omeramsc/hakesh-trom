@@ -80,7 +80,7 @@ def manage_campaign():
 @app.route('/manage_campaign/campaign_control_panel/<int:campaign_id>')
 def campaign_control_panel(campaign_id):
     campaign = Campaign.query.get_or_404(campaign_id)
-    return render_template('/campaign_control_panel.html')
+    return render_template('/campaign_control_panel.html', campaign=campaign)
 
 
 @app.route('/donation', methods=['GET', 'POST'])
