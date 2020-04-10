@@ -47,19 +47,19 @@ body {
     text-align: center;
 }
 
-.no_deco{
+.no_deco {
     list-style: none;
 }
 
-.date_field{
+.date_field {
     text-align: right;
 }
 
-.center_marg{
+.center_marg {
     margin: auto;
 }
 
-.font_rub{
+.font_rub {
     font-family: Rubik;
 }
 
@@ -173,6 +173,7 @@ main {
     border: 1px solid black;
     justify-content: center;
 }
+
 /*----------- Login ------------*/
 .login_layout {
     width: 23%;
@@ -335,7 +336,7 @@ li:hover {
 }
 
 .sponsers img {
-	transition: 0.5s;
+    transition: 0.5s;
 }
 
 .sponsers img:hover {
@@ -394,7 +395,7 @@ li:hover {
     color: black;
 }
 
-#guide_box{
+#guide_box {
     display: none;
     direction: rtl;
     text-align: justify;
@@ -528,22 +529,83 @@ li:hover {
 }
 
 /*------------------------- Manage Campaign -------------------------*/
-.manage_box{
+.manage_box {
     height: 140%;
 }
 
-.manage_search{
+.manage_search {
     padding: 30px 10px 50px 0px;
     margin: auto 0px;
 }
 
-.big_src{
+.big_src {
     width: 66%;
 }
 
 /*------------------------- Campaign Control Panel -------------------------*/
-.ctrl_box{
+.ctrl_box {
     height: 60%;
+}
+
+/*------------------------- Campaign Neighborhoods Panel -------------------------*/
+.unset-display {
+    display: unset;
+}
+
+.text-align-right {
+    text-align: right;
+}
+
+.display-none {
+    display: none;
+}
+
+.neighborhoods-add-panel {
+    direction: rtl;
+}
+
+.neighborhoods-add-form {
+    padding-top: 1em;
+    padding-right: 1em;
+    text-align: right;
+}
+
+.neighborhoods-control-no-neighborhood {
+    text-align: center;
+    font-size: xx-large;
+    text-decoration: underline;
+    color: #dc3545;
+}
+
+.neighborhoods-control-container {
+    padding-top: 1em;
+}
+
+.neighborhoods-control-row {
+    background: white;
+    text-align: right;
+    line-height: 300%;
+    border-radius: 5px;
+    border: solid 2px #90D6F4;
+    margin-bottom: 0.5em;
+}
+
+.neighborhoods-control-row__neighborhood-name {
+    font-size: larger;
+}
+
+.neighborhoods-control-row__icon_link {
+    float: left;
+}
+
+.neighborhoods-control-row__icon {
+    height: 2em;
+    width: 2em;
+}
+
+#team-user-dialog {
+    text-align: right;
+    direction: rtl;
 }
 
 /*------------------------- Footer -------------------------*/
@@ -557,6 +619,7 @@ hr {
     border-top: 1px solid #C7CACB;
     width: 75%;
 }
+
 #unified_footer a img {
     margin-right: 25px;
 }
@@ -567,7 +630,7 @@ hr {
 
 /*------------------------- Media Queries -------------------------*/
 
-@media only screen and (max-width : 1260px) {
+@media only screen and (max-width: 1260px) {
     .box {
         margin: auto 20px;
         height: 100%;
@@ -641,6 +704,7 @@ hr {
     .login_layout {
         width: 90%;
     }
+
     /* reports */
     .search {
         display: none;
@@ -758,6 +822,7 @@ hr {
     .finish_btn button {
         width: 50%;
     }
+
     /* first steps */
     .text {
         font-size: 11px;

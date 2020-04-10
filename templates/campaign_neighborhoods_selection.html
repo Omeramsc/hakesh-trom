@@ -1,0 +1,94 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="neighborhoods-add-panel">
+        <form method="POST" action="{{ url_for('manage_campaign_neighborhoods', campaign_id=campaign_id) }}"
+              class="neighborhoods-add-form">
+            {{ form.hidden_tag() }}
+
+            <div class="center_text">
+                <div>
+                    {{ form.neighborhood_id.label(class="form-control-label text-align-right col-md-1") }}
+                    {{ form.neighborhood_id(class="form-control col-md-2 unset-display") }}
+                </div>
+                <div>
+                    {{ form.number_of_teams.label(class="form-control-label text-align-right col-md-1") }}
+                    {{ form.number_of_teams(class="form-control col-md-2 unset-display") }}
+
+                    <br/>
+
+                    {% if form.number_of_teams.errors %}
+                        <div class="invalid-feedback unset-display">
+                            {% for error in form.number_of_teams.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+
+        <div class="neighborhoods-control-container">
+            {% if campaign_neighborhoods %}
+                {% for campaign_neighborhood in campaign_neighborhoods %}
+                    <div class="col-md-4 neighborhoods-control-row center_marg">
+                        <span class="neighborhoods-control-row__neighborhood-name">{{ campaign_neighborhood['neighborhood_name'] }}</span>
+                        <span>
+                        | צוותים: {{ campaign_neighborhood['number_of_teams'] }} |
+                        מסלולים: {{ campaign_neighborhood['number_of_routes'] }}
+                    </span>
+                        <a class="hide_link neighborhoods-control-row__icon_link" href="#">
+                            <img src="{{ url_for('static', filename='routes.png') }}"
+                                 class="neighborhoods-control-row__icon"
+                                 alt="לא פעיל">
+                        </a>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="neighborhoods-control-no-neighborhood">
+                    טרם נבחרו שכונות
+                </div>
+            {% endif %}
+        </div>
+        {% with teams_users_data_raw = get_flashed_messages(category_filter=["users_data"])[0] %}
+            {% if teams_users_data_raw %}
+                {% with teams_users_data = loads_json(teams_users_data_raw) %}
+                    <div class="display-none">
+                        <div id="team-user-dialog" onload="">
+                            להלן פרטי התחברות לצוותים:
+                            <div class="container">
+                                {% for team_user_data in teams_users_data %}
+                                    <div>
+                                        <hr/>
+                                        <div class="row">
+                                            <span class="col-6">שם משתמש:</span>
+                                            <span>{{ team_user_data['username'] }}</span>
+                                        </div>
+                                        <div class="row">
+                                            <span class="col-6">סיסמה:</span>
+                                            <code>{{ team_user_data['password'] }}</code>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <script type="application/javascript">
+                        const jqueryLoadInterval = setInterval(() => {
+                            if (window.jQuery) {
+                                $("#team-user-dialog").dialog({
+                                    modal: true,
+                                    autoOpen: true,
+                                    title: "<span style='direction: rtl;'>הצוותים נוצרו בהצלחה</span>",
+                                });
+                                clearInterval(jqueryLoadInterval);
+                            }
+                        });
+                    </script>
+                {% endwith %}
+            {% endif %}
+        {% endwith %}
+
+    </div>
+
+{% endblock content %}

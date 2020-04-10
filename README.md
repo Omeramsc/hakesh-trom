@@ -32,11 +32,6 @@ heroku local web -f Procfile.windows
 
 ## Local DB
 
-### Common issues
-#### pyscopg2 failed to install
-* Use py3.7
-* Add pg to PATH
-
 ### Create local database
 ```bash
 createdb -U postgres hakes_trom
@@ -56,3 +51,24 @@ set "APP_SETTINGS=config.DevelopmentConfig" && set "DATABASE_URL=postgresql://lo
 ```bash
 psql -U postgres
 ```
+
+### Restart Local DB
+> Make sure to add PGPASSWORD and PGUSER to your env vars before hand
+
+```bash
+dropdb hakes_trom
+createdb hakes_trom
+set "APP_SETTINGS=config.DevelopmentConfig" && set "DATABASE_URL=postgresql://localhost/hakes_trom?user=postgres&password=Aa123456" && python manage.py db upgrade 
+set "APP_SETTINGS=config.DevelopmentConfig" && set "DATABASE_URL=postgresql://localhost/hakes_trom?user=postgres&password=Aa123456" && python manage.py db migrate
+set "APP_SETTINGS=config.DevelopmentConfig" && set "DATABASE_URL=postgresql://localhost/hakes_trom?user=postgres&password=Aa123456" && python manage.py db upgrade 
+heroku local web -f Procfile.windows
+```
+
+## Common issues
+
+### pyscopg2 failed to install
+* Use py3.7
+* Add pg to PATH
+
+### Issues with DATABASE_URL
+* Set `DATABASE_URL` as env var
