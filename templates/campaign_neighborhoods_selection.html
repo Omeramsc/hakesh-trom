@@ -80,12 +80,17 @@
                         <script type="application/javascript">
                             const jqueryLoadInterval = setInterval(() => {
                                 if (window.jQuery) {
-                                    $("#team-user-dialog").dialog({
-                                        modal: true,
-                                        autoOpen: true,
-                                        title: "<span style='direction: rtl;'>הצוותים נוצרו בהצלחה</span>",
-                                    });
-                                    clearInterval(jqueryLoadInterval);
+                                    try {
+                                        $("#team-user-dialog").dialog({
+                                            modal: true,
+                                            autoOpen: true,
+                                            title: "<span style='direction: rtl;'>הצוותים נוצרו בהצלחה</span>",
+                                        });
+                                    } catch (e) {
+                                        console.error(e);
+                                    } finally {
+                                        clearInterval(jqueryLoadInterval);
+                                    }
                                 }
                             });
                         </script>
