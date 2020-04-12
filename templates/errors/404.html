@@ -4,7 +4,7 @@
     <h3>404 - לא נמצא</h3>
 </div>
 <main id="main_layout" class="unified_layout">
-    <img src="/static/404_error.png" class="error_pic">
+    <img src="{{ url_for('static', filename='404_error.png') }}" class="error_pic">
     <p class="center_text">
         העמוד שביקשת אינו קיים.<br>
         <a href="{{ url_for('home') }}">חזרה לעמוד הראשי</a>
