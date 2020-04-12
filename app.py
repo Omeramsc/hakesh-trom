@@ -1,8 +1,8 @@
 from flask import render_template, jsonify, flash, redirect, url_for, request
 from flask_login import login_user, current_user, logout_user, login_required
-from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood
+from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood, DonationForm, InvoiceForm
 from app_init import app, bcrypt
-from models import Campaign, User, Neighborhood, Team
+from models import Campaign, User, Neighborhood, Team, Donation, Invoice
 from db import db
 from utils.forms_helpers import get_campaign_icon
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users
@@ -178,14 +178,61 @@ def campaign_control_panel(campaign_id):
     return render_template('/campaign_control_panel.html', campaign=campaign)
 
 
-@app.route('/donation', methods=['GET', 'POST'])
+# --------------------------------------------------------------------------
+
+@app.route('/donation_address', methods=['GET', 'POST'])
+@login_required
+def donation_address():
+    return render_template('/donation_address.html')
+
+
+@app.route('/donation_address/donation', methods=['GET', 'POST'])
 @login_required
 @user_access
 def donation():
-    # if request.method == 'GET':
-    # INSERT INTO DB / MOVE TO PP/bit
-    # return render_template('/<---->.html')
-    return render_template('/donation.html')
+    form = DonationForm()
+    if form.validate_on_submit():
+        building = "Need to get this from the page donation_address"
+        payment_type = form.payment_type.data
+        donation = Donation(building=building,
+                            amount=form.amount.data,
+                            payment_type=payment_type)
+        # DO NOT ENTER THE DONATION UNTIL WE GET THE INVOICE... I THINK
+        # if payment_type is 'PayPal':
+        #     return redirect(url_for('paypal_payment'))
+        # elif payment_type is 'bit':
+        #     return redirect(url_for('bit_payment'))
+        # else:
+        return redirect(url_for('invoice'), donation=donation)
+        # FOR NOW, IGNORE PAYPAL AND BIT AND GO ONLY FOR CASH DONATIONS
+    return render_template('/donation.html', form=form)
+
+
+@app.route('/donation_address/donation/invoice', methods=['GET', 'POST'])
+@login_required
+def invoice():
+    donation="Temporary"
+    # donation = request.args['donation']
+    form = InvoiceForm()
+    if form.validate_on_submit():
+        db.session.add(donation)
+        db.session.commit()
+        invoice = Invoice(donation_id=donation.id,
+                          type=form.type.data,
+                          reference_id=form.reference_id.data)
+        db.session.add(invoice)
+        db.session.commit()
+        return redirect(url_for('donation_end'))
+    return render_template('/invoice.html', form=form, donation=donation)
+
+
+@app.route('/donation_address/donation/invoice/thanks')
+@login_required
+def donation_end():
+    return render_template('/donation_end.html')
+
+
+# --------------------------------------------------------------------------
 
 
 @app.route('/reports', methods=['GET', 'POST'])

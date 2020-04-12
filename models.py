@@ -187,3 +187,56 @@ class User(db.Model, UserMixin):
             'type': 'Admin' if self.is_admin else 'User',
             'creation_date': self.creation_date
         }
+
+
+# --------------------------------------------------------
+
+class Donation(db.Model):
+    __tablename__ = 'donation'
+
+    id = db.Column(db.Integer, primary_key=True)
+    # team-ID foreign key
+    amount = db.Column(db.Float(), nullable=False)
+    payment_type = db.Column(db.String(), nullable=False)
+
+    # city = db.Column(db.String(50), nullable=False) #building_id foerign key
+    # building_id = db.Column(db.Integer, db.ForeignKey('building.id'))
+
+    def __init__(self, amount, payment_type):
+        self.amount = amount
+        self.payment_type = payment_type
+
+    def __repr__(self):
+        return f'id: {self.id}\namount: {self.amount}\npayment_type: {self.payment_type}\n'
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'amount': self.amount,
+            'payment_type': self.payment_type,
+        }
+
+
+class Invoice(db.Model):
+    __tablename__ = 'invoice'
+
+    id = db.Column(db.Integer, primary_key=True)
+    donation_id = db.Column(db.ForeignKey('donation.id'), nullable=False)
+    type = db.Column(db.String(), nullable=False)
+    reference_id: db.Column(db.String(), default='None')
+
+    def __init__(self, donation_id, reference_id, type):
+        self.donation_id = donation_id
+        self.type = type
+        self.reference_id = reference_id
+
+    def __repr__(self):
+        return f'id: {self.id}\ndonation_id: {self.donation_id}\ntype: {self.type}\nreference_id: {self.reference_id}\n'
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'donation_id': self.donation_id,
+            'type': self.type,
+            'reference_id': self.reference_id,
+        }

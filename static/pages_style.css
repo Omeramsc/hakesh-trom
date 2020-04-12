@@ -75,6 +75,10 @@ body {
     font-family: Rubik;
 }
 
+.hidden {
+    visibility: hidden;
+}
+
 #hamburger a:hover,
 .nav_btn:hover,
 .option_button a:hover,
@@ -524,7 +528,7 @@ li:hover {
     transition: 1s;
 }
 
-#mail {
+.invoice_field {
     margin: auto;
     width: 50%;
     font-size: 1.2em;

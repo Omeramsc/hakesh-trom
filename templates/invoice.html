@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+{% block content %}
+<div id="subtitle_container">
+    <h3>תרומה</h3>
+</div>
+<main id="main_layout" class="unified_layout">
+    <button class="guide_btn" id="btnShow"><i class="fa fa-question-circle-o"></i></button>
+    {% include "donation_guidance.html" %}
+    <form style="all:unset" action="{{ url_for('donation_end') }}">
+        {{ form.hidden_tag() }}
+        <section class='ctrl flex_me center_text'>
+            <div class='ctrl__counter'>
+                <div class='ctrl__counter-num'>{{ donation }}</div>
+            </div>
+        </section>
+
+        <section class="center_text">
+        {% for subfield in form.invoice_type %}
+            {{ subfield}}
+            {{ subfield.label (style="margin-left:1%") }}
+        {% endfor %}
+        </section>
+        <section class="flex_me" style="justify-content: space-evenly">
+            <section class="box" style="height: 300px;">
+                <section id="paper" class="center_text invoice_field">
+                    {{ form.reference_id.label() }}
+                    {% if form.reference_id.errors %}
+                        {{ form.reference_id() }}
+                        <div class="invalid-feedback">
+                            {% for error in form.reference_id.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.reference_id() }}
+                    {% endif %}
+                    <img style="width: 80%; display: block; margin: 3.5% auto; border:1px solid black;"
+                         src="{{ url_for('static', filename='paper_invoice.png') }}">
+                </section>
+                <section id="digital" class="center_text invoice_field" style="display:none">
+                    {{ form.mail_address.label() }}
+                    {% if form.mail_address.errors %}
+                        {{ form.mail_address() }}
+                        <div class="invalid-feedback">
+                            {% for error in form.mail_address.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.mail_address() }}
+                    {% endif %}
+                    <img style="width: 100%; display: block; margin: 3.5% auto;"
+                         src="{{ url_for('static', filename='logos/green_invoice.png') }}">
+                </section>
+            </section>
+        </section>
+        <a class="finish_btn flex_me" href="#">
+            <button type=submit class="btn btn-primary btn-lg" type="button">סיים</button>
+        </a>
+    </form>
+    <script>
+        $(document).ready(function() {
+            $("input[name$='invoice_type']").click(function() {
+                $("#paper").toggle();
+                $("#digital").toggle();
+            });
+        });
+    </script>
+</main>
+{% endblock content %}

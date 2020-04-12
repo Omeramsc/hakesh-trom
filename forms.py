@@ -2,10 +2,9 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FloatField, SelectField, RadioField, PasswordField, BooleanField, \
     IntegerField
 from wtforms.fields.html5 import DateField
-from wtforms.validators import DataRequired, Length, ValidationError, NumberRange
+from wtforms.validators import DataRequired, Length, ValidationError, NumberRange, Email
 from models import Campaign
 import json
-
 
 def memoize_dropdown(func):
     """Checks if the dropdown list has already been created.
@@ -69,3 +68,22 @@ class AddNeighborhood(FlaskForm):
     neighborhood_id = SelectField("בחר שכונה", coerce=int, validators=[DataRequired()], choices=[])
     number_of_teams = IntegerField("מספר צוותים", validators=[NumberRange(min=1)])
     submit = SubmitField('הוסף שכונה')
+
+
+class DonationForm(FlaskForm):
+    building = StringField('בחר כתובת מהמסלול:', validators=[DataRequired()])
+    amount = FloatField('סכום לתרומה:', validators=[DataRequired(), NumberRange(min=5, max=None)])
+    payment_type = RadioField('אמצעי תשלום', choices=[("PayPal", 'PayPal'), ("Cash", 'מזומן'), ("bit", 'bit')],
+                              validators=[DataRequired()])
+
+    submit = SubmitField('המשך')
+
+
+class InvoiceForm(FlaskForm):
+    invoice_type = RadioField('סוג קבלה', choices=[("paper", 'חשבונית נייר'), ("digital", 'חשבונית דיגיטלית')],
+                              validators=[DataRequired()], default="paper")
+    reference_id = IntegerField('מספר קבלה:', validators=[NumberRange(min=5, max=None, message="אנא הזן את האסמכתא "
+                                                                                               "כפי שמופיעה בקבלה")])
+    mail_address = StringField('כתובת מייל למשלוח הקבלה:', [Email])
+
+    submit = SubmitField('סיים')
