@@ -5,6 +5,16 @@ from flask_login import UserMixin
 from sqlalchemy.dialects.postgresql import JSON
 
 
+class Building(db.Model):
+    __tablename__ = 'buildings'
+
+    id = db.Column(db.Integer, primary_key=True)
+    neighborhood_id = db.Column(db.Integer, db.ForeignKey('neighborhoods.id'))
+    neighborhood = db.relationship("Neighborhood", back_populates="buildings")
+    attributes = db.Column(JSON)
+    geometry = db.Column(JSON)
+
+
 class Team(db.Model):
     __tablename__ = 'teams'
 
@@ -29,6 +39,7 @@ class Neighborhood(db.Model):
     city_name = db.Column(db.String, nullable=False)
     geometry = db.Column(JSON)
     teams = db.relationship("Team", back_populates="neighborhood")
+    buildings = db.relationship("Building", back_populates="neighborhood")
 
     def __init__(self, name, city_name, geometry):
         self.name = name
