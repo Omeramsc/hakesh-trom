@@ -54,10 +54,11 @@ def upgrade():
     for neighborhood in all_neighborhoods:
         neighborhood_id_by_name[neighborhood['name']] = neighborhood['id']
 
+    # Load buildings
     with open('./seed_data/buildings.json', encoding='utf-8') as json_file:
         building_data = json.load(json_file)
 
-    # Load buildings
+    # Inserting data to DB
     op.bulk_insert(buildings_table, list(
         map(lambda b: serialize_building(b, neighborhood_id_by_name), building_data)))
 
