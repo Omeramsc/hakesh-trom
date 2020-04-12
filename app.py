@@ -4,7 +4,7 @@ from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighbor
 from app_init import app, bcrypt
 from models import Campaign, User
 from db import db
-from utils.froms_helpers import get_campaign_icon
+from utils.forms_helpers import get_campaign_icon
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users
 import datetime
 import json

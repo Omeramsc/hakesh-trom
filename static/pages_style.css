@@ -47,6 +47,18 @@ body {
     text-align: center;
 }
 
+.unset-display {
+    display: unset;
+}
+
+.text-align-right {
+    text-align: right;
+}
+
+.display-none {
+    display: none;
+}
+
 .no_deco {
     list-style: none;
 }
@@ -548,18 +560,6 @@ li:hover {
 }
 
 /*------------------------- Campaign Neighborhoods Panel -------------------------*/
-.unset-display {
-    display: unset;
-}
-
-.text-align-right {
-    text-align: right;
-}
-
-.display-none {
-    display: none;
-}
-
 .neighborhoods-add-panel {
     direction: rtl;
 }
