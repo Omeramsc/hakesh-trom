@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, FloatField, SelectField, RadioField, PasswordField, BooleanField
+from wtforms import StringField, SubmitField, FloatField, SelectField, RadioField, PasswordField, BooleanField, \
+    IntegerField
 from wtforms.fields.html5 import DateField
-from wtforms.validators import DataRequired, Length, ValidationError
+from wtforms.validators import DataRequired, Length, ValidationError, NumberRange
 from models import Campaign
 import json
 
@@ -62,3 +63,9 @@ class LoginForm(FlaskForm):
     password = PasswordField('סיסמא:', validators=[DataRequired()], render_kw={"placeholder": "הזן סיסמא"})
     remember = BooleanField('זכור אותי')
     submit = SubmitField('התחבר')
+
+
+class AddNeighborhood(FlaskForm):
+    neighborhood_id = SelectField("בחר שכונה", coerce=int, validators=[DataRequired()], choices=[])
+    number_of_teams = IntegerField("מספר צוותים", validators=[NumberRange(min=1)])
+    submit = SubmitField('הוסף שכונה')

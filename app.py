@@ -1,28 +1,36 @@
 from flask import render_template, jsonify, flash, redirect, url_for, request
 from flask_login import login_user, current_user, logout_user, login_required
-from forms import CreateCampaignForm, SearchCampaignForm, LoginForm
+from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood
 from app_init import app, bcrypt
 from models import Campaign, User
 from db import db
+from utils.forms_helpers import get_campaign_icon
+from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users
 import datetime
+import json
 
 
-def get_icon(d1):
-    d2 = datetime.date.today()
-    if d1 > d2:
-        return "static/didnt_begin.png"
-    elif d2 > d1:
-        return "static/done.png"
-    return "static/in_progress.png"
-
-
-@app.route('/campaigns_test')
+@app.route('/admin/campaigns', methods=["GET"])
 def campaigns_test():
     try:
         campaigns = Campaign.query.all()
         return jsonify([e.serialize() for e in campaigns])
     except Exception as e:
         return str(e)
+
+
+@app.route('/admin/campaigns/<int:campaign_id>', methods=["DELETE"])
+def delete_campaign(campaign_id):
+    campaign = Campaign.query.get_or_404(campaign_id)
+
+    for team in campaign.teams:
+        for user in team.users:
+            db.session.delete(user)
+        db.session.delete(team)
+
+    db.session.delete(campaign)
+    db.session.commit()
+    return '', 204
 
 
 @app.route('/')
@@ -102,7 +110,33 @@ def manage_campaign():
             elif form.status.data == "future":
                 campaigns_query = campaigns_query.filter(Campaign.start_date > today)
     # Preforming the fetch from the DB now
-    return render_template('/manage_campaign.html', campaigns=campaigns_query.all(), get_icon=get_icon, form=form)
+    return render_template('/manage_campaign.html', campaigns=campaigns_query.all(), get_icon=get_campaign_icon,
+                           form=form)
+
+
+@app.route('/campaign/<int:campaign_id>/neighborhoods', methods=['GET', 'POST'])
+@login_required
+def manage_campaign_neighborhoods(campaign_id):
+    campaign = Campaign.query.get_or_404(campaign_id)
+    form = AddNeighborhood()
+
+    # Calling `validate` for the specific field due to flask forms not liking dynamic loaded selection field
+    if form.is_submitted() and form.neighborhood_id.data and form.number_of_teams.validate(form):
+        teams_users_data = create_teams_and_users(campaign_id, int(form.neighborhood_id.data),
+                                                  int(form.number_of_teams.data))
+        flash(json.dumps(teams_users_data), 'users_data')
+        return redirect(url_for('manage_campaign_neighborhoods', campaign_id=campaign_id))
+
+    # Getting the available and selected neighborhoods
+    available_neighborhoods, campaign_neighborhoods = get_response_campaign_neighborhoods(campaign)
+
+    # Building neighborhood selection choices
+    form.neighborhood_id.choices = list(map(lambda x: (x['id'], x['name']), available_neighborhoods))
+    # Set default number of teams
+    form.number_of_teams.process_data(1)
+
+    return render_template('/campaign_neighborhoods_selection.html', campaign_neighborhoods=campaign_neighborhoods,
+                           form=form, campaign_id=campaign_id, loads_json=json.loads)
 
 
 @app.route('/manage_campaign/campaign_control_panel/<int:campaign_id>')

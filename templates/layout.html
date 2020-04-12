@@ -7,79 +7,82 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"/>
     <link href="http://www.cssscript.com/wp-includes/css/sticky.css" rel="stylesheet" type="text/css">
     <link href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.9/themes/blitzer/jquery-ui.css" rel="stylesheet"
-        type="text/css" />
+          type="text/css"/>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link href="/static/pages_style.css" rel="stylesheet" type="text/css" />
-    <link href="/static/main_page.css" rel="stylesheet" type="text/css" />
+    <link href="/static/pages_style.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/main_page.css" rel="stylesheet" type="text/css"/>
     {% block header %}{% endblock %}
 </head>
 <body class="flex_me" onload="onLoad()">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="push_notification center_text">
-                         <strong>{{ message }}</strong>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    <header class="flex_me">
-        <img class="user_type" src="http://u.cubeupload.com/Chibameta/TEAM8.png">
-        <a href="{{ url_for('home') }}" class="logo"><img src="http://u.cubeupload.com/Chibameta/HEADERLOGOCENTERPNGF.png"
-            alt="חזור לעמוד הראשי"></a>
-        <button class="nav_btn" onclick="toggleSideNav()"><i class="fa fa-bars"></i></button>
-    </header>
-    <aside>
-        <nav id="hamburger" class="quick_trans hide_link">
-            <button class="nav_btn" onclick="toggleSideNav()"><i class="fa fa-times"></i></button>
-            <img id="nav_logo" src="http://u.cubeupload.com/Chibameta/HEADERLOGOCENTERPNGF.png"
-                style="width:190px; height: 50px; margin:6px auto;">
-            <hr>
-            <a href="{{ url_for('donation') }}">תרומות<img src="http://u.cubeupload.com/Chibameta/FUNDIcoFix5.png" alt="תרומות"></a>
-            <a href="{{ url_for('reports') }}">דיווחים<img src="http://u.cubeupload.com/Chibameta/RepIcoFix.png" alt="דיווחים"></a>
-            <a class="not_allowed" href="#">הצוות שלי<img src="http://u.cubeupload.com/Chibameta/pplIcoFix.png"
-                alt="לא פעיל בכוונה"></a>
-            <a class="not_allowed" href="#">לוח הישגים<img src="http://u.cubeupload.com/Chibameta/LBIcoFix.png"
-                alt="לא פעיל בכוונה"></a>
-            <a class="not_allowed" href="#">התראות<img src="http://u.cubeupload.com/Chibameta/BellIcofix.png"
-                alt="לא פעיל בכוונה"></a>
-            <a class="not_allowed" href="{{ url_for('about_org') }}">על הארגון<img src="/static/about_org.png"
-                alt="על הארגון"></a>
-            <hr>
-            <a class="not_allowed" href="#">החלף שפה<img src="http://u.cubeupload.com/Chibameta/LangIcoFix.png"
-                alt="לא פעיל בכוונה"></a>
-            <a class="not_allowed" href="#">נגישות<img src="http://u.cubeupload.com/Chibameta/DisIcoFix.png"
-                alt="לא פעיל בכוונה"></a>
-            <a href="{{ url_for('logout') }}">התנתקות<img src="http://u.cubeupload.com/Chibameta/DDISicofix.png"
-                alt="התנתקות"></a>
-        </nav>
-    </aside>
-    {% block content %}{% endblock %}
-    <footer id="unified_footer" class="quick_trans center_text">
+{% with messages = get_flashed_messages(with_categories=true, category_filter=['danger', 'success']) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="push_notification center_text">
+                <strong>{{ message }}</strong>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<header class="flex_me">
+    <img class="user_type" src="http://u.cubeupload.com/Chibameta/TEAM8.png">
+    <a href="{{ url_for('home') }}" class="logo"><img src="http://u.cubeupload.com/Chibameta/HEADERLOGOCENTERPNGF.png"
+                                                      alt="חזור לעמוד הראשי"></a>
+    <button class="nav_btn" onclick="toggleSideNav()"><i class="fa fa-bars"></i></button>
+</header>
+<aside>
+    <nav id="hamburger" class="quick_trans hide_link">
+        <button class="nav_btn" onclick="toggleSideNav()"><i class="fa fa-times"></i></button>
+        <img id="nav_logo" src="http://u.cubeupload.com/Chibameta/HEADERLOGOCENTERPNGF.png"
+             style="width:190px; height: 50px; margin:6px auto;">
         <hr>
-        <a href="#" onClick="document.location.reload(true)">רענן עמוד</a> | <a href="{{ url_for('home') }}">דף הבית</a><br>
-        <a href="https://www.mta.ac.il"> <img src="https://u.cubeupload.com/Chibameta/ACA1.png" alt="אתר המכללה"
-            height="25px" width="70px"></a><a href="#"><img src="https://u.cubeupload.com/Chibameta/PNGOTR4.png"></a><br>
-        © כל הזכויות שמורות: רותם, עומר ותומר
-    </footer>
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
-    </script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
-    </script>
-    <script src="https://code.jquery.com/jquery-2.2.4.js"></script>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <script src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.9/jquery-ui.js" type="text/javascript"></script>
-    <script src="/static/script.js"></script>
-    <script>
-        totalProgressImitation();
-    </script>
+        <a href="{{ url_for('donation') }}">תרומות<img src="http://u.cubeupload.com/Chibameta/FUNDIcoFix5.png"
+                                                       alt="תרומות"></a>
+        <a href="{{ url_for('reports') }}">דיווחים<img src="http://u.cubeupload.com/Chibameta/RepIcoFix.png"
+                                                       alt="דיווחים"></a>
+        <a class="not_allowed" href="#">הצוות שלי<img src="http://u.cubeupload.com/Chibameta/pplIcoFix.png"
+                                                      alt="לא פעיל בכוונה"></a>
+        <a class="not_allowed" href="#">לוח הישגים<img src="http://u.cubeupload.com/Chibameta/LBIcoFix.png"
+                                                       alt="לא פעיל בכוונה"></a>
+        <a class="not_allowed" href="#">התראות<img src="http://u.cubeupload.com/Chibameta/BellIcofix.png"
+                                                   alt="לא פעיל בכוונה"></a>
+        <a class="not_allowed" href="{{ url_for('about_org') }}">על הארגון<img src="/static/about_org.png"
+                                                                               alt="על הארגון"></a>
+        <hr>
+        <a class="not_allowed" href="#">החלף שפה<img src="http://u.cubeupload.com/Chibameta/LangIcoFix.png"
+                                                     alt="לא פעיל בכוונה"></a>
+        <a class="not_allowed" href="#">נגישות<img src="http://u.cubeupload.com/Chibameta/DisIcoFix.png"
+                                                   alt="לא פעיל בכוונה"></a>
+        <a href="{{ url_for('logout') }}">התנתקות<img src="http://u.cubeupload.com/Chibameta/DDISicofix.png"
+                                                      alt="התנתקות"></a>
+    </nav>
+</aside>
+{% block content %}{% endblock %}
+<footer id="unified_footer" class="quick_trans center_text">
+    <hr>
+    <a href="#" onClick="document.location.reload(true)">רענן עמוד</a> | <a href="{{ url_for('home') }}">דף הבית</a><br>
+    <a href="https://www.mta.ac.il"> <img src="https://u.cubeupload.com/Chibameta/ACA1.png" alt="אתר המכללה"
+                                          height="25px" width="70px"></a><a href="#"><img
+        src="https://u.cubeupload.com/Chibameta/PNGOTR4.png"></a><br>
+    © כל הזכויות שמורות: רותם, עומר ותומר
+</footer>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
+</script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+</script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
+</script>
+<script src="https://code.jquery.com/jquery-2.2.4.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.9/jquery-ui.js" type="text/javascript"></script>
+<script src="/static/script.js"></script>
+<script>
+    totalProgressImitation();
+</script>
 </body>
 </html>

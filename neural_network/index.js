@@ -2,7 +2,7 @@ const brain = require("brain.js");
 const fs = require("fs");
 const parse = require("csv-parse/lib/sync");
 
-const neighborhoodsData = require("../tlv_data/neighborhoods.json");
+const neighborhoodsData = require("../seed_data/neighborhoods.json");
 
 const net = new brain.NeuralNetwork();
 
