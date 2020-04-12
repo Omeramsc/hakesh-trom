@@ -3,7 +3,7 @@
   <main id="main_layout" class="quick_trans center_text">
     <section class="user_info">
       <div class="user">
-        <img class="flex_me" src="http://u.cubeupload.com/Chibameta/TeamGif.gif" alt="Team photo">
+        <img class="flex_me" src="{{ url_for('static', filename='default_team.png') }}" alt="Team photo">
       </div>
       <div class="usernames flex_me">
         <div>ישראל ישראלי</div>
@@ -12,32 +12,32 @@
     </section>
     <section class="buttons flex_me">
       <div class="icon">
-        <a class="hide_link" href="{{ url_for('donation') }}"> <img src="http://u.cubeupload.com/Chibameta/FUNDIcoFix5.png"
+        <a class="hide_link" href="{{ url_for('donation') }}"> <img src="{{ url_for('static', filename='donation.png') }}"
             alt="תרומות"><br>
           תרומות</a>
       </div>
       <div class="icon">
-        <a class="hide_link not_allowed" href="#"><img src="http://u.cubeupload.com/Chibameta/pplIcoFix.png"
+        <a class="hide_link not_allowed" href="#"><img src="{{ url_for('static', filename='teams.png') }}"
             alt="לא פעיל בכוונה"><br>
           הצוות שלי</a>
       </div>
       <div class="icon">
-        <a class="hide_link not_allowed" href="#"><img src="http://u.cubeupload.com/Chibameta/LBIcoFix.png"
+        <a class="hide_link not_allowed" href="#"><img src="{{ url_for('static', filename='leaderboard.png') }}"
             alt="לא פעיל בכוונה"><br>
           לוח הישגים</a>
       </div>
       <div class="icon">
-        <a class="hide_link" href="{{ url_for('reports') }}"><img src="http://u.cubeupload.com/Chibameta/RepIcoFix.png"
+        <a class="hide_link" href="{{ url_for('reports') }}"><img src="{{ url_for('static', filename='report_ico.png') }}"
             alt="דיווחים"><br>
           דיווחים</a>
       </div>
       <div class="icon">
-        <a class="hide_link" href="{{ url_for('create_campaign') }}"><img src="static/CreateCamp.png"
+        <a class="hide_link" href="{{ url_for('create_campaign') }}"><img src="{{ url_for('static', filename='CreateCamp.png') }}"
             alt="צור קמפיין"><br>
           צור קמפיין</a>
       </div>
             <div class="icon">
-        <a class="hide_link" href="{{ url_for('manage_campaign') }}"><img src="static/management.png"
+        <a class="hide_link" href="{{ url_for('manage_campaign') }}"><img src="{{ url_for('static', filename='management.png') }}"
             alt="צור קמפיין"><br>
           ניהול קמפיין</a>
       </div>
