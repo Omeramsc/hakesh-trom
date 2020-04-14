@@ -503,7 +503,7 @@ li:hover {
 .payment_choice {
     width: 60%;
     margin: 4% auto 4%;
-    flex-direction: row ltr;
+    flex-direction: row;
     flex-wrap: wrap;
 }
 
@@ -553,6 +553,7 @@ li:hover {
 .big_src {
     width: 66%;
 }
+
 
 /*------------------------- Campaign Control Panel -------------------------*/
 .ctrl_box {
@@ -606,6 +607,13 @@ li:hover {
 #team-user-dialog {
     text-align: right;
     direction: rtl;
+}
+
+/*------------------------- Errors -------------------------*/
+.error_pic {
+    width: 35%;
+    display: block;
+    margin: 4% auto;
 }
 
 /*------------------------- Footer -------------------------*/
@@ -697,6 +705,10 @@ hr {
     .slide-container {
         height: 250px;
     }
+
+    .error_pic {
+        width: 70%;
+    }
 }
 
 @media screen and (max-width: 600px) {
@@ -774,6 +786,11 @@ hr {
         margin-bottom: 5px;
     }
 
+    .error_pic {
+        width: 50%;
+        margin: 10% auto;
+    }
+
 }
 
 @media screen and (max-width: 360px) {
@@ -830,5 +847,10 @@ hr {
 
     .slide-container {
         height: 120px;
+    }
+
+    .error_pic {
+        width: 80%;
+        margin: 10% auto;
     }
 }

@@ -6,8 +6,19 @@ from models import Campaign, User
 from db import db
 from utils.forms_helpers import get_campaign_icon
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users
+from utils.app_decorators import admin_access, user_access
 import datetime
 import json
+
+
+@app.errorhandler(403)
+def error_403(error):
+    return render_template('errors/403.html'), 403
+
+
+@app.errorhandler(404)
+def error_404(error):
+    return render_template('errors/404.html'), 404
 
 
 @app.route('/admin/campaigns', methods=["GET"])
@@ -70,6 +81,7 @@ def about_org():
 
 @app.route('/create_campaign', methods=['GET', 'POST'])
 @login_required
+@admin_access
 def create_campaign():
     form = CreateCampaignForm()
     if form.validate_on_submit():
@@ -86,6 +98,7 @@ def create_campaign():
 
 @app.route('/manage_campaign', methods=['GET', 'POST'])
 @login_required
+@admin_access
 def manage_campaign():
     form = SearchCampaignForm()
     # Start with an empty query
@@ -116,6 +129,7 @@ def manage_campaign():
 
 @app.route('/campaign/<int:campaign_id>/neighborhoods', methods=['GET', 'POST'])
 @login_required
+@admin_access
 def manage_campaign_neighborhoods(campaign_id):
     campaign = Campaign.query.get_or_404(campaign_id)
     form = AddNeighborhood()
@@ -141,6 +155,7 @@ def manage_campaign_neighborhoods(campaign_id):
 
 @app.route('/manage_campaign/campaign_control_panel/<int:campaign_id>')
 @login_required
+@admin_access
 def campaign_control_panel(campaign_id):
     campaign = Campaign.query.get_or_404(campaign_id)
     return render_template('/campaign_control_panel.html', campaign=campaign)
@@ -148,6 +163,7 @@ def campaign_control_panel(campaign_id):
 
 @app.route('/donation', methods=['GET', 'POST'])
 @login_required
+@user_access
 def donation():
     # if request.method == 'GET':
     # INSERT INTO DB / MOVE TO PP/bit
