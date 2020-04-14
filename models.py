@@ -197,6 +197,8 @@ class Donation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
     # team = db.relationship("Team", back_populates="donations")
+    invoice_id = db.Column(db.Integer, db.ForeignKey('invoice.id'))
+    invoice = db.relationship("Donation", back_populates="invoices")
     amount = db.Column(db.Float(), nullable=False)
     payment_type = db.Column(db.String(), nullable=False)
 
@@ -221,8 +223,8 @@ class Invoice(db.Model):
     __tablename__ = 'invoices'
 
     id = db.Column(db.Integer, primary_key=True)
-    # donation_id = db.Column(db.Integer, db.ForeignKey('donation.id'), nullable=False)
-    # donation = db.relationship("Donation", back_populates="invoices")
+    donation_id = db.Column(db.Integer, db.ForeignKey('donation.id'), nullable=False)
+    donation = db.relationship("Donation", back_populates="invoices")
     type = db.Column(db.String(), nullable=False)
     reference_id: db.Column(db.String(), nullable=True)
 

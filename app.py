@@ -211,24 +211,25 @@ def invoice():
     digital_form = DigitalInvoiceForm()
     logger.error('----------------------------Before validation---------------------------------------------')
     logger.error(paper_form.submit_p.data)
-    logger.error(paper_form.validate())
-    logger.error(paper_form.submit_p.data and paper_form.validate())
-    # if (paper_form.submit.data and paper_form.validate()) or (digital_form.submit.data and digital_form.validate()):
-    #     # db.session.add(donation)
-    #     # db.session.commit()
-    #     if paper_form.submit.data and paper_form.validate():
-    #         logger.error('PAPER SUBMITTED AND VALIDATED')
-    #         # new_invoice = Invoice(donation_id=donation.id,
-    #         #                       type='Paper',
-    #         #                       reference_id=paper_form.reference_id.data)
-    #     elif digital_form.submit.data and digital_form.validate():
-    #         logger.error('DIGITAL SUBMITTED AND VALIDATED')
-    #         #     new_invoice = Invoice(donation_id=donation.id,
-    #         #                       type='Digital')
-    #         # Send mail through 'Green Invoice'
-    #     # db.session.add(new_invoice)
-    #     # db.session.commit()
-    #     return redirect(url_for('donation_end'))
+    logger.error(paper_form.errors)
+
+    if (paper_form.is_submitted() and paper_form.submit_p.data and paper_form.validate()) or (
+            digital_form.is_submitted() and digital_form.submit_d.data and digital_form.validate()):
+        # db.session.add(donation)
+        # db.session.commit()
+        if paper_form.submit_p.data and paper_form.validate():
+            logger.error('PAPER SUBMITTED AND VALIDATED')
+            # new_invoice = Invoice(donation_id=donation.id,
+            #                       type='Paper',
+            #                       reference_id=paper_form.reference_id.data)
+        elif digital_form.submit_d.data and digital_form.validate():
+            logger.error('DIGITAL SUBMITTED AND VALIDATED')
+            # new_invoice = Invoice(donation_id=donation.id,
+            #                       type='Digital')
+            # Send mail through 'Green Invoice'
+        # db.session.add(new_invoice)
+        # db.session.commit()
+        return redirect(url_for('donation_end'))
     return render_template('/invoice.html', paper_form=paper_form, digital_form=digital_form)
 
 

@@ -16,21 +16,21 @@
         <input type="radio" name="invoice_type" value="paper" checked> חשבונית נייר
         <input type="radio" name="invoice_type" value="digital"> חשבונית דיגיטלית
     </section>
-    <form id="paper" class="hide_inv" action="">
+    <form id="paper" class="hide_inv" action="" method="post">
         {{ paper_form.hidden_tag() }}
         <section class="flex_me" style="justify-content: space-evenly">
             <section class="box size_box" style="height: 300px;">
                 <section class="center_text">
                     {{ paper_form.reference_id.label() }}
                     {% if paper_form.reference_id.errors %}
-                        {{ paper_form.reference_id() }}
-                        <div class="invalid-feedback d-block">
-                            {% for error in paper_form.reference_id.errors %}
-                            <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        {% else %}
-                        {{ paper_form.reference_id() }}
+                    {{ paper_form.reference_id() }}
+                    <div class="invalid-feedback d-block">
+                        {% for error in paper_form.reference_id.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ paper_form.reference_id() }}
                     {% endif %}
                     <img class="paper_inv" src="{{ url_for('static', filename='paper_invoice.png') }}">
                 </section>
@@ -40,22 +40,50 @@
             {{ paper_form.submit_p(class="btn btn-primary btn-lg") }}
         </span>
     </form>
-    <form id="digital" class="hide_inv" style="display:none;" action="">
+    <form id="digital" class="hide_inv" style="display:none;" action="" method="post">
         {{ digital_form.hidden_tag() }}
         <section class="flex_me" style="justify-content: space-evenly">
             <section class="box size_box" style="height: 300px;">
                 <section class="center_text">
-                    {{ digital_form.mail_address.label() }}
-                    {% if digital_form.mail_address.errors %}
-                    {{ digital_form.mail_address() }}
-                    <div class="invalid-feedback d-block">
-                        {% for error in digital_form.mail_address.errors %}
-                        <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    {{ digital_form.mail_address() }}
-                    {% endif %}
+                    <section class="form-group">
+                        {{ digital_form.mail_address.label() }}
+                        {% if digital_form.mail_address.errors %}
+                        {{ digital_form.mail_address() }}
+                        <div class="invalid-feedback d-block">
+                            {% for error in digital_form.mail_address.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ digital_form.mail_address() }}
+                        {% endif %}
+                    </section>
+                    <section class="form-group">
+                        {{ digital_form.donor_id.label() }}
+                        {% if digital_form.donor_id.errors %}
+                        {{ digital_form.donor_id() }}
+                        <div class="invalid-feedback d-block">
+                            {% for error in digital_form.donor_id.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ digital_form.donor_id() }}
+                        {% endif %}
+                    </section>
+                    <section class="form-group">
+                        {{ digital_form.donor_name.label() }}
+                        {% if digital_form.donor_name.errors %}
+                        {{ digital_form.donor_name() }}
+                        <div class="invalid-feedback d-block">
+                            {% for error in digital_form.donor_name.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ digital_form.donor_name() }}
+                        {% endif %}
+                    </section>
                     <img style="width: 60%; display: block; margin: 3.5% auto;"
                          src="{{ url_for('static', filename='logos/green_invoice.png') }}">
                 </section>
