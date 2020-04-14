@@ -6,6 +6,7 @@ from wtforms.validators import DataRequired, Length, ValidationError, NumberRang
 from models import Campaign
 import json
 
+
 def memoize_dropdown(func):
     """Checks if the dropdown list has already been created.
     If it did, it returns the cached list. otherwise, it creates one.
@@ -71,19 +72,22 @@ class AddNeighborhood(FlaskForm):
 
 
 class DonationForm(FlaskForm):
-    building = StringField('בחר כתובת מהמסלול:', validators=[DataRequired()])
-    amount = FloatField('סכום לתרומה:', validators=[DataRequired(), NumberRange(min=5, max=None)])
-    payment_type = RadioField('אמצעי תשלום', choices=[("PayPal", 'PayPal'), ("Cash", 'מזומן'), ("bit", 'bit')],
-                              validators=[DataRequired()])
-
+    amount = FloatField('סכום לתרומה:', validators=[DataRequired(), NumberRange(min=5, message='*אין להזין תרומות '
+                                                                                               'מתחת ל-5 ש"ח')])
+    payment_type = RadioField('אמצעי תשלום', validators=[DataRequired(message="*סוג התשלום הינו שדה חובה")],
+                              choices=[("PayPal", 'PayPal'), ("Cash", 'מזומן'), ("bit", 'bit')], default="Cash")
     submit = SubmitField('המשך')
 
 
-class InvoiceForm(FlaskForm):
-    invoice_type = RadioField('סוג קבלה', choices=[("paper", 'חשבונית נייר'), ("digital", 'חשבונית דיגיטלית')],
-                              validators=[DataRequired()], default="paper")
-    reference_id = IntegerField('מספר קבלה:', validators=[NumberRange(min=5, max=None, message="אנא הזן את האסמכתא "
-                                                                                               "כפי שמופיעה בקבלה")])
-    mail_address = StringField('כתובת מייל למשלוח הקבלה:', [Email])
+class PaperInvoiceForm(FlaskForm):
+    reference_id = IntegerField('מספר קבלה:',
+                                validators=[DataRequired()])
+    submit_p = SubmitField('סיים תרומה')
 
-    submit = SubmitField('סיים')
+
+class DigitalInvoiceForm(FlaskForm):
+    mail_address = StringField('כתובת מייל למשלוח הקבלה:', validators=[DataRequired(), Email])
+    donor_id = IntegerField('ת.ז התורם:', validators=[DataRequired()])
+    donor_name = StringField('שם התורם:',  validators=[DataRequired()])
+
+    submit_d = SubmitField('סיים תרומה')

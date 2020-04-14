@@ -1,6 +1,6 @@
-from flask import render_template, jsonify, flash, redirect, url_for, request
+from flask import render_template, jsonify, flash, redirect, url_for, request, session
 from flask_login import login_user, current_user, logout_user, login_required
-from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood, DonationForm, InvoiceForm
+from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood, PaperInvoiceForm, DigitalInvoiceForm
 from app_init import app, bcrypt
 from models import Campaign, User, Neighborhood, Team, Donation, Invoice
 from db import db
@@ -9,6 +9,9 @@ from utils.campaign import get_response_campaign_neighborhoods, create_teams_and
 from utils.app_decorators import admin_access, user_access
 import datetime
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @app.errorhandler(403)
@@ -192,18 +195,10 @@ def donation_address():
 def donation():
     form = DonationForm()
     if form.validate_on_submit():
-        building = "Need to get this from the page donation_address"
-        payment_type = form.payment_type.data
-        donation = Donation(building=building,
-                            amount=form.amount.data,
-                            payment_type=payment_type)
-        # DO NOT ENTER THE DONATION UNTIL WE GET THE INVOICE... I THINK
-        # if payment_type is 'PayPal':
-        #     return redirect(url_for('paypal_payment'))
-        # elif payment_type is 'bit':
-        #     return redirect(url_for('bit_payment'))
-        # else:
-        return redirect(url_for('invoice'), donation=donation)
+        # building = "Need to get this from the page donation_address"
+        session['donation'] = {"amount": form.amount.data,
+                               "payment_type": form.payment_type.data}
+        return redirect(url_for('invoice'))
         # FOR NOW, IGNORE PAYPAL AND BIT AND GO ONLY FOR CASH DONATIONS
     return render_template('/donation.html', form=form)
 
@@ -211,19 +206,30 @@ def donation():
 @app.route('/donation_address/donation/invoice', methods=['GET', 'POST'])
 @login_required
 def invoice():
-    donation="Temporary"
-    # donation = request.args['donation']
-    form = InvoiceForm()
-    if form.validate_on_submit():
-        db.session.add(donation)
-        db.session.commit()
-        invoice = Invoice(donation_id=donation.id,
-                          type=form.type.data,
-                          reference_id=form.reference_id.data)
-        db.session.add(invoice)
-        db.session.commit()
-        return redirect(url_for('donation_end'))
-    return render_template('/invoice.html', form=form, donation=donation)
+    logger.info(session['donation'])
+    paper_form = PaperInvoiceForm()
+    digital_form = DigitalInvoiceForm()
+    logger.error('----------------------------Before validation---------------------------------------------')
+    logger.error(paper_form.submit_p.data)
+    logger.error(paper_form.validate())
+    logger.error(paper_form.submit_p.data and paper_form.validate())
+    # if (paper_form.submit.data and paper_form.validate()) or (digital_form.submit.data and digital_form.validate()):
+    #     # db.session.add(donation)
+    #     # db.session.commit()
+    #     if paper_form.submit.data and paper_form.validate():
+    #         logger.error('PAPER SUBMITTED AND VALIDATED')
+    #         # new_invoice = Invoice(donation_id=donation.id,
+    #         #                       type='Paper',
+    #         #                       reference_id=paper_form.reference_id.data)
+    #     elif digital_form.submit.data and digital_form.validate():
+    #         logger.error('DIGITAL SUBMITTED AND VALIDATED')
+    #         #     new_invoice = Invoice(donation_id=donation.id,
+    #         #                       type='Digital')
+    #         # Send mail through 'Green Invoice'
+    #     # db.session.add(new_invoice)
+    #     # db.session.commit()
+    #     return redirect(url_for('donation_end'))
+    return render_template('/invoice.html', paper_form=paper_form, digital_form=digital_form)
 
 
 @app.route('/donation_address/donation/invoice/thanks')

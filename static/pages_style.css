@@ -528,13 +528,6 @@ li:hover {
     transition: 1s;
 }
 
-.invoice_field {
-    margin: auto;
-    width: 50%;
-    font-size: 1.2em;
-    font-weight: bold;
-}
-
 .finish_btn {
     justify-content: center;
     padding: 10px;
@@ -544,6 +537,18 @@ li:hover {
     width: 20%;
 }
 
+/*------------------------- Invoice -------------------------*/
+
+.paper_inv {
+    width: 50%;
+    display: block;
+    margin: 2% auto;
+    border:1px solid black;"
+}
+
+.size_box{
+    width:30%;
+}
 /*------------------------- Manage Campaign -------------------------*/
 .manage_box {
     height: 140%;
@@ -745,6 +750,11 @@ hr {
         width: 30%;
         font-size: 13px;
     }
+
+    /* Invoice */
+    .paper_inv{
+        width: 70%;
+    }
 }
 
 @media screen and (max-width: 900px) {
@@ -818,7 +828,8 @@ hr {
 
     /* Donation */
     .ctrl {
-        width: 46%;
+        height: 30%;
+        width: 45%;
     }
 
     .payment_choice {
@@ -831,6 +842,17 @@ hr {
 
     #mail {
         width: 100%;
+    }
+
+    /* invoice */
+    .paper_inv{
+        width: 60%;
+    }
+
+    .size_box{
+        background: rgba(255, 255, 255, 0.8);
+        width:90%;
+        border: 2px outset gray;
     }
 
     /* first steps */
@@ -915,6 +937,11 @@ hr {
 
     .finish_btn button {
         width: 50%;
+    }
+
+    /* invoice */
+    .paper_inv{
+        width: 80%;
     }
 
     /* first steps */

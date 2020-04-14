@@ -192,14 +192,14 @@ class User(db.Model, UserMixin):
 # --------------------------------------------------------
 
 class Donation(db.Model):
-    __tablename__ = 'donation'
+    __tablename__ = 'donations'
 
     id = db.Column(db.Integer, primary_key=True)
-    # team-ID foreign key
+    # team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+    # team = db.relationship("Team", back_populates="donations")
     amount = db.Column(db.Float(), nullable=False)
     payment_type = db.Column(db.String(), nullable=False)
 
-    # city = db.Column(db.String(50), nullable=False) #building_id foerign key
     # building_id = db.Column(db.Integer, db.ForeignKey('building.id'))
 
     def __init__(self, amount, payment_type):
@@ -218,25 +218,25 @@ class Donation(db.Model):
 
 
 class Invoice(db.Model):
-    __tablename__ = 'invoice'
+    __tablename__ = 'invoices'
 
     id = db.Column(db.Integer, primary_key=True)
-    donation_id = db.Column(db.ForeignKey('donation.id'), nullable=False)
+    # donation_id = db.Column(db.Integer, db.ForeignKey('donation.id'), nullable=False)
+    # donation = db.relationship("Donation", back_populates="invoices")
     type = db.Column(db.String(), nullable=False)
-    reference_id: db.Column(db.String(), default='None')
+    reference_id: db.Column(db.String(), nullable=True)
 
-    def __init__(self, donation_id, reference_id, type):
-        self.donation_id = donation_id
+    def __init__(self, donation_id, type, reference_id):
         self.type = type
+        self.donation_id = donation_id
         self.reference_id = reference_id
 
     def __repr__(self):
-        return f'id: {self.id}\ndonation_id: {self.donation_id}\ntype: {self.type}\nreference_id: {self.reference_id}\n'
+        return f'id: {self.id}\ntype: {self.type}\nreference_id: {self.reference_id}\n'
 
     def serialize(self):
         return {
             'id': self.id,
-            'donation_id': self.donation_id,
             'type': self.type,
             'reference_id': self.reference_id,
         }

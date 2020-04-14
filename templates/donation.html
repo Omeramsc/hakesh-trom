@@ -5,9 +5,9 @@
 </div>
 <main id="main_layout" class="unified_layout">
   <button class="guide_btn" id="btnShow"><i class="fa fa-question-circle-o"></i></button>
-  <form style="all:unset" onsubmit="return donationValidation()" method="POST" action="{{ url_for('invoice') }}" >
+  {% include "donation_guidance.html" %}
+  <form style="all:unset" method="POST" action="" >
     {{ form.hidden_tag() }}
-    {% include "donation_guidance.html" %}
     <section class='ctrl flex_me center_text'>
       <div class=' ctrl__button--increment'>+</div>
       <div class='ctrl__counter'>
@@ -15,14 +15,14 @@
         <div class='ctrl__counter-num'>0</div>
       </div>
       <div class=' ctrl__button--decrement'>&ndash;</div>
-      {% if form.amount.errors %}
-        <div class="invalid-feedback">
+    </section>
+    {% if form.amount.errors %}
+        <div class="invalid-feedback d-block center_text">
          {% for error in form.amount.errors %}
           <span>{{ error }}</span>
          {% endfor %}
         </div>
-      {% endif %}
-    </section>
+    {% endif %}
     <section class="payment_choice flex_me center_text">
       {% for subfield in form.payment_type %}
       <label class="payment_option">
@@ -31,7 +31,7 @@
       </label>
       {% endfor %}
       {% if form.payment_type.errors %}
-        <div class="invalid-feedback">
+        <div class="invalid-feedback d-block">
          {% for error in form.payment_type.errors %}
           <span>{{ error }}</span>
          {% endfor %}
@@ -43,7 +43,4 @@
     </a>
   </form>
 </main>
-<script>
-  donation();
-</script>
 {% endblock content %}
