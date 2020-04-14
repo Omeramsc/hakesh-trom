@@ -129,6 +129,7 @@ def manage_campaign():
 
 @app.route('/campaign/<int:campaign_id>/neighborhoods', methods=['GET', 'POST'])
 @login_required
+@admin_access
 def manage_campaign_neighborhoods(campaign_id):
     campaign = Campaign.query.get_or_404(campaign_id)
     form = AddNeighborhood()
@@ -154,6 +155,7 @@ def manage_campaign_neighborhoods(campaign_id):
 
 @app.route('/manage_campaign/campaign_control_panel/<int:campaign_id>')
 @login_required
+@admin_access
 def campaign_control_panel(campaign_id):
     campaign = Campaign.query.get_or_404(campaign_id)
     return render_template('/campaign_control_panel.html', campaign=campaign)
