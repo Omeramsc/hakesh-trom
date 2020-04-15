@@ -42,29 +42,6 @@
         return slideIndex;
     }
 
-    function donationValidation() {
-        var payment = document.getElementsByName('payment');
-        var x = parseInt(document.getElementById('donation').value, 10);
-        // var email = document.getElementById('emailInput').value;
-        var isValid = true;
-        var error_content = 'לא ניתן להשלים את התרומה:\n';
-        if (x == 0) {
-            error_content += "* אנא הקש סכום הגבוה מאפס.\n";
-            isValid = false;
-        }
-        if (((!payment[0].checked)&&(!payment[1].checked)&&(!payment[2].checked))) {
-            error_content += "* אנא בחר באחת מאופציות התשלום .\n";
-            isValid = false;
-        }
-        if (!isValid) {
-            alert(error_content);
-        } else {
-            // alert(' התקבלה תרומה על סך ' + x + ' ש"ח ' + '\n המשיכו כך!');
-            // window.open('mailto:' + email); OPTIONAL if we want to send the email ourselvs
-        }
-		return isValid;
-    }
-
     $(function activate_box() {
         $("#guide_box").dialog({
             modal: true,
