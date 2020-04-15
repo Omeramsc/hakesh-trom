@@ -71,6 +71,7 @@ class Team(db.Model):
         "Building",
         secondary=buildings_teams_association_table,
         back_populates="teams")
+    donations = db.relationship("Donation", back_populates="team")
 
     def __init__(self, neighborhood_id, campaign_id):
         self.neighborhood_id = neighborhood_id
@@ -195,27 +196,26 @@ class Donation(db.Model):
     __tablename__ = 'donations'
 
     id = db.Column(db.Integer, primary_key=True)
-    # team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
-    # team = db.relationship("Team", back_populates="donations")
-    invoice_id = db.Column(db.Integer, db.ForeignKey('invoice.id'))
-    invoice = db.relationship("Donation", back_populates="invoices")
     amount = db.Column(db.Float(), nullable=False)
     payment_type = db.Column(db.String(), nullable=False)
+    team_id = db.Column(db.Integer, db.ForeignKey('teams.id'))
+    team = db.relationship("Team", back_populates="donations")
+    invoice = db.relationship("Invoice", back_populates="donation")
 
-    # building_id = db.Column(db.Integer, db.ForeignKey('building.id'))
-
-    def __init__(self, amount, payment_type):
+    def __init__(self, amount, payment_type, team_id):
         self.amount = amount
         self.payment_type = payment_type
+        self.team_id = team_id
 
     def __repr__(self):
-        return f'id: {self.id}\namount: {self.amount}\npayment_type: {self.payment_type}\n'
+        return f'id: {self.id}\namount: {self.amount}\npayment_type: {self.payment_type}\nteam_id: {self.team_id}'
 
     def serialize(self):
         return {
             'id': self.id,
             'amount': self.amount,
             'payment_type': self.payment_type,
+            'team_id': self.team_id,
         }
 
 
@@ -223,22 +223,23 @@ class Invoice(db.Model):
     __tablename__ = 'invoices'
 
     id = db.Column(db.Integer, primary_key=True)
-    donation_id = db.Column(db.Integer, db.ForeignKey('donation.id'), nullable=False)
-    donation = db.relationship("Donation", back_populates="invoices")
     type = db.Column(db.String(), nullable=False)
-    reference_id: db.Column(db.String(), nullable=True)
+    reference_id = db.Column(db.String(), nullable=True)
+    donation_id = db.Column(db.Integer, db.ForeignKey('donations.id'), nullable=False)
+    donation = db.relationship("Donation", back_populates="invoice")
 
-    def __init__(self, donation_id, type, reference_id):
+    def __init__(self, type, donation_id, reference_id=None):
         self.type = type
         self.donation_id = donation_id
         self.reference_id = reference_id
 
     def __repr__(self):
-        return f'id: {self.id}\ntype: {self.type}\nreference_id: {self.reference_id}\n'
+        return f'id: {self.id}\ntype: {self.type}\nreference_id: {self.reference_id}\ndonation_id: {self.donation_id}'
 
     def serialize(self):
         return {
             'id': self.id,
             'type': self.type,
             'reference_id': self.reference_id,
+            'donation_id': self.donation_id,
         }

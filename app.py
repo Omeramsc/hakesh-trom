@@ -1,6 +1,7 @@
 from flask import render_template, jsonify, flash, redirect, url_for, request, session
 from flask_login import login_user, current_user, logout_user, login_required
-from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood, PaperInvoiceForm, DigitalInvoiceForm
+from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood, DonationForm, PaperInvoiceForm, \
+    DigitalInvoiceForm
 from app_init import app, bcrypt
 from models import Campaign, User, Neighborhood, Team, Donation, Invoice
 from db import db
@@ -181,10 +182,9 @@ def campaign_control_panel(campaign_id):
     return render_template('/campaign_control_panel.html', campaign=campaign)
 
 
-# --------------------------------------------------------------------------
-
 @app.route('/donation_address', methods=['GET', 'POST'])
 @login_required
+@user_access
 def donation_address():
     return render_template('/donation_address.html')
 
@@ -192,54 +192,56 @@ def donation_address():
 @app.route('/donation_address/donation', methods=['GET', 'POST'])
 @login_required
 @user_access
-def donation():
+def get_donation():
     form = DonationForm()
     if form.validate_on_submit():
-        # building = "Need to get this from the page donation_address"
-        session['donation'] = {"amount": form.amount.data,
-                               "payment_type": form.payment_type.data}
-        return redirect(url_for('invoice'))
-        # FOR NOW, IGNORE PAYPAL AND BIT AND GO ONLY FOR CASH DONATIONS
+        session['current_donation'] = {"amount": form.amount.data,
+                                       "payment_type": form.payment_type.data,
+                                       "team_id": current_user.team_id}
+        return redirect(url_for('send_invoice'))
+        # FOR NOW, IGNORE PAYPAL AND BIT AND APPLY CASH DONATIONS FLOW ONLY
     return render_template('/donation.html', form=form)
 
 
 @app.route('/donation_address/donation/invoice', methods=['GET', 'POST'])
 @login_required
-def invoice():
-    logger.info(session['donation'])
+@user_access
+def send_invoice():
     paper_form = PaperInvoiceForm()
     digital_form = DigitalInvoiceForm()
-    logger.error('----------------------------Before validation---------------------------------------------')
-    logger.error(paper_form.submit_p.data)
-    logger.error(paper_form.errors)
 
+    # first we'll check if the forms are validated, so we won't commit the donation with an invoice error.
     if (paper_form.is_submitted() and paper_form.submit_p.data and paper_form.validate()) or (
             digital_form.is_submitted() and digital_form.submit_d.data and digital_form.validate()):
-        # db.session.add(donation)
-        # db.session.commit()
+
+        # commit the donation:
+        donation = Donation(amount=session['current_donation']['amount'],
+                            payment_type=session['current_donation']['payment_type'],
+                            team_id=session['current_donation']['team_id'])
+        db.session.add(donation)
+        db.session.commit()
+
+        # checking what kind of invoice was requested, validate It's information and commit it
         if paper_form.submit_p.data and paper_form.validate():
-            logger.error('PAPER SUBMITTED AND VALIDATED')
-            # new_invoice = Invoice(donation_id=donation.id,
-            #                       type='Paper',
-            #                       reference_id=paper_form.reference_id.data)
+            new_invoice = Invoice(type='Paper',
+                                  reference_id=paper_form.reference_id.data,
+                                  donation_id=donation.id)
         elif digital_form.submit_d.data and digital_form.validate():
-            logger.error('DIGITAL SUBMITTED AND VALIDATED')
-            # new_invoice = Invoice(donation_id=donation.id,
-            #                       type='Digital')
-            # Send mail through 'Green Invoice'
-        # db.session.add(new_invoice)
-        # db.session.commit()
+            new_invoice = Invoice(type='Digital',
+                                  donation_id=donation.id)
+            # Here we'll send email through 'Green Invoice'
+        db.session.add(new_invoice)
+        db.session.commit()
         return redirect(url_for('donation_end'))
     return render_template('/invoice.html', paper_form=paper_form, digital_form=digital_form)
 
 
 @app.route('/donation_address/donation/invoice/thanks')
 @login_required
+@user_access
 def donation_end():
+    session.pop('current_donation')
     return render_template('/donation_end.html')
-
-
-# --------------------------------------------------------------------------
 
 
 @app.route('/reports', methods=['GET', 'POST'])

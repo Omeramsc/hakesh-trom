@@ -4,6 +4,7 @@ from wtforms import StringField, SubmitField, FloatField, SelectField, RadioFiel
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, Length, ValidationError, NumberRange, Email
 from models import Campaign
+from utils.consts import INVOICE_REF_LENGTH
 import json
 
 
@@ -80,8 +81,9 @@ class DonationForm(FlaskForm):
 
 
 class PaperInvoiceForm(FlaskForm):
-    reference_id = IntegerField('מספר קבלה:',
-                                validators=[DataRequired()])
+    reference_id = StringField('מספר קבלה:',
+                               validators=[DataRequired(), Length(min=INVOICE_REF_LENGTH, max=INVOICE_REF_LENGTH,
+                                                                  message=f'אנא הזן את מספר הקבלה הכולל {INVOICE_REF_LENGTH} ספרות במלואו')])
     submit_p = SubmitField('סיים תרומה')
 
 
