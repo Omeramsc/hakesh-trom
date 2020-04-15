@@ -2,7 +2,7 @@ from flask import render_template, jsonify, flash, redirect, url_for, request
 from flask_login import login_user, current_user, logout_user, login_required
 from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood
 from app_init import app, bcrypt
-from models import Campaign, User
+from models import Campaign, User, Neighborhood, Team
 from db import db
 from utils.forms_helpers import get_campaign_icon
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users
@@ -151,6 +151,22 @@ def manage_campaign_neighborhoods(campaign_id):
 
     return render_template('/campaign_neighborhoods_selection.html', campaign_neighborhoods=campaign_neighborhoods,
                            form=form, campaign_id=campaign_id, loads_json=json.loads)
+
+
+@app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>', methods=['GET', 'POST'])
+@login_required
+def manage_neighborhood_route(campaign_id, neighborhood_id):
+    campaign = Campaign.query.get_or_404(campaign_id)
+    neighborhood = Neighborhood.query.get_or_404(neighborhood_id)
+    neighborhood_buildings = neighborhood.buildings
+    neighborhood_teams = Team.query.filter_by(campaign_id=campaign.id, neighborhood_id=neighborhood.id).all()
+
+    serialized_neighborhood_teams = list(map(lambda team: team.serialize(), neighborhood_teams))
+    serialized_neighborhood_buildings = list(map(lambda building: building.serialize(), neighborhood_buildings))
+
+    return render_template('/neighborhood_route_builder.html', neighborhood_teams=serialized_neighborhood_teams,
+                           neighborhood_data=neighborhood.serialize(),
+                           neighborhood_buildings=serialized_neighborhood_buildings)
 
 
 @app.route('/manage_campaign/campaign_control_panel/<int:campaign_id>')

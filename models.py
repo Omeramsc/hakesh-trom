@@ -4,6 +4,11 @@ from app_init import login_manager, bcrypt
 from flask_login import UserMixin
 from sqlalchemy.dialects.postgresql import JSON
 
+buildings_teams_association_table = db.Table('buildings_teams', db.Model.metadata,
+                                             db.Column('building_id', db.Integer, db.ForeignKey('buildings.id')),
+                                             db.Column('team_id', db.Integer, db.ForeignKey('teams.id'))
+                                             )
+
 
 class Building(db.Model):
     __tablename__ = 'buildings'
@@ -13,6 +18,27 @@ class Building(db.Model):
     neighborhood = db.relationship("Neighborhood", back_populates="buildings")
     attributes = db.Column(JSON)
     geometry = db.Column(JSON)
+    center_point = db.Column(JSON)
+    address = db.Column(db.String)
+    last_campaign_earnings = db.Column(db.Float)
+    teams = db.relationship(
+        "Team",
+        secondary=buildings_teams_association_table,
+        back_populates="buildings")
+
+    def predict_earnings(self):
+        # TODO: Add the modal here
+        return 0
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'address': self.address,
+            'geometry': self.geometry,
+            'center_point': self.center_point,
+            'last_campaign_earnings': self.last_campaign_earnings,
+            'predicted_earnings': self.predict_earnings()
+        }
 
 
 class Team(db.Model):
@@ -25,10 +51,20 @@ class Team(db.Model):
     campaign = db.relationship("Campaign", back_populates="teams")
     neighborhood_id = db.Column(db.Integer, db.ForeignKey('neighborhoods.id'))
     neighborhood = db.relationship("Neighborhood", back_populates="teams")
+    buildings = db.relationship(
+        "Building",
+        secondary=buildings_teams_association_table,
+        back_populates="teams")
 
     def __init__(self, neighborhood_id, campaign_id):
         self.neighborhood_id = neighborhood_id
         self.campaign_id = campaign_id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'buildings': list(map(lambda building: building.serialize(), self.buildings))
+        }
 
 
 class Neighborhood(db.Model):
@@ -40,6 +76,7 @@ class Neighborhood(db.Model):
     geometry = db.Column(JSON)
     teams = db.relationship("Team", back_populates="neighborhood")
     buildings = db.relationship("Building", back_populates="neighborhood")
+    center_point = db.Column(JSON)
 
     def __init__(self, name, city_name, geometry):
         self.name = name
@@ -49,7 +86,9 @@ class Neighborhood(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'name': self.name
+            'name': self.name,
+            'center_point': self.center_point,
+            'geometry': self.geometry
         }
 
 
