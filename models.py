@@ -1,5 +1,6 @@
+import datetime
+
 from db import db
-from time import localtime, strftime
 from app_init import login_manager, bcrypt
 from flask_login import UserMixin
 from sqlalchemy.dialects.postgresql import JSON
@@ -121,8 +122,7 @@ class Campaign(db.Model):
     city = db.Column(db.String(50), nullable=False)
     start_date = db.Column(db.Date(), nullable=False)
     goal = db.Column(db.Float())
-    creation_date = db.Column(db.DateTime, nullable=False,
-                              default=strftime("%d-%m-%Y %H:%M:%S", localtime()))
+    creation_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     teams = db.relationship("Team", back_populates="campaign")
 
     def __init__(self, name, city, start_date, goal):
@@ -159,7 +159,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(), nullable=False)
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
     is_active = db.Column(db.Boolean, default=False, nullable=False)
-    creation_date = db.Column(db.DateTime, nullable=False, default=strftime("%d-%m-%Y %H:%M:%S", localtime()))
+    creation_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     team_id = db.Column(db.Integer, db.ForeignKey('teams.id'))
     team = db.relationship("Team", back_populates="users")
 
