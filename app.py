@@ -222,9 +222,9 @@ def send_invoice():
         new_invoice = Invoice(donation_id=donation.id)
         if paper_form.submit_p.data:
             new_invoice.reference_id = paper_form.reference_id.data
-            new_invoice.type = INVOICE_TYPES[0]
+            new_invoice.type = INVOICE_TYPES['PAPER']
         else:
-            new_invoice.type = INVOICE_TYPES[1]
+            new_invoice.type = INVOICE_TYPES['DIGITAL']
             # Here we'll send email through 'Green Invoice'
         db.session.add(new_invoice)
         db.session.commit()
