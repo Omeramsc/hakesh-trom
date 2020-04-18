@@ -41,7 +41,8 @@
                         | צוותים: {{ campaign_neighborhood['number_of_teams'] }} |
                         מסלולים: {{ campaign_neighborhood['number_of_routes'] }}
                     </span>
-                            <a class="hide_link neighborhoods-control-row__icon_link" href="#">
+                            <a class="hide_link neighborhoods-control-row__icon_link"
+                               href="{{ url_for('manage_neighborhood_route', campaign_id=campaign_id, neighborhood_id=campaign_neighborhood['neighborhood_id']) }}">
                                 <img src="{{ url_for('static', filename='routes.png') }}"
                                      class="neighborhoods-control-row__icon"
                                      alt="לא פעיל">

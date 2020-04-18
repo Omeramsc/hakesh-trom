@@ -3,6 +3,14 @@ from time import localtime, strftime
 from app_init import login_manager, bcrypt
 from flask_login import UserMixin
 from sqlalchemy.dialects.postgresql import JSON
+from utils.neural_network import run_network
+from utils.network_input import STANDARDIZE_TYPE_FLOORS, STANDARDIZE_TYPE_EARNINGS, STANDARDIZE_TYPE_HEIGHT, \
+    STANDARDIZE_TYPE_NEIGHBORHOOD, encodeInput, decodeInput
+
+buildings_teams_association_table = db.Table('buildings_teams', db.Model.metadata,
+                                             db.Column('building_id', db.Integer, db.ForeignKey('buildings.id')),
+                                             db.Column('team_id', db.Integer, db.ForeignKey('teams.id'))
+                                             )
 
 
 class Building(db.Model):
@@ -13,6 +21,40 @@ class Building(db.Model):
     neighborhood = db.relationship("Neighborhood", back_populates="buildings")
     attributes = db.Column(JSON)
     geometry = db.Column(JSON)
+    center_point = db.Column(JSON)
+    address = db.Column(db.String)
+    last_campaign_earnings = db.Column(db.Float)
+    teams = db.relationship(
+        "Team",
+        secondary=buildings_teams_association_table,
+        back_populates="buildings")
+
+    def get_encoded_input(self):
+        return {
+            'ms_komot': encodeInput(self.attributes['ms_komot'], STANDARDIZE_TYPE_FLOORS),
+            'gova_simplex_2019': encodeInput(self.attributes['gova_simplex_2019'], STANDARDIZE_TYPE_HEIGHT),
+            'max_height': encodeInput(self.attributes['max_height'], STANDARDIZE_TYPE_HEIGHT),
+            'min_height': encodeInput(self.attributes['min_height'], STANDARDIZE_TYPE_HEIGHT),
+            'neighborhoodName': encodeInput(self.attributes['ms_shchuna'], STANDARDIZE_TYPE_NEIGHBORHOOD),
+            'lastYearEarnings': encodeInput(self.last_campaign_earnings, STANDARDIZE_TYPE_EARNINGS),
+        }
+
+    def predict_earnings(self):
+        encoded_input = self.get_encoded_input()
+        encoded_prediction = run_network(encoded_input)['currentYearEarnings']
+
+        return float("{:.2f}".format(decodeInput(encoded_prediction, STANDARDIZE_TYPE_EARNINGS)))
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'address': self.address,
+            'geometry': self.geometry,
+            'center_point': self.center_point,
+            'last_campaign_earnings': self.last_campaign_earnings,
+            'predicted_earnings': self.predict_earnings(),
+            'number_of_floors': self.attributes.get('ms_komot', 0)
+        }
 
 
 class Team(db.Model):
@@ -25,10 +67,24 @@ class Team(db.Model):
     campaign = db.relationship("Campaign", back_populates="teams")
     neighborhood_id = db.Column(db.Integer, db.ForeignKey('neighborhoods.id'))
     neighborhood = db.relationship("Neighborhood", back_populates="teams")
+    buildings = db.relationship(
+        "Building",
+        secondary=buildings_teams_association_table,
+        back_populates="teams")
 
     def __init__(self, neighborhood_id, campaign_id):
         self.neighborhood_id = neighborhood_id
         self.campaign_id = campaign_id
+
+    def serialize(self):
+        serialized_buildings = list(map(lambda building: building.serialize(), self.buildings))
+        predicted_total = sum(map(lambda building: building['predicted_earnings'], serialized_buildings))
+
+        return {
+            'id': self.id,
+            'buildings': serialized_buildings,
+            'predicted_total': float("{:.2f}".format(predicted_total))
+        }
 
 
 class Neighborhood(db.Model):
@@ -40,6 +96,7 @@ class Neighborhood(db.Model):
     geometry = db.Column(JSON)
     teams = db.relationship("Team", back_populates="neighborhood")
     buildings = db.relationship("Building", back_populates="neighborhood")
+    center_point = db.Column(JSON)
 
     def __init__(self, name, city_name, geometry):
         self.name = name
@@ -49,7 +106,9 @@ class Neighborhood(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'name': self.name
+            'name': self.name,
+            'center_point': self.center_point,
+            'geometry': self.geometry
         }
 
 

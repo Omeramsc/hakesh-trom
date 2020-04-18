@@ -16,21 +16,33 @@ const anonymous = input => {
 
         totalLayers +=
             currentYearLayer.weights[layerKey] /
-            (1 + 1 / Math.exp(relevantLayerTotal));
+            (1 + 1 / Math.tanh(relevantLayerTotal));
     }
     let currentYearEarnings =
-        1 / (1 + 1 / Math.exp(currentYearLayer.bias + totalLayers));
+        1 / (1 + 1 / Math.tanh(currentYearLayer.bias + totalLayers));
 
     return {currentYearEarnings};
 };
 
+// Validation
 console.log(
     anonymous({
-        gova_simplex_2019: 0.1,
-        ms_komot: 0.03,
-        max_height: 0.01,
-        min_height: 0.01,
-        lastYearEarnings: 0.1,
-        neighborhoodName: 0.28
+        "gova_simplex_2019": 0.01691,
+        "lastYearEarnings": 0.06,
+        "max_height": 0.02892,
+        "min_height": 0.01201,
+        "ms_komot": 0.04,
+        "neighborhoodName": 0.1
+    })
+);
+
+console.log(
+    anonymous({
+        ms_komot: 0.01,
+        gova_simplex_2019: 0.008230000000000001,
+        max_height: 0.0349,
+        min_height: 0.026670000000000003,
+        lastYearEarnings: 0.01,
+        neighborhoodName: 0.15
     })
 );

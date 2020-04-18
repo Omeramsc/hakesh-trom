@@ -4,7 +4,13 @@ const parse = require("csv-parse/lib/sync");
 
 const neighborhoodsData = require("../seed_data/neighborhoods.json");
 
-const net = new brain.NeuralNetwork();
+const config = {
+    binaryThresh: 0.5,
+    activation: 'tanh',
+    leakyReluAlpha: 0.01,
+}
+
+const net = new brain.NeuralNetwork(config);
 
 const OUTPUT = {
     attributeName: "currentYearEarnings",

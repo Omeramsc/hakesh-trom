@@ -14,25 +14,6 @@
         }
     }
 
-    function toggleSideNav() {
-        var x = document.getElementById("hamburger");
-        var fadedElements;
-        var fadedElement1 = document.getElementById("main_layout");
-        var fadedElement2 = document.getElementById("unified_footer");
-        var fadedElement3 = document.getElementById("subtitle_container");
-        if (getComputedStyle(x).width <= "1px") {
-            x.style.width = "260px";
-            fadedElement1.style.opacity = "0.2";
-            fadedElement2.style.opacity = "0.2";
-            fadedElement3.style.opacity = "0.2";
-        } else {
-            x.style.width = "0px";
-            fadedElement1.style.opacity = "1";
-            fadedElement2.style.opacity = "1";
-            fadedElement3.style.opacity = "1";
-        }
-    }
-
     function sucessful_report() {
         alert("הדיווח התקבל בהצלחה! אנא המתן למענה מהאחראי");
         window.location.href = "report.php";
