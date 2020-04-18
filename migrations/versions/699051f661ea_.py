@@ -80,6 +80,13 @@ def upgrade():
 
     # Delete all the old buildings
     conn.execute("DELETE FROM buildings;")
+
+    # Delete all teams users
+    conn.execute("DELETE FROM users where team_id != null;")
+
+    # Delete all teams
+    conn.execute("DELETE FROM teams;")
+
     # Delete all neighborhoods
     conn.execute("DELETE FROM neighborhoods;")
 
