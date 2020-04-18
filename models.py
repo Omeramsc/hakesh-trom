@@ -1,5 +1,4 @@
 import datetime
-
 from db import db
 from app_init import login_manager, bcrypt
 from flask_login import UserMixin
