@@ -9,7 +9,7 @@
 
 {% block layout %}
     <div id="subtitle_container">
-        <h3>ניהול מסלול</h3>
+        <h3 class="route-builder-team-title">ניהול מסלול</h3>
     </div>
     <main id="main_layout" class="unified_layout route-builder">
         <div class="route-builder-team-panel">
@@ -33,7 +33,7 @@
                                 {% endfor %}
                             </ul>
                             <span><b>סה"כ צפי רווח</b>:
-                                {{ team['buildings'] | sum(attribute='predicted_earnings') }}
+                            {{ team['predicted_total'] }}
                             </span>
                         {% else %}
                             לא נבחר מסלול
@@ -42,18 +42,24 @@
                 </div>
             {% endfor %}
         </div>
-        <div class="route-builder-map-panel" id="map"></div>
+        <div class="route-builder-map-panel" id="map">
+        </div>
     </main>
     <script>
-        const AVAILABLE_COLOR = '#55eb34';
+        // Building colors
         const NOT_AVAILABLE_COLOR = '#a2a4a6';
         const PICKED_TEAM_COLOR = '#4287f5';
+        const ABOVE_AVG_COLOR = '#55eb34';
+        const AVG_COLOR = '#eef207';
+        const BELLOW_AVG_COLOR = '#FF0000';
+        const AVG_BIAS = 5;
 
         const teamELms = document.getElementsByClassName('route-builder-team-panel__team');
         const buildings = {{ neighborhood_buildings | tojson  }};
         const neighborhood =  {{ neighborhood_data | tojson }};
         const _teams = {{ neighborhood_teams | tojson }};
-        const teams = _teams.map(t => ({...t, buildingIds: t.buildings.map(b => b.id)}))
+        const teams = _teams.map(t => ({...t, buildingIds: t.buildings.map(b => b.id)}));
+        const avgPredictedEarnings = Math.floor(buildings.reduce((accumulator, currentValue) => accumulator + currentValue.predicted_earnings, 0) / buildings.length);
 
         let selectedTeamId;
         let buildingLayerByTeamId = {};
@@ -134,6 +140,10 @@
             addressSpan.innerHTML = `<u><b>כתובת</b></u>:${building.address}`;
             contentDiv.appendChild(addressSpan);
 
+            const numberOfFloorsSpan = document.createElement('span');
+            numberOfFloorsSpan.innerHTML = `<u><b>מספר קומות</b></u>: ${building.number_of_floors}`;
+            contentDiv.appendChild(numberOfFloorsSpan);
+
             const predictedEarningsSpan = document.createElement('span');
             predictedEarningsSpan.innerHTML = `<u><b>צפי רווח</b></u>: ${building.predicted_earnings}`;
             contentDiv.appendChild(predictedEarningsSpan);
@@ -160,8 +170,8 @@
                 paths: building.geometry.map(convertPointToLatLng),
                 strokeOpacity: 0.8,
                 strokeWeight: 2,
-                strokeColor: teamForBuilding ? NOT_AVAILABLE_COLOR : AVAILABLE_COLOR,
-                fillColor: teamForBuilding ? NOT_AVAILABLE_COLOR : AVAILABLE_COLOR
+                strokeColor: calculatePolygonColor(building, teamForBuilding),
+                fillColor: calculatePolygonColor(building, teamForBuilding),
             });
 
             google.maps.event.addListener(polygon, "click", function (event) {
@@ -177,6 +187,22 @@
 
                 buildingLayerByTeamId[teamForBuilding.id].push(polygon)
             }
+        }
+
+        function calculatePolygonColor(building, teamForBuilding) {
+            if (teamForBuilding) {
+                return NOT_AVAILABLE_COLOR;
+            }
+
+            if (building.predicted_earnings > avgPredictedEarnings + AVG_BIAS) {
+                return ABOVE_AVG_COLOR;
+            }
+
+            if (building.predicted_earnings >= avgPredictedEarnings - AVG_BIAS && building.predicted_earnings <= avgPredictedEarnings + AVG_BIAS) {
+                return AVG_COLOR;
+            }
+
+            return BELLOW_AVG_COLOR;
         }
 
         function initMap() {

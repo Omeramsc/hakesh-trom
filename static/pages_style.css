@@ -670,10 +670,15 @@ li:hover {
 
 .route-builder-map__info_window {
     font-size: 14px;
+    padding: 5px;
 }
 
 .route-builder-map__info_window span {
     display: block;
+}
+
+.route-builder-team-title {
+    margin-top: 10px;
 }
 
 /*------------------------- Errors -------------------------*/

@@ -154,6 +154,7 @@ def manage_campaign_neighborhoods(campaign_id):
 
 
 @app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>', methods=['GET', 'POST'])
+@admin_access
 @login_required
 def manage_neighborhood_route(campaign_id, neighborhood_id):
     campaign = Campaign.query.get_or_404(campaign_id)
