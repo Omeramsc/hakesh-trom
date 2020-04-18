@@ -190,8 +190,6 @@ class User(db.Model, UserMixin):
         }
 
 
-# --------------------------------------------------------
-
 class Donation(db.Model):
     __tablename__ = 'donations'
 
@@ -206,9 +204,6 @@ class Donation(db.Model):
         self.amount = amount
         self.payment_type = payment_type
         self.team_id = team_id
-
-    def __repr__(self):
-        return f'id: {self.id}\namount: {self.amount}\npayment_type: {self.payment_type}\nteam_id: {self.team_id}'
 
     def serialize(self):
         return {
@@ -228,13 +223,10 @@ class Invoice(db.Model):
     donation_id = db.Column(db.Integer, db.ForeignKey('donations.id'), nullable=False)
     donation = db.relationship("Donation", back_populates="invoice")
 
-    def __init__(self, type, donation_id, reference_id=None):
-        self.type = type
+    def __init__(self, donation_id, type=None, reference_id=None):
         self.donation_id = donation_id
+        self.type = type
         self.reference_id = reference_id
-
-    def __repr__(self):
-        return f'id: {self.id}\ntype: {self.type}\nreference_id: {self.reference_id}\ndonation_id: {self.donation_id}'
 
     def serialize(self):
         return {

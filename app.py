@@ -8,11 +8,9 @@ from db import db
 from utils.forms_helpers import get_campaign_icon
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users
 from utils.app_decorators import admin_access, user_access
+from utils.consts import INVOICE_TYPES
 import datetime
 import json
-import logging
-
-logger = logging.getLogger(__name__)
 
 
 @app.errorhandler(403)
@@ -211,9 +209,8 @@ def send_invoice():
     digital_form = DigitalInvoiceForm()
 
     # first we'll check if the forms are validated, so we won't commit the donation with an invoice error.
-    if (paper_form.is_submitted() and paper_form.submit_p.data and paper_form.validate()) or (
-            digital_form.is_submitted() and digital_form.submit_d.data and digital_form.validate()):
-
+    if paper_form.submit_p.data and paper_form.validate_on_submit() or \
+            digital_form.submit_d.data and digital_form.validate_on_submit():
         # commit the donation:
         donation = Donation(amount=session['current_donation']['amount'],
                             payment_type=session['current_donation']['payment_type'],
@@ -222,13 +219,12 @@ def send_invoice():
         db.session.commit()
 
         # checking what kind of invoice was requested, validate It's information and commit it
-        if paper_form.submit_p.data and paper_form.validate():
-            new_invoice = Invoice(type='Paper',
-                                  reference_id=paper_form.reference_id.data,
-                                  donation_id=donation.id)
-        elif digital_form.submit_d.data and digital_form.validate():
-            new_invoice = Invoice(type='Digital',
-                                  donation_id=donation.id)
+        new_invoice = Invoice(donation_id=donation.id)
+        if paper_form.submit_p.data:
+            new_invoice.reference_id = paper_form.reference_id.data
+            new_invoice.type = INVOICE_TYPES[0]
+        else:
+            new_invoice.type = INVOICE_TYPES[1]
             # Here we'll send email through 'Green Invoice'
         db.session.add(new_invoice)
         db.session.commit()
@@ -240,7 +236,8 @@ def send_invoice():
 @login_required
 @user_access
 def donation_end():
-    session.pop('current_donation')
+    if session['current_donation']:
+        session.pop('current_donation')
     return render_template('/donation_end.html')
 
 
