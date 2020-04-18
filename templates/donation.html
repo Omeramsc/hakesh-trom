@@ -5,62 +5,42 @@
 </div>
 <main id="main_layout" class="unified_layout">
   <button class="guide_btn" id="btnShow"><i class="fa fa-question-circle-o"></i></button>
-  <div id="guide_box">
-    <p>
-      <p>
-        <strong>שלב 1: הזנת סכום התרומה</strong><br>
-        באפשרותך להזין את סכום התרומה המבוקש באמצעות לחיצה על כפתור ה"+" וה"-", או לחלופין על-ידי הקשה על חלונית הסכום
-        והקשת המספר
-      </p>
-      <p>
-        <strong>שלב 2: בחירת אמצעי התשלום</strong><br>
-        ניתן לבחור את אמצעי התשלום המבוקר באמצעות לחיצה על העיגול הנמצא מתחת לאמצעי התשלום.<br>
-        שימו לב: בגרסא זו של המערכת, מזומן הינו אמצעי התשלום היחיד שפעיל
-      </p>
-      <p>
-        <strong>שלב 3: שליחת חשבונית</strong><br>
-        יש להקיש על חלונית האימייל ולהזין את כתובת האימייל של המתרים, כך שהקבלה תשלח מיידית לכתובת זו
-      </p>
-      <p>
-        <strong>שלב 4: השלמת התהליך</strong><br>
-        בכדי לאשר סופית את מתן התרומה, יש ללחוץ על כפתור "סיים"
-      </p>
-      <strong>ניתן לקבל סיוע או הדרכה נוספת דרך כפתור "צור קשר" בעמוד הדיווחים</strong>
-    </p>
-  </div>
-  <form style="all:unset" onsubmit="return donationValidation()" action="{{ url_for('home') }}">
+  {% include "donation_guidance.html" %}
+  <form style="all:unset" method="POST">
+    {{ form.hidden_tag() }}
     <section class='ctrl flex_me center_text'>
       <div class=' ctrl__button--increment'>+</div>
       <div class='ctrl__counter'>
-        <input class='ctrl__counter-input center_text' id="donation" name="donation" maxlength='7' type='text' value='0'>
+        {{ form.amount(class="ctrl__counter-input center_text", id=donation) }}
         <div class='ctrl__counter-num'>0</div>
       </div>
       <div class=' ctrl__button--decrement'>&ndash;</div>
     </section>
+    {% if form.amount.errors %}
+        <div class="invalid-feedback d-block center_text">
+         {% for error in form.amount.errors %}
+          <span>{{ error }}</span>
+         {% endfor %}
+        </div>
+    {% endif %}
     <section class="payment_choice flex_me center_text">
-      <div class="payment_option">
-        <img class="not_allowed" src="{{ url_for('static', filename='paypal.png') }}" alt="לא פעיל בכוונה"><br>
-        <input type="radio" name="payment" value="paypal"> PayPal
-      </div>
-      <div class="payment_option">
-        <img src="{{ url_for('static', filename='cash.png') }}" alt="תשלום במזומן"> <br>
-        <input type="radio" name="payment" value="cash"> מזומן
-      </div>
-      <div class="payment_option">
-        <img class="not_allowed" src="{{ url_for('static', filename='bit.png') }}" alt="לא פעיל בכוונה"><br>
-        <input type="radio" name="payment" value="bit"> bit
-      </div>
-    </section>
-    <section id="mail" class="center_text">
-      *כתובת מייל למשלוח קבלה:<br>
-      <input type="email" name="email" id="emailInput"><br>
+      {% for subfield in form.payment_type %}
+      <label class="payment_option">
+        <img src="/static/{{ subfield.data }}.png" alt="{{ subfield.data }}"><br>
+        {{ subfield }} {{ subfield.label }}
+      </label>
+      {% endfor %}
+      {% if form.payment_type.errors %}
+        <div class="invalid-feedback d-block">
+         {% for error in form.payment_type.errors %}
+          <span>{{ error }}</span>
+         {% endfor %}
+        </div>
+      {% endif %}
     </section>
     <a class="finish_btn flex_me" href="#">
-      <button type=submit class="btn btn-primary btn-lg" type="button">סיים</button> </a>
+      {{ form.submit(class="btn btn-primary btn-lg") }}
+    </a>
   </form>
 </main>
-<script>
-  donation();
-  activate_box();
-</script>
 {% endblock content %}

@@ -71,6 +71,7 @@ class Team(db.Model):
         "Building",
         secondary=buildings_teams_association_table,
         back_populates="teams")
+    donations = db.relationship("Donation", back_populates="team")
 
     def __init__(self, neighborhood_id, campaign_id):
         self.neighborhood_id = neighborhood_id
@@ -186,4 +187,51 @@ class User(db.Model, UserMixin):
             'username': self.username,
             'type': 'Admin' if self.is_admin else 'User',
             'creation_date': self.creation_date
+        }
+
+
+class Donation(db.Model):
+    __tablename__ = 'donations'
+
+    id = db.Column(db.Integer, primary_key=True)
+    amount = db.Column(db.Float(), nullable=False)
+    payment_type = db.Column(db.String(), nullable=False)
+    team_id = db.Column(db.Integer, db.ForeignKey('teams.id'))
+    team = db.relationship("Team", back_populates="donations")
+    invoice = db.relationship("Invoice", back_populates="donation")
+
+    def __init__(self, amount, payment_type, team_id):
+        self.amount = amount
+        self.payment_type = payment_type
+        self.team_id = team_id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'amount': self.amount,
+            'payment_type': self.payment_type,
+            'team_id': self.team_id,
+        }
+
+
+class Invoice(db.Model):
+    __tablename__ = 'invoices'
+
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String(), nullable=False)
+    reference_id = db.Column(db.String(), nullable=True)
+    donation_id = db.Column(db.Integer, db.ForeignKey('donations.id'), nullable=False)
+    donation = db.relationship("Donation", back_populates="invoice")
+
+    def __init__(self, donation_id, type=None, reference_id=None):
+        self.donation_id = donation_id
+        self.type = type
+        self.reference_id = reference_id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'type': self.type,
+            'reference_id': self.reference_id,
+            'donation_id': self.donation_id,
         }

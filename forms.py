@@ -2,8 +2,9 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FloatField, SelectField, RadioField, PasswordField, BooleanField, \
     IntegerField
 from wtforms.fields.html5 import DateField
-from wtforms.validators import DataRequired, Length, ValidationError, NumberRange
+from wtforms.validators import DataRequired, Length, ValidationError, NumberRange, Email
 from models import Campaign
+from utils.consts import INVOICE_REF_LENGTH
 import json
 
 
@@ -69,3 +70,27 @@ class AddNeighborhood(FlaskForm):
     neighborhood_id = SelectField("בחר שכונה", coerce=int, validators=[DataRequired()], choices=[])
     number_of_teams = IntegerField("מספר צוותים", validators=[NumberRange(min=1)])
     submit = SubmitField('הוסף שכונה')
+
+
+class DonationForm(FlaskForm):
+    amount = FloatField('סכום לתרומה:', validators=[DataRequired(), NumberRange(min=5, message='*אין להזין תרומות '
+                                                                                               'מתחת ל-5 ש"ח')])
+    payment_type = RadioField('אמצעי תשלום', validators=[DataRequired(message="*סוג התשלום הינו שדה חובה")],
+                              choices=[("PayPal", 'PayPal'), ("Cash", 'מזומן'), ("bit", 'bit')], default="Cash")
+    submit = SubmitField('המשך')
+
+
+class PaperInvoiceForm(FlaskForm):
+    reference_id = StringField('מספר קבלה:',
+                               validators=[DataRequired(), Length(min=INVOICE_REF_LENGTH, max=INVOICE_REF_LENGTH,
+                                                                  message=f'אנא הזן את מספר הקבלה הכולל {INVOICE_REF_LENGTH} ספרות במלואו')])
+    submit_p = SubmitField('סיים תרומה')
+
+
+class DigitalInvoiceForm(FlaskForm):
+    mail_address = StringField('כתובת מייל:', validators=[DataRequired(), Email()])
+    donor_id = StringField('ת.ז התורם:', validators=[DataRequired(), Length(min=9, max=9,
+                                                                            message='אנא הזן ת.ז בעלת 9 ספרות, כולל ספרת הביקורת')])
+    donor_name = StringField('שם התורם:', validators=[DataRequired()])
+
+    submit_d = SubmitField('סיים תרומה')

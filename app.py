@@ -1,12 +1,14 @@
-from flask import render_template, jsonify, flash, redirect, url_for, request
+from flask import render_template, jsonify, flash, redirect, url_for, request, session
 from flask_login import login_user, current_user, logout_user, login_required
-from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood
+from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood, DonationForm, PaperInvoiceForm, \
+    DigitalInvoiceForm
 from app_init import app, bcrypt
-from models import Campaign, User, Neighborhood, Team
+from models import Campaign, User, Neighborhood, Team, Donation, Invoice
 from db import db
 from utils.forms_helpers import get_campaign_icon
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users
 from utils.app_decorators import admin_access, user_access
+from utils.consts import INVOICE_TYPES
 import datetime
 import json
 
@@ -178,14 +180,65 @@ def campaign_control_panel(campaign_id):
     return render_template('/campaign_control_panel.html', campaign=campaign)
 
 
-@app.route('/donation', methods=['GET', 'POST'])
+@app.route('/donation_address', methods=['GET', 'POST'])
 @login_required
 @user_access
-def donation():
-    # if request.method == 'GET':
-    # INSERT INTO DB / MOVE TO PP/bit
-    # return render_template('/<---->.html')
-    return render_template('/donation.html')
+def donation_address():
+    return render_template('/donation_address.html')
+
+
+@app.route('/donation_address/donation', methods=['GET', 'POST'])
+@login_required
+@user_access
+def get_donation():
+    form = DonationForm()
+    if form.validate_on_submit():
+        session['current_donation'] = {"amount": form.amount.data,
+                                       "payment_type": form.payment_type.data,
+                                       "team_id": current_user.team_id}
+        return redirect(url_for('send_invoice'))
+        # FOR NOW, IGNORE PAYPAL AND BIT AND APPLY CASH DONATIONS FLOW ONLY
+    return render_template('/donation.html', form=form)
+
+
+@app.route('/donation_address/donation/invoice', methods=['GET', 'POST'])
+@login_required
+@user_access
+def send_invoice():
+    paper_form = PaperInvoiceForm()
+    digital_form = DigitalInvoiceForm()
+
+    # first we'll check if the forms are validated, so we won't commit the donation with an invoice error.
+    if paper_form.submit_p.data and paper_form.validate_on_submit() or \
+            digital_form.submit_d.data and digital_form.validate_on_submit():
+        # commit the donation:
+        donation = Donation(amount=session['current_donation']['amount'],
+                            payment_type=session['current_donation']['payment_type'],
+                            team_id=session['current_donation']['team_id'])
+        db.session.add(donation)
+        db.session.commit()
+
+        # checking what kind of invoice was requested, validate It's information and commit it
+        new_invoice = Invoice(donation_id=donation.id)
+        if paper_form.submit_p.data:
+            new_invoice.reference_id = paper_form.reference_id.data
+            new_invoice.type = INVOICE_TYPES['PAPER']
+        else:
+            new_invoice.type = INVOICE_TYPES['DIGITAL']
+            # Here we'll send email through 'Green Invoice'
+        db.session.add(new_invoice)
+        db.session.commit()
+        return redirect(url_for('donation_end'))
+    return render_template('/invoice.html', paper_form=paper_form, digital_form=digital_form)
+
+
+@app.route('/donation_address/donation/invoice/thanks')
+@login_required
+@user_access
+def donation_end():
+    if session['current_donation']:
+        session.pop('current_donation')
+    return render_template('/donation_end.html')
 
 
 @app.route('/reports', methods=['GET', 'POST'])

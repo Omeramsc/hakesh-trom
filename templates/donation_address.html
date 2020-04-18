@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+<div id="subtitle_container">
+  <h3>תרומה</h3>
+</div>
+<main id="main_layout" class="unified_layout">
+  <button class="guide_btn" id="btnShow"><i class="fa fa-question-circle-o"></i></button>
+  {% include "donation_guidance.html" %}
+  <p class="center_text">עמוד זה נוצר בשביל הזרימה של התהליך, בפועל עמוד זה יכלול בחירה של כתובת לביצוע התרומה.</p>
+  <a class="finish_btn flex_me" href="#">
+    <a class="finish_btn flex_me" href="{{ url_for('get_donation') }}">
+      <button type="button" class="btn btn-primary btn-lg" >המשך</button> </a>
+    </a>
+</main>
+{% endblock content %}

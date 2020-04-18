@@ -1,0 +1,117 @@
+{% extends "layout.html" %}
+{% block content %}
+<div id="subtitle_container">
+    <h3>תרומה</h3>
+</div>
+<main id="main_layout" class="unified_layout">
+    <button class="guide_btn" id="btnShow"><i class="fa fa-question-circle-o"></i></button>
+    {% include "donation_guidance.html" %}
+    <section class='ctrl flex_me center_text'>
+        <div class='ctrl__counter'>
+            <div class='ctrl__counter-num'>{{ session['current_donation'].amount }}</div>
+
+        </div>
+    </section>
+    <section class="center_text">
+        <input type="radio" name="invoice_type" value="paper" checked> חשבונית נייר
+        <input type="radio" name="invoice_type" value="digital"> חשבונית דיגיטלית
+    </section>
+    {% if paper_form.errors or digital_form.errors %}
+    <div class="invalid-feedback d-block center_text">
+        <span>הפרטים שהוזנו שגויים. אנא נסה שנית.</span>
+    </div>
+    {% endif %}
+    <form id="paper" class="hide_inv" method="post">
+        {{ paper_form.hidden_tag() }}
+        <section class="flex_me" style="justify-content: space-evenly">
+            <section class="box size_box" style="height: 300px;">
+                <section class="center_text">
+                    {{ paper_form.reference_id.label() }}
+                    {% if paper_form.reference_id.errors %}
+                    {{ paper_form.reference_id() }}
+                    <div class="invalid-feedback d-block">
+                        {% for error in paper_form.reference_id.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ paper_form.reference_id() }}
+                    {% endif %}
+                    <img class="paper_inv" src="{{ url_for('static', filename='paper_invoice.png') }}">
+                </section>
+            </section>
+        </section>
+        <span class="finish_btn flex_me">
+            {{ paper_form.submit_p(class="btn btn-primary btn-lg") }}
+            <a href="{{ url_for('get_donation') }}">
+                <input type=button class="btn btn-secondary btn-lg" style="margin-right:5px;" value="חזור">
+            </a>
+        </span>
+    </form>
+    <form id="digital" class="hide_inv" style="display:none;" method="post">
+        {{ digital_form.hidden_tag() }}
+        <section class="flex_me" style="justify-content: space-evenly">
+            <section class="box size_box" style="height: 300px;">
+                <section class="center_text">
+                    <section class="form-group">
+                        {{ digital_form.mail_address.label() }}
+                        {% if digital_form.mail_address.errors %}
+                        {{ digital_form.mail_address() }}
+                        <div class="invalid-feedback d-block">
+                            {% for error in digital_form.mail_address.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ digital_form.mail_address() }}
+                        {% endif %}
+                    </section>
+                    <section class="form-group">
+                        {{ digital_form.donor_id.label() }}
+                        {% if digital_form.donor_id.errors %}
+                        {{ digital_form.donor_id() }}
+                        <div class="invalid-feedback d-block">
+                            {% for error in digital_form.donor_id.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ digital_form.donor_id() }}
+                        {% endif %}
+                    </section>
+                    <section class="form-group">
+                        {{ digital_form.donor_name.label() }}
+                        {% if digital_form.donor_name.errors %}
+                        {{ digital_form.donor_name() }}
+                        <div class="invalid-feedback d-block">
+                            {% for error in digital_form.donor_name.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ digital_form.donor_name() }}
+                        {% endif %}
+                    </section>
+                    <img style="width: 60%; display: block; margin: 3.5% auto;"
+                         src="{{ url_for('static', filename='logos/green_invoice.png') }}">
+                </section>
+            </section>
+        </section>
+        <span class="finish_btn flex_me">
+            {{ digital_form.submit_d(class="btn btn-primary btn-lg") }}
+            <a href="{{ url_for('get_donation') }}">
+                <input type=button class="btn btn-secondary btn-lg" style="margin-right:5px;" value="חזור">
+            </a>
+        </span>
+    </form>
+    <script>
+        $(document).ready(function () {
+            $("input[name=invoice_type]").on("change", function () {
+                var selectionValue =  $(this).val();
+                $(".hide_inv").hide();
+                $("#" + selectionValue).show();
+            });
+        });
+    </script>
+</main>
+{% endblock content %}
