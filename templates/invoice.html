@@ -9,7 +9,6 @@
     <section class='ctrl flex_me center_text'>
         <div class='ctrl__counter'>
             <div class='ctrl__counter-num'>{{ session['current_donation'].amount }}</div>
-
         </div>
     </section>
     <section class="center_text">
@@ -19,6 +18,10 @@
     {% if paper_form.errors or digital_form.errors %}
     <div class="invalid-feedback d-block center_text">
         <span>הפרטים שהוזנו שגויים. אנא נסה שנית.</span>
+    </div>
+    {% elif conn_error %}
+    <div class="invalid-feedback d-block center_text">
+        <span>ישנה תקלה בשרת החשבונית הירוקה, אנא הנפק חשבונית נייר ופנה לאחראי הארצי</span>
     </div>
     {% endif %}
     <form id="paper" class="hide_inv" method="post">
