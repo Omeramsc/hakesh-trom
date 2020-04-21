@@ -537,18 +537,45 @@ li:hover {
     width: 20%;
 }
 
+/*------------------------- bit donation -------------------------*/
+
+.bit_box {
+    width: 40%;
+    overflow-x: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.bold_input {
+    border: 2px dotted dodgerblue;
+    border-radius: 6px;
+}
+
+.bit_pay {
+    width: 12em;
+    border: 1px solid black;
+}
+
+.the_img, .the_form {
+    padding: 3%;
+}
+
 /*------------------------- Invoice -------------------------*/
 
 .paper_inv {
     width: 50%;
     display: block;
     margin: 2% auto;
-    border:1px solid black;"
+    border: 1px solid black;
+"
 }
 
-.size_box{
-    width:30%;
+.size_box {
+    width: 30%;
 }
+
 /*------------------------- Manage Campaign -------------------------*/
 .manage_box {
     height: 140%;
@@ -752,7 +779,7 @@ hr {
     }
 
     /* Invoice */
-    .paper_inv{
+    .paper_inv {
         width: 70%;
     }
 }
@@ -845,13 +872,13 @@ hr {
     }
 
     /* invoice */
-    .paper_inv{
+    .paper_inv {
         width: 60%;
     }
 
-    .size_box{
+    .size_box {
         background: rgba(255, 255, 255, 0.8);
-        width:90%;
+        width: 90%;
         border: 2px outset gray;
     }
 
@@ -940,7 +967,7 @@ hr {
     }
 
     /* invoice */
-    .paper_inv{
+    .paper_inv {
         width: 80%;
     }
 

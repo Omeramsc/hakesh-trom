@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FloatField, SelectField, RadioField, PasswordField, BooleanField, \
     IntegerField
 from wtforms.fields.html5 import DateField
-from wtforms.validators import DataRequired, Length, ValidationError, NumberRange, Email
+from wtforms.validators import DataRequired, Length, ValidationError, NumberRange, Email, Regexp
 from models import Campaign
 from utils.consts import INVOICE_REF_LENGTH
 import json
@@ -77,6 +77,13 @@ class DonationForm(FlaskForm):
                                                                                                'מתחת ל-5 ש"ח')])
     payment_type = RadioField('אמצעי תשלום', validators=[DataRequired(message="*סוג התשלום הינו שדה חובה")],
                               choices=[("PayPal", 'PayPal'), ("Cash", 'מזומן'), ("bit", 'bit')], default="Cash")
+    submit = SubmitField('המשך')
+
+
+class BitForm(FlaskForm):
+    transaction_id = StringField('מספר אישור:', validators=[DataRequired(), Regexp('^[0-9]{4}-[0-9]{4}-[0-9]{5}$',
+                                                                                   message='אנא הזן את מספר האישור '
+                                                                                           'לפי ההנחיה')])
     submit = SubmitField('המשך')
 
 

@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+{% block content %}
+<div id="subtitle_container">
+    <h3>תרומה</h3>
+</div>
+<main id="main_layout" class="unified_layout">
+    <button class="guide_btn" id="btnShow"><i class="fa fa-question-circle-o"></i></button>
+    {% include "donation_guidance.html" %}
+    <section class='ctrl flex_me center_text'>
+        <div class='ctrl__counter'>
+            <div class='ctrl__counter-num'>{{ session['current_donation'].amount }}</div>
+        </div>
+    </section>
+    <form class="hide_inv" method="post">
+        {{ form.hidden_tag() }}
+        <section class="flex_me" style="justify-content: space-evenly">
+            <section class="box size_box bit_box" style="height:320px;">
+                <div class="the_form">
+                    <section class="form-group center_text">
+                        <label>מספר איש הקשר להעברה:</label><br>
+                        <input class="center_text bold_input" type="text" value={{ bit_account_num }} disabled>
+                    </section>
+                    <section class="form-group center_text">
+                        {{ form.transaction_id.label() }} <br>
+                        {% if form.transaction_id.errors %}
+                        {{ form.transaction_id() }}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.transaction_id.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.transaction_id() }}
+                        {% endif %}
+                    </section>
+                </div>
+                <div class="the_img">
+                    <img class="bit_pay" src="{{ url_for('static', filename='bit_ref_guide.png') }}">
+                </div>
+            </section>
+        </section>
+        <span class="finish_btn flex_me">
+            <a href="{{ url_for('get_donation') }}">
+                <input type=button class="btn btn-secondary btn-lg" style="margin-right:5px;" value="חזור">
+            </a>
+            <span style="padding:5px;"></span>
+            {{ form.submit(class="btn btn-primary btn-lg") }}
+        </span>
+    </form>
+</main>
+{% endblock content %}
