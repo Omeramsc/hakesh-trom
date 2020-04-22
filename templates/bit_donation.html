@@ -17,8 +17,8 @@
             <section class="box size_box bit_box" style="height:320px;">
                 <div class="the_form">
                     <section class="form-group center_text">
-                        <label>מספר איש הקשר להעברה:</label><br>
-                        <input class="center_text bold_input" type="text" value={{ bit_account_num }} disabled>
+                        {{ form.account_num.label() }} <br>
+                        {{ form.account_num(class_="center_text bold_input") }}
                     </section>
                     <section class="form-group center_text">
                         {{ form.transaction_id.label() }} <br>

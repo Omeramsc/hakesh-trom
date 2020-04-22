@@ -4,7 +4,7 @@ from wtforms import StringField, SubmitField, FloatField, SelectField, RadioFiel
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, Length, ValidationError, NumberRange, Email, Regexp
 from models import Campaign
-from utils.consts import INVOICE_REF_LENGTH
+from utils.consts import INVOICE_REF_LENGTH, BIT_ACCOUNT_NUM
 import json
 
 
@@ -81,6 +81,7 @@ class DonationForm(FlaskForm):
 
 
 class BitForm(FlaskForm):
+    account_num = StringField("מספר איש קשר להעברה:", render_kw={"value": BIT_ACCOUNT_NUM, "disabled": ""})
     transaction_id = StringField('מספר אישור:', validators=[DataRequired(), Regexp('^[0-9]{4}-[0-9]{4}-[0-9]{5}$',
                                                                                    message='אנא הזן את מספר האישור '
                                                                                            'לפי ההנחיה')])
