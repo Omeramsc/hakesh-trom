@@ -24,7 +24,6 @@ def get_bearer_token():
     data = json.loads(res.read().decode("utf-8"))
     if data.get('errorCode'):
         raise ConnectionError  # unexpected login error
-        return False
     return data.get('token')
 
 
