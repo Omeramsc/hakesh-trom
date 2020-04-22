@@ -8,7 +8,7 @@ from db import db
 from utils.forms_helpers import get_campaign_icon
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users
 from utils.app_decorators import admin_access, user_access
-from utils.consts import INVOICE_TYPES, BIT_ACCOUNT_NUM
+from utils.consts import INVOICE_TYPES
 import datetime
 import json
 
@@ -211,7 +211,7 @@ def bit_donation():
     if form.validate_on_submit():
         session['current_donation']['transaction_id'] = form.transaction_id.data
         return redirect(url_for('send_invoice'))
-    return render_template('/bit_donation.html', form=form, bit_account_num=BIT_ACCOUNT_NUM)
+    return render_template('/bit_donation.html', form=form)
 
 
 @app.route('/donation_address/donation/invoice', methods=['GET', 'POST'])
