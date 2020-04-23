@@ -22,15 +22,13 @@
                     </section>
                     <section class="form-group center_text">
                         {{ form.transaction_id.label() }} <br>
-                        {% if form.transaction_id.errors %}
                         {{ form.transaction_id() }}
+                        {% if form.transaction_id.errors %}
                         <div class="invalid-feedback d-block">
                             {% for error in form.transaction_id.errors %}
                             <span>{{ error }}</span>
                             {% endfor %}
                         </div>
-                        {% else %}
-                        {{ form.transaction_id() }}
                         {% endif %}
                     </section>
                 </div>
