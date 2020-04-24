@@ -9,6 +9,7 @@ from utils.forms_helpers import get_campaign_icon
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users
 from utils.app_decorators import admin_access, user_access
 from utils.consts import INVOICE_TYPES
+import utils.green_invoice as gi
 import datetime
 import json
 
@@ -220,30 +221,50 @@ def bit_donation():
 def send_invoice():
     paper_form = PaperInvoiceForm()
     digital_form = DigitalInvoiceForm()
+    conn_error = False  # This way we make sure the conn error will appear only when there's an unexpected error.
 
     # first we'll check if the forms are validated, so we won't commit the donation with an invoice error.
     if paper_form.submit_p.data and paper_form.validate_on_submit() or \
             digital_form.submit_d.data and digital_form.validate_on_submit():
-        # commit the donation:
+
+        # create donation object:
         donation = Donation(amount=session['current_donation']['amount'],
                             payment_type=session['current_donation']['payment_type'],
                             team_id=session['current_donation']['team_id'],
                             transaction_id=session['current_donation'].get('transaction_id'))
-        db.session.add(donation)
-        db.session.commit()
 
-        # checking what kind of invoice was requested, validate It's information and commit it
-        new_invoice = Invoice(donation_id=donation.id)
-        if paper_form.submit_p.data:
-            new_invoice.reference_id = paper_form.reference_id.data
-            new_invoice.type = INVOICE_TYPES['PAPER']
+        # checking what kind of invoice was requested, validate It's information and commit it:
+        new_invoice = Invoice()
+        try:
+            if paper_form.submit_p.data:
+                new_invoice.reference_id = paper_form.reference_id.data
+                new_invoice.type = INVOICE_TYPES['PAPER']
+            else:
+
+                # Try to create a client in Green Invoice API and send the invoice to the client
+                token = gi.get_bearer_token()
+                client_id = gi.create_new_client(token, digital_form.donor_name.data,
+                                                 digital_form.mail_address.data, digital_form.donor_id.data)
+                reference_id = gi.send_invoice(token, digital_form.mail_address.data, client_id, donation.amount,
+                                               donation.payment_type)
+                new_invoice.type = INVOICE_TYPES['DIGITAL']
+                new_invoice.reference_id = reference_id
+        except (ConnectionError, RuntimeError, KeyError):
+            conn_error = True  # if there's a connection error or unexpected error, display an error in the invoice page
+        except ValueError:
+            digital_form.donor_id.errors.append("מספר ת.ז אינו תקין")
         else:
-            new_invoice.type = INVOICE_TYPES['DIGITAL']
-            # Here we'll send email through 'Green Invoice'
-        db.session.add(new_invoice)
-        db.session.commit()
-        return redirect(url_for('donation_end'))
-    return render_template('/invoice.html', paper_form=paper_form, digital_form=digital_form)
+
+            # If all went well, commit the donation.
+            db.session.add(donation)
+            db.session.commit()
+
+            # after we committed the donation, we get it's id for the invoice FK and commit the invoice.
+            new_invoice.donation_id = donation.id
+            db.session.add(new_invoice)
+            db.session.commit()
+            return redirect(url_for('donation_end'))
+    return render_template('/invoice.html', paper_form=paper_form, digital_form=digital_form, conn_error=conn_error)
 
 
 @app.route('/donation_address/donation/invoice/thanks')

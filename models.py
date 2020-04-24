@@ -224,7 +224,7 @@ class Invoice(db.Model):
     donation_id = db.Column(db.Integer, db.ForeignKey('donations.id'), nullable=False)
     donation = db.relationship("Donation", back_populates="invoice")
 
-    def __init__(self, donation_id, type=None, reference_id=None):
+    def __init__(self, donation_id=None, type=None, reference_id=None):
         self.donation_id = donation_id
         self.type = type
         self.reference_id = reference_id
