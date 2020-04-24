@@ -4,7 +4,7 @@
     <h3>יצירת קמפיין</h3>
 </div>
 <main id="main_layout" class="unified_layout">
-    <form class="report_form" method="POST" action="{{ url_for('create_campaign') }}">
+    <form class="report_form" method="POST">
         {{ form.hidden_tag() }}
         <div class="form-group">
             {{ form.name.label(class="form-control-label") }}
