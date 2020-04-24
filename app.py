@@ -3,7 +3,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood, DonationForm, PaperInvoiceForm, \
     DigitalInvoiceForm
 from app_init import app, bcrypt
-from models import Campaign, User, Neighborhood, Team, Donation, Invoice
+from models import Campaign, User, Neighborhood, Team, Donation, Invoice, Building
 from db import db
 from utils.forms_helpers import get_campaign_icon
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users
@@ -168,8 +168,34 @@ def manage_neighborhood_route(campaign_id, neighborhood_id):
     serialized_neighborhood_buildings = list(map(lambda building: building.serialize(), neighborhood_buildings))
 
     return render_template('/neighborhood_route_builder.html', neighborhood_teams=serialized_neighborhood_teams,
-                           neighborhood_data=neighborhood.serialize(),
-                           neighborhood_buildings=serialized_neighborhood_buildings)
+                           neighborhood_data=neighborhood.serialize(), campaign_id=campaign_id,
+                           neighborhood_id=neighborhood_id, neighborhood_buildings=serialized_neighborhood_buildings)
+
+
+@app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>/routes', methods=['POST'])
+@admin_access
+@login_required
+def upsert_routes(campaign_id, neighborhood_id):
+    # Validate the parameters
+    Campaign.query.get_or_404(campaign_id)
+    Neighborhood.query.get_or_404(neighborhood_id)
+    body = request.get_json()
+
+    for team_id in body.keys():
+        team = Team.query.get_or_404(team_id)
+        if team.campaign_id != campaign_id:
+            # The user wanted to change team for different campaign - blocking the changes
+            return jsonify({"message": "Team not found"}), 404
+
+        # Delete all the buildings
+        team.buildings = []
+        for building_id in body[team_id]:
+            # If the building exists, add it to the team
+            b = Building.query.get_or_404(building_id)
+            team.buildings.append(b)
+
+    db.session.commit()
+    return jsonify({"status": "OK"})
 
 
 @app.route('/manage_campaign/campaign_control_panel/<int:campaign_id>')

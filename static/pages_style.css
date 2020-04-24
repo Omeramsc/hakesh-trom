@@ -543,12 +543,13 @@ li:hover {
     width: 50%;
     display: block;
     margin: 2% auto;
-    border:1px solid black;"
+    border: 1px solid black;
 }
 
-.size_box{
-    width:30%;
+.size_box {
+    width: 30%;
 }
+
 /*------------------------- Manage Campaign -------------------------*/
 .manage_box {
     height: 140%;
@@ -635,6 +636,11 @@ li:hover {
     padding-left: 10px;
 }
 
+.route-builder-team-panel__save-btn {
+    width: 100%;
+    margin-bottom: 0.5em;
+}
+
 .route-builder-team-panel__team {
     border-bottom: solid 2px;
     cursor: pointer;
@@ -650,13 +656,21 @@ li:hover {
     font-weight: bolder;
 }
 
-.route-builder-team-panel__team_title__no_route {
+.route-builder-team-panel__team_title__no_route, .route-builder-team-panel__team_title__unclean {
     float: left;
     font-size: 24px;
-    color: red;
     font-weight: bold;
     line-height: 24px;
 }
+
+.route-builder-team-panel__team_title__no_route {
+    color: red;
+}
+
+.route-builder-team-panel__team_title__unclean {
+    color: #659cef;
+}
+
 
 .route-builder-team-panel__team_route ul {
     display: unset;
@@ -752,7 +766,7 @@ hr {
     }
 
     /* Invoice */
-    .paper_inv{
+    .paper_inv {
         width: 70%;
     }
 }
@@ -845,13 +859,13 @@ hr {
     }
 
     /* invoice */
-    .paper_inv{
+    .paper_inv {
         width: 60%;
     }
 
-    .size_box{
+    .size_box {
         background: rgba(255, 255, 255, 0.8);
-        width:90%;
+        width: 90%;
         border: 2px outset gray;
     }
 
@@ -940,7 +954,7 @@ hr {
     }
 
     /* invoice */
-    .paper_inv{
+    .paper_inv {
         width: 80%;
     }
 
