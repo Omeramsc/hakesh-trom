@@ -38,9 +38,13 @@
         </div>
       {% endif %}
     </section>
-    <a class="finish_btn flex_me" href="#">
-      {{ form.submit(class="btn btn-primary btn-lg") }}
-    </a>
+    <section class="finish_btn flex_me">
+        <a href="{{ url_for('donation_address') }}">
+            <input type=button class="btn btn-secondary btn-lg"  value="חזור">
+        </a>
+        <span style="padding:5px;"></span>
+        {{ form.submit(class="btn btn-primary btn-lg") }}
+    </section>
   </form>
 </main>
 {% endblock content %}
