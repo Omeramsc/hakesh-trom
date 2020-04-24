@@ -197,12 +197,14 @@ class Donation(db.Model):
     payment_type = db.Column(db.String(), nullable=False)
     team_id = db.Column(db.Integer, db.ForeignKey('teams.id'))
     team = db.relationship("Team", back_populates="donations")
+    transaction_id = db.Column(db.String(), nullable=True)
     invoice = db.relationship("Invoice", back_populates="donation")
 
-    def __init__(self, amount, payment_type, team_id):
+    def __init__(self, amount, payment_type, team_id, transaction_id):
         self.amount = amount
         self.payment_type = payment_type
         self.team_id = team_id
+        self.transaction_id = transaction_id
 
     def serialize(self):
         return {

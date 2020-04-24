@@ -1,7 +1,7 @@
 from flask import render_template, jsonify, flash, redirect, url_for, request, session
 from flask_login import login_user, current_user, logout_user, login_required
 from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood, DonationForm, PaperInvoiceForm, \
-    DigitalInvoiceForm
+    DigitalInvoiceForm, BitForm
 from app_init import app, bcrypt
 from models import Campaign, User, Neighborhood, Team, Donation, Invoice, Building
 from db import db
@@ -222,9 +222,22 @@ def get_donation():
         session['current_donation'] = {"amount": form.amount.data,
                                        "payment_type": form.payment_type.data,
                                        "team_id": current_user.team_id}
+        if form.payment_type.data == 'bit':
+            return redirect(url_for('bit_donation'))
         return redirect(url_for('send_invoice'))
         # FOR NOW, IGNORE PAYPAL AND BIT AND APPLY CASH DONATIONS FLOW ONLY
     return render_template('/donation.html', form=form)
+
+
+@app.route('/donation_address/donation/bit', methods=['GET', 'POST'])
+@login_required
+@user_access
+def bit_donation():
+    form = BitForm()
+    if form.validate_on_submit():
+        session['current_donation']['transaction_id'] = form.transaction_id.data
+        return redirect(url_for('send_invoice'))
+    return render_template('/bit_donation.html', form=form)
 
 
 @app.route('/donation_address/donation/invoice', methods=['GET', 'POST'])
@@ -240,7 +253,8 @@ def send_invoice():
         # commit the donation:
         donation = Donation(amount=session['current_donation']['amount'],
                             payment_type=session['current_donation']['payment_type'],
-                            team_id=session['current_donation']['team_id'])
+                            team_id=session['current_donation']['team_id'],
+                            transaction_id=session['current_donation'].get('transaction_id'))
         db.session.add(donation)
         db.session.commit()
 
