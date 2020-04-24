@@ -12,7 +12,10 @@ def get_bearer_token():
     """
 
     conn = http.client.HTTPSConnection("sandbox.d.greeninvoice.co.il")
-    payload = {'id': 'cf4eb537-6eec-4900-affe-e49be73112d3', 'secret': os.environ['GREEN_INV_TOKEN']}
+    try:
+        payload = {'id': 'cf4eb537-6eec-4900-affe-e49be73112d3', 'secret': os.environ['GREEN_INV_TOKEN']}
+    except KeyError:
+        raise KeyError
     headers = {
         'Authorization': f'Basic OWNkMTEyYzItYjRkNi00OTYwLTk2OTQtY2NiMDkyODBjM2Q0OlgyczhXcW5za2JFaVNtbnhvQkUtb0E=',
         'Content-Type': 'application/json',

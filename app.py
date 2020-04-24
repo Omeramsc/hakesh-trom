@@ -249,7 +249,7 @@ def send_invoice():
                                                donation.payment_type)
                 new_invoice.type = INVOICE_TYPES['DIGITAL']
                 new_invoice.reference_id = reference_id
-        except (ConnectionError, RuntimeError):
+        except (ConnectionError, RuntimeError, KeyError):
             conn_error = True  # if there's a connection error or unexpected error, display an error in the invoice page
         except ValueError:
             digital_form.donor_id.errors.append("מספר ת.ז אינו תקין")
