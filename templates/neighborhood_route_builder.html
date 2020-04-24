@@ -103,6 +103,11 @@
             for (const polygon of buildingLayerByTeamId[newTeamId]) {
                 polygon.setOptions({'fillColor': PICKED_TEAM_COLOR, strokeColor: PICKED_TEAM_COLOR})
             }
+
+            // Close info window
+            if (window.infoWindow) {
+                window.infoWindow.close();
+            }
         }
 
         function closeAllRoutes() {
@@ -314,6 +319,10 @@
                 // Color the polygon
                 polygon.setOptions({'fillColor': PICKED_TEAM_COLOR, strokeColor: PICKED_TEAM_COLOR});
 
+                // Adding the building to the team layer
+                if (!buildingLayerByTeamId[selectedTeamId]) buildingLayerByTeamId[selectedTeamId] = []
+                buildingLayerByTeamId[selectedTeamId].push(polygon)
+
                 // Update the team list
                 renderTeamRoute(selectedTeam);
 
@@ -343,6 +352,10 @@
                     'fillColor': calculatePolygonColor(building, null),
                     strokeColor: calculatePolygonColor(building, null)
                 });
+
+                // Remove the building to the team layer
+                if (!buildingLayerByTeamId[selectedTeamId]) buildingLayerByTeamId[selectedTeamId] = [];
+                buildingLayerByTeamId[selectedTeamId] = buildingLayerByTeamId[selectedTeamId].filter(p => p !== polygon);
 
                 // Update the team list
                 renderTeamRoute(selectedTeam);
@@ -375,7 +388,7 @@
                 if (selectedTeamId === teamIdOfBuildingInRoute) {
                     // The selected team is the ones who have this building in the route
                     contentDiv.appendChild(createDeleteBuildingFromRouteButton(building, polygon, infoWindow))
-                } else {
+                } else if (polygon.strokeColor !== NOT_AVAILABLE_COLOR) {
                     contentDiv.appendChild(createAddBuildingToRouteButton(building, polygon, infoWindow));
                 }
             }
@@ -448,6 +461,8 @@
             const infoWindow = new google.maps.InfoWindow({
                 size: new google.maps.Size(150, 50)
             });
+
+            window.infoWindow = infoWindow;
 
             google.maps.event.addListener(map, "click", function () {
                 infoWindow.close();
