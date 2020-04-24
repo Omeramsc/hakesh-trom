@@ -4,7 +4,6 @@ from utils.consts import ORGANIZATION_NAME, PAYMENT_TYPES
 import os
 import json
 
-
 def get_bearer_token():
     """
     Creates the bearer key in order to perform requests from the Green Invoice API.
@@ -13,13 +12,13 @@ def get_bearer_token():
     """
 
     conn = http.client.HTTPSConnection("sandbox.d.greeninvoice.co.il")
-    payload = f"{{\"id\":\"cf4eb537-6eec-4900-affe-e49be73112d3\",\"secret\":\"{os.environ['GREEN_INV_TOKEN']}\"}}"
+    payload = {'id': 'cf4eb537-6eec-4900-affe-e49be73112d3', 'secret': os.environ['GREEN_INV_TOKEN']}
     headers = {
         'Authorization': f'Basic OWNkMTEyYzItYjRkNi00OTYwLTk2OTQtY2NiMDkyODBjM2Q0OlgyczhXcW5za2JFaVNtbnhvQkUtb0E=',
         'Content-Type': 'application/json',
         'Content-Type': 'text/plain'
     }
-    conn.request("POST", "/api/v1/account/token", payload, headers)
+    conn.request("POST", "/api/v1/account/token", json.dumps(payload), headers)
     res = conn.getresponse()
     data = json.loads(res.read().decode("utf-8"))
     if data.get('errorCode'):
@@ -62,17 +61,14 @@ def create_new_client(token, name, email, tax_id, address='רחוב סוקולו
     """
 
     conn = http.client.HTTPSConnection("sandbox.d.greeninvoice.co.il")
-    payload = f"{{\"name\":\"{name}\",\"emails\":[\"{email}\"],\"paymentTerms\": 0,\"taxId\":\"{tax_id}\"," \
-              f"\"address\":\"{address}\",\"city\":\"{city}\",\"zip\":\"6291790\",\"country\":\"IL\"," \
-              f"\"accountingKey\":\"10202\",\"category\":5,\"subCategory\":501}}".encode('utf-8')
-    # Add address when possible
+    payload = {'name': name, 'emails': [email], 'paymentTerms': 0, 'taxId': tax_id, 'address': address, 'city': city,
+               'country': 'IL', 'accountingKey': 10202, 'category': 5, 'subCategory': 501}
 
     headers = {
         'Authorization': f'Bearer {token}',
-        'Content-Type': 'application/json',
-        'Content-Type': 'text/plain'
+        'Content-Type': 'application/json'
     }
-    conn.request("POST", "/api/v1/clients", payload, headers)
+    conn.request("POST", "/api/v1/clients", json.dumps(payload), headers)
     res = conn.getresponse()
     data = json.loads(res.read().decode("utf-8"))
     if data.get('errorCode'):
@@ -80,9 +76,8 @@ def create_new_client(token, name, email, tax_id, address='רחוב סוקולו
             client_id = data['errorMessage']
             if get_client_information(token, client_id)['taxId'] == tax_id:
                 return client_id  # If the existing client has the same ID number, return it's user id.
-            else:
-                return create_new_client(token, name + '.', email, tax_id)
-                # If it has a different ID number, recourse to create a new client, adding a dot to the requested name.
+            return create_new_client(token, name + '.', email, tax_id)
+            # If it has a different ID number, recourse to create a new client, adding a dot to the requested name.
         elif data['errorCode'] == 1111:  # Invalid ID
             raise ValueError()
         else:  # unexpected error
@@ -118,19 +113,19 @@ def send_invoice(token, email, client_id, amount, payment_type, org=ORGANIZATION
 
     app_type, p_code = payment_type_to_code(payment_type)
     conn = http.client.HTTPSConnection("sandbox.d.greeninvoice.co.il")
-    payload = f"{{\"type\": 400,\"date\":\"{to_date}\",\"vatType\":1,\"lang\":\"he\"," \
-              f"\"currency\":\"ILS\",\"description\":\"קבלה עבור תרומה ל{org}\",\"remarks\":\"קבלה זו " \
-              f"מוכרת לצרכי זיכוי  מס , על פי סעיף 46  לפקודת מס הכנסה\",\"footer\":\"תודה על תרומתך!\"," \
-              f"\"client\":{{\"self\": false,\"emails\":[\"{email}\"]," \
-              f"\"id\":\"{client_id}\"}},\"rounding\": false,\"signed\":" \
-              f"true,\"income\": [{{\"catalogNum\": \"\",\"price\": {amount}," \
-              f"\"currency\":\"ILS\",\"currencyRate\": 1,\"quantity\": 1,\"vatType\":1,\"vatRate\": 0}}]," \
-              f"\"payment\":[{{\"type\":{p_code},\"appType\":{app_type},\"price\": {amount},\"currency\":" \
-              f"\"ILS\",\"currencyRate\": 1,\"date\":\"{to_date}\"}}]}}".encode('utf-8')
+    payload = {'type': 400, 'date': to_date, 'vatType': 1, 'lang': 'he', 'currency': 'ILS',
+               'description': f'קבלה עבור תרומה ל{org}',
+               'remarks': 'קבלה זו מוכרת לצרכי זיכוי מס, על פי סעיף 46 לפקודת מס הכנסה', 'footer': 'תודה על תרומתך!',
+               'client': {'self': False, 'emails': [email], 'id': client_id}, 'rounding': False, 'signed': True,
+               'income': [{'catalogNum': "", 'price': amount, 'currency': 'ILS', 'currencyRate': 1, 'quantity': 1,
+                           'vatType': 1, 'vatRate': 0}], 'payment': [
+            {'type': p_code, 'appType': app_type, 'price': amount, 'currency': 'ILS', 'currencyRate': 1,
+             'date': to_date}]}
+
     headers = {
         'Authorization': f'Bearer {token}',
         'Content-Type': 'application/json'
     }
-    conn.request("POST", "/api/v1/documents", payload, headers)
+    conn.request("POST", "/api/v1/documents", json.dumps(payload, default=str), headers)
     data = conn.getresponse().read().decode('utf-8')
     return json.loads(data)['number']  # return ID of the invoice
