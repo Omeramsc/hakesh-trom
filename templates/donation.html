@@ -1,50 +1,55 @@
 {% extends "layout.html" %}
 {% block content %}
-<div id="subtitle_container">
-  <h3>תרומה</h3>
-</div>
-<main id="main_layout" class="unified_layout">
-  <button class="guide_btn" id="btnShow"><i class="fa fa-question-circle-o"></i></button>
-  {% include "donation_guidance.html" %}
-  <form style="all:unset" method="POST">
-    {{ form.hidden_tag() }}
-    <section class='ctrl flex_me center_text'>
-      <div class=' ctrl__button--increment'>+</div>
-      <div class='ctrl__counter'>
-        {{ form.amount(class="ctrl__counter-input center_text", id=donation) }}
-        <div class='ctrl__counter-num'>0</div>
-      </div>
-      <div class=' ctrl__button--decrement'>&ndash;</div>
-    </section>
-    {% if form.amount.errors %}
-        <div class="invalid-feedback d-block center_text">
-         {% for error in form.amount.errors %}
-          <span>{{ error }}</span>
-         {% endfor %}
-        </div>
-    {% endif %}
-    <section class="payment_choice flex_me center_text">
-      {% for subfield in form.payment_type %}
-      <label class="payment_option">
-        <img src="/static/{{ subfield.data }}.png" alt="{{ subfield.data }}"><br>
-        {{ subfield }} {{ subfield.label }}
-      </label>
-      {% endfor %}
-      {% if form.payment_type.errors %}
-        <div class="invalid-feedback d-block">
-         {% for error in form.payment_type.errors %}
-          <span>{{ error }}</span>
-         {% endfor %}
-        </div>
-      {% endif %}
-    </section>
-    <section class="finish_btn flex_me">
-        <a href="{{ url_for('donation_address') }}">
-            <input type=button class="btn btn-secondary btn-lg"  value="חזור">
-        </a>
-        <span style="padding:5px;"></span>
-        {{ form.submit(class="btn btn-primary btn-lg") }}
-    </section>
-  </form>
-</main>
+    <div id="subtitle_container">
+        <h3>תרומה</h3>
+    </div>
+    <main id="main_layout" class="unified_layout">
+        <button class="guide_btn" id="btnShow"><i class="fa fa-question-circle-o"></i></button>
+        {% include "donation_guidance.html" %}
+        <form style="all:unset" method="POST">
+            {{ form.hidden_tag() }}
+            <section class='ctrl flex_me center_text'>
+                <div class=' ctrl__button--increment'>+</div>
+                <div class='ctrl__counter'>
+                    {{ form.amount(class="ctrl__counter-input center_text", id=donation) }}
+                    <div class='ctrl__counter-num'>0</div>
+                </div>
+                <div class=' ctrl__button--decrement'>&ndash;</div>
+            </section>
+            {% if form.amount.errors %}
+                <div class="invalid-feedback d-block center_text">
+                    {% for error in form.amount.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% if conn_error %}
+                <div class="invalid-feedback d-block center_text">
+                    <span>ישנה תקלה בשירות ה- paypal, העסקה בוטלה. אנא השתמש באמצעי תשלום אחר ופנה לאחראי הארצי</span>
+                </div>
+            {% endif %}
+            <section class="payment_choice flex_me center_text">
+                {% for subfield in form.payment_type %}
+                    <label class="payment_option">
+                        <img src="/static/{{ subfield.data }}.png" alt="{{ subfield.data }}"><br>
+                        {{ subfield }} {{ subfield.label }}
+                    </label>
+                {% endfor %}
+                {% if form.payment_type.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.payment_type.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </section>
+            <section class="finish_btn flex_me">
+                <a href="{{ url_for('donation_address') }}">
+                    <input type=button class="btn btn-secondary btn-lg" value="חזור">
+                </a>
+                <span style="padding:5px;"></span>
+                {{ form.submit(class="btn btn-primary btn-lg") }}
+            </section>
+        </form>
+    </main>
 {% endblock content %}

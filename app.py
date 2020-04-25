@@ -8,8 +8,9 @@ from db import db
 from utils.forms_helpers import get_campaign_icon
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users
 from utils.app_decorators import admin_access, user_access
-from utils.consts import INVOICE_TYPES
+from utils.consts import INVOICE_TYPES, HOST_URL
 import utils.green_invoice as gi
+import utils.paypal as pp
 import datetime
 import json
 
@@ -244,15 +245,24 @@ def get_donation():
         redirect(url_for('donation_address'))
 
     form = DonationForm()
+    conn_error = request.args.get('conn_error')
     if form.validate_on_submit():
         session['current_donation'] = {"amount": form.amount.data,
                                        "payment_type": form.payment_type.data,
                                        "team_id": current_user.team_id}
         if form.payment_type.data == 'bit':
             return redirect(url_for('bit_donation'))
-        return redirect(url_for('send_invoice'))
-        # FOR NOW, IGNORE PAYPAL AND BIT AND APPLY CASH DONATIONS FLOW ONLY
-    return render_template('/donation.html', form=form)
+        elif form.payment_type.data == 'PayPal':
+            # Create a paypal payment and redirect to the authorization process via paypal's api
+            try:
+                payment = pp.create_payment(form.amount.data, f'{HOST_URL}donation_address/donation/paypal/execute',
+                                            f'{HOST_URL}donation_address/donation')
+                return redirect(pp.authorize_payment(payment))
+            except (ConnectionError, RuntimeError):
+                conn_error = True  # if there's a connection error / unexpected error, display an error in the donation page
+        if not conn_error:
+            return redirect(url_for('send_invoice'))
+    return render_template('/donation.html', form=form, conn_error=conn_error)
 
 
 @app.route('/donation_address/donation/bit', methods=['GET', 'POST'])
@@ -265,8 +275,22 @@ def bit_donation():
     form = BitForm()
     if form.validate_on_submit():
         session['current_donation']['transaction_id'] = form.transaction_id.data
+        session.modified = True
         return redirect(url_for('send_invoice'))
     return render_template('/bit_donation.html', form=form)
+
+
+@app.route('/donation_address/donation/paypal/execute', methods=['GET', 'POST'])
+@login_required
+@user_access
+def pp_execute():
+    """ This route gets the payment authorization and execute the transaction itself via paypal's api """
+    pp_req = request.args.to_dict()
+    if pp.execute_payment(pp_req):
+        session['current_donation']['transaction_id'] = pp_req['paymentId']
+        session.modified = True
+        return redirect(url_for('send_invoice'))
+    return redirect(url_for('get_donation', conn_error=True))
 
 
 @app.route('/donation_address/donation/invoice', methods=['GET', 'POST'])
@@ -279,11 +303,9 @@ def send_invoice():
     paper_form = PaperInvoiceForm()
     digital_form = DigitalInvoiceForm()
     conn_error = False  # This way we make sure the conn error will appear only when there's an unexpected error.
-
     # first we'll check if the forms are validated, so we won't commit the donation with an invoice error.
     if paper_form.submit_p.data and paper_form.validate_on_submit() or \
             digital_form.submit_d.data and digital_form.validate_on_submit():
-
         # create donation object:
         donation = Donation(amount=session['current_donation']['amount'],
                             payment_type=session['current_donation']['payment_type'],
