@@ -569,7 +569,6 @@ li:hover {
     display: block;
     margin: 2% auto;
     border: 1px solid black;
-"
 }
 
 .size_box {
@@ -662,6 +661,11 @@ li:hover {
     padding-left: 10px;
 }
 
+.route-builder-team-panel__save-btn {
+    width: 100%;
+    margin-bottom: 0.5em;
+}
+
 .route-builder-team-panel__team {
     border-bottom: solid 2px;
     cursor: pointer;
@@ -677,13 +681,21 @@ li:hover {
     font-weight: bolder;
 }
 
-.route-builder-team-panel__team_title__no_route {
+.route-builder-team-panel__team_title__no_route, .route-builder-team-panel__team_title__unclean {
     float: left;
     font-size: 24px;
-    color: red;
     font-weight: bold;
     line-height: 24px;
 }
+
+.route-builder-team-panel__team_title__no_route {
+    color: red;
+}
+
+.route-builder-team-panel__team_title__unclean {
+    color: #659cef;
+}
+
 
 .route-builder-team-panel__team_route ul {
     display: unset;
