@@ -97,8 +97,8 @@ class PaperInvoiceForm(FlaskForm):
 
 class DigitalInvoiceForm(FlaskForm):
     mail_address = StringField('כתובת מייל:', validators=[DataRequired(), Email()])
-    donor_id = StringField('ת.ז התורם:', validators=[DataRequired(), Length(min=9, max=9,
-                                                                            message='אנא הזן ת.ז בעלת 9 ספרות, כולל ספרת הביקורת')])
+    donor_id = StringField('ת.ז/ח.פ התורם:', validators=[DataRequired(), Length(min=9, max=9,
+                                                                                message='אנא הזן מספר ת.ז/ח.פ בעל 9 ספרות, כולל ספרת הביקורת')])
     donor_name = StringField('שם התורם:', validators=[DataRequired()])
 
     submit_d = SubmitField('סיים תרומה')
