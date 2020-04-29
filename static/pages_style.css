@@ -729,6 +729,43 @@ li:hover {
     margin-top: 10px;
 }
 
+/*------------------------- Selecting address -------------------------*/
+.donation-address {
+    text-align: center;
+}
+
+.donation-address-selection {
+    border: solid;
+    display: inline-block;
+    padding: 1em;
+    width: 20em;
+}
+
+.donation-address-map {
+    min-width: 20em;
+    margin: auto;
+    height: 20em;
+    max-width: 70%;
+}
+
+.donation-address-selection__search {
+    margin-bottom: 1em;
+}
+
+.donation-address-selection__building-list ul li.selected {
+    color: #fff;
+    background-color: #007bff !important;
+}
+
+.donation-address-selection__building-list ul li {
+    transform: unset;
+    transition: unset;
+    list-style-type: none;
+    background: white;
+    border: solid 1px black;
+    cursor: pointer;
+}
+
 /*------------------------- Errors -------------------------*/
 .error_pic {
     width: 35%;

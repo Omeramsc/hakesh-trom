@@ -207,17 +207,42 @@ def campaign_control_panel(campaign_id):
     return render_template('/campaign_control_panel.html', campaign=campaign)
 
 
-@app.route('/donation_address', methods=['GET', 'POST'])
+@app.route('/donation_address', methods=['GET'])
 @login_required
 @user_access
 def donation_address():
-    return render_template('/donation_address.html')
+    if session.get('current_building_id'):
+        session.pop('current_building_id')
+
+    buildings = current_user.team.buildings
+    buildings_donations = Donation.query.filter(Donation.building_id.in_(map(lambda b: b.id, buildings)))
+    building_ids_with_donations = list(map(lambda d: d.building_id, buildings_donations))
+    serialized_buildings = list(map(lambda b: b.serialize(), buildings))
+
+    for building in serialized_buildings:
+        building['have_donations'] = building['id'] in building_ids_with_donations
+
+    neighborhood_data = current_user.team.neighborhood.serialize()
+
+    return render_template('/donation_address.html', buildings=serialized_buildings, neighborhood=neighborhood_data)
+
+
+@app.route('/donation_address/<int:building_id>', methods=['GET'])
+@login_required
+@user_access
+def set_current_building_id(building_id):
+    session['current_building_id'] = building_id
+
+    return redirect(url_for('get_donation'))
 
 
 @app.route('/donation_address/donation', methods=['GET', 'POST'])
 @login_required
 @user_access
 def get_donation():
+    if not session.get('current_building_id'):
+        redirect(url_for('donation_address'))
+
     form = DonationForm()
     if form.validate_on_submit():
         session['current_donation'] = {"amount": form.amount.data,
@@ -234,6 +259,9 @@ def get_donation():
 @login_required
 @user_access
 def bit_donation():
+    if not session.get('current_building_id'):
+        redirect(url_for('donation_address'))
+
     form = BitForm()
     if form.validate_on_submit():
         session['current_donation']['transaction_id'] = form.transaction_id.data
@@ -245,6 +273,9 @@ def bit_donation():
 @login_required
 @user_access
 def send_invoice():
+    if not session.get('current_building_id'):
+        redirect(url_for('donation_address'))
+
     paper_form = PaperInvoiceForm()
     digital_form = DigitalInvoiceForm()
     conn_error = False  # This way we make sure the conn error will appear only when there's an unexpected error.
@@ -257,7 +288,8 @@ def send_invoice():
         donation = Donation(amount=session['current_donation']['amount'],
                             payment_type=session['current_donation']['payment_type'],
                             team_id=session['current_donation']['team_id'],
-                            transaction_id=session['current_donation'].get('transaction_id'))
+                            transaction_id=session['current_donation'].get('transaction_id'),
+                            building_id=session['current_building_id'])
 
         # checking what kind of invoice was requested, validate It's information and commit it:
         new_invoice = Invoice()
