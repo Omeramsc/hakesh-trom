@@ -7,7 +7,7 @@
     <section class="boxes_container flex_me">
       <section class="box search manage_search">
         <h3 class=center_text> <u>חיפוש קמפייניים:</u></h3>
-        <form method="POST">
+        <form method="POST" >
           {{ form.hidden_tag() }}
           <div class="form-row">
             <div class="col-md-8 mb-3">
@@ -37,7 +37,7 @@
       <section class="box report_list manage_box">
         <h3 class=center_text> <u> בחר קמפיין:</u></h3>
         <ul>
-            {% for campaign in campaigns: %}
+            {% for campaign in campaigns %}
               <li>
                 <img src="{{ get_icon(campaign.start_date) }}">
                 <a id='report_summary'

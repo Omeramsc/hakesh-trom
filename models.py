@@ -73,6 +73,7 @@ class Team(db.Model):
         secondary=buildings_teams_association_table,
         back_populates="teams")
     donations = db.relationship("Donation", back_populates="team")
+    reports = db.relationship("Report", back_populates="team")
 
     def __init__(self, neighborhood_id, campaign_id):
         self.neighborhood_id = neighborhood_id
@@ -239,4 +240,37 @@ class Invoice(db.Model):
             'type': self.type,
             'reference_id': self.reference_id,
             'donation_id': self.donation_id,
+        }
+
+
+class Report(db.Model):
+    __tablename__ = 'reports'
+
+    id = db.Column(db.Integer, primary_key=True)
+    address = db.Column(db.String, nullable=False)
+    category = db.Column(db.String(), nullable=False)
+    description = db.Column(db.String, nullable=False)
+    creation_time = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    is_open = db.Column(db.Boolean, default=True, nullable=False)
+    response = db.Column(db.String, nullable=True)
+    response_time = db.Column(db.DateTime, nullable=True)
+    team_id = db.Column(db.Integer, db.ForeignKey('teams.id'))
+    team = db.relationship("Team", back_populates="reports")
+
+    def __init__(self, address, category, description):
+        self.address = address
+        self.category = category
+        self.description = description
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'address': self.address,
+            'category': self.category,
+            'description': self.description,
+            'creation_time': self.creation_time,
+            'is_open': self.is_open,
+            'response': self.response,
+            'response_time': self.response_time,
+            'team_id': self.team_id,
         }

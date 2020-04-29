@@ -1,39 +1,11 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FloatField, SelectField, RadioField, PasswordField, BooleanField, \
-    IntegerField
+    IntegerField, TextAreaField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, Length, ValidationError, NumberRange, Email, Regexp
 from models import Campaign
 from utils.consts import INVOICE_REF_LENGTH, BIT_ACCOUNT_NUM
-import json
-
-
-def memoize_dropdown(func):
-    """Checks if the dropdown list has already been created.
-    If it did, it returns the cached list. otherwise, it creates one.
-    """
-
-    dropdown_cache = []
-
-    def wrapper():
-        if not dropdown_cache:
-            for city in func():
-                dropdown_cache.append((city, city))
-        return dropdown_cache
-
-    return wrapper
-
-
-@memoize_dropdown
-def read_cities():
-    """Reads the city-list files, while putting 'Tel-Aviv' first and ignoring tribes & settlement."""
-    with open('static/israel-cities.json', 'r', encoding="utf8") as data:
-        data = json.load(data)
-    yield 'תל - אביב - יפו'
-    for line in data:
-        if ")" not in line.get('name'):
-            yield line.get('name')
-
+from utils.forms_helpers import report_categories, read_cities
 
 class CreateCampaignForm(FlaskForm):
     name = StringField('*שם הקמפיין:',
@@ -118,3 +90,30 @@ class DigitalInvoiceForm(FlaskForm):
     donor_name = StringField('שם התורם:', validators=[DataRequired(message='שדה זה הינו שדה חובה')])
 
     submit_d = SubmitField('סיים תרומה')
+
+
+class ReportForm(FlaskForm):
+    address = StringField('כתובת:', validators=[DataRequired()],
+                          render_kw={"placeholder": "הזן את כתובת המיקום של האירוע"})
+    category = SelectField('סוג הדיווח:', choices=[(value, value) for value in report_categories],
+                           validators=[DataRequired()])
+    description = TextAreaField('תיאור:', validators=[DataRequired(), Length(max=200,
+                                                                             message='אנא הזן תיאור עד 200 תווים.')])
+
+    submit = SubmitField('שמור דיווח')
+
+
+class RespondReportForm(FlaskForm):
+    response = TextAreaField('תשובה:', validators=[DataRequired(), Length(max=200,
+                                                                          message='אנא הזן תיאור עד 200 תווים.')],
+                             default="קיבלתי, תודה.")
+
+    submit = SubmitField('ענה לדיווח')
+
+
+class SearchReportForm(FlaskForm):
+    category = SelectField('סוג הדיווח:', choices=[(value, value) for value in report_categories], default="")
+    status = RadioField(choices=[("open", 'פתוח'), ("closed", 'סגור')])
+    submit = SubmitField('בצע חיפוש')
+
+

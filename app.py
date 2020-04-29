@@ -1,11 +1,11 @@
-from flask import render_template, jsonify, flash, redirect, url_for, request, session
+from flask import render_template, jsonify, flash, redirect, url_for, request, session, abort
 from flask_login import login_user, current_user, logout_user, login_required
 from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood, DonationForm, PaperInvoiceForm, \
-    DigitalInvoiceForm, BitForm
+    DigitalInvoiceForm, BitForm, ReportForm, SearchReportForm, RespondReportForm
 from app_init import app, bcrypt
-from models import Campaign, User, Neighborhood, Team, Donation, Invoice, Building
+from models import Campaign, User, Neighborhood, Team, Donation, Invoice, Building, Report
 from db import db
-from utils.forms_helpers import get_campaign_icon
+from utils.forms_helpers import get_campaign_icon, get_report_status_icon
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users
 from utils.app_decorators import admin_access, user_access
 from utils.consts import INVOICE_TYPES, HOST_URL
@@ -360,17 +360,118 @@ def donation_end():
 @app.route('/reports', methods=['GET', 'POST'])
 @login_required
 def reports():
-    # GET REPORTS FROM DB
-    return render_template('/reports.html')
+    form = SearchReportForm()
+    # Start with an empty query
+    reports_query = Report.query
+
+    if form.submit():
+        # If the user added category, add it to the query
+        if form.category.data:
+            reports_query = reports_query.filter(Report.category == form.category.data)
+
+        # If the user selected a status
+        if form.status.data:
+            if form.status.data == "open":
+                reports_query = reports_query.filter(Report.is_open)
+            elif form.status.data == "closed":
+                reports_query = reports_query.filter(Report.is_open == False)  # 'is false' or 'not' are not working.
+    # Preforming the fetch from the DB now
+    return render_template('/reports.html', reports=reports_query.all(), get_icon=get_report_status_icon, form=form)
 
 
-@app.route('/create_report', methods=['GET', 'POST'])
+@app.route('/reports/create_report', methods=['GET', 'POST'])
 @login_required
 def create_report():
-    # if request.method == 'GET':
-    # INSERT INTO DB
-    # return redirect(url_for('create_report'))
-    return render_template('/create_report.html')
+    form = ReportForm()
+    if form.validate_on_submit():
+        report = Report(address=form.address.data,
+                        category=form.category.data,
+                        description=form.description.data)
+        if current_user.team_id:
+            report.team_id = current_user.team_id
+        db.session.add(report)
+        db.session.commit()
+        flash('!הדיווח נוצר בהצלחה', 'success')
+        return redirect(url_for('reports'))
+    return render_template('/create_report.html', form=form, legend="יצירת דיווח")
+
+
+@app.route('/reports/view_report/<int:report_id>')
+@login_required
+def view_report(report_id):
+    report = Report.query.get_or_404(report_id)
+    return render_template('/view_report.html', report=report)
+
+
+@app.route('/reports/view_report/<int:report_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_report(report_id):
+    report = Report.query.get_or_404(report_id)
+    if report.team_id != current_user.team_id and not current_user.is_admin:
+        abort(403)
+    form = ReportForm()
+    if form.validate_on_submit():
+        report.address = form.address.data
+        report.category = form.category.data
+        report.description = form.description.data
+        db.session.commit()
+        flash('!הדיווח עודכן בהצלחה', 'success')
+        return redirect(url_for('view_report', report_id=report.id))
+    elif request.method == 'GET':
+        form.address.data = report.address
+        form.category.data = report.category
+        form.description.data = report.description
+    return render_template('/create_report.html', form=form, legend="עריכת דיווח")
+
+
+@app.route('/reports/view_report/<int:report_id>/delete', methods=['POST'])
+@login_required
+def delete_report(report_id):
+    report = Report.query.get_or_404(report_id)
+    if report.team_id != current_user.team_id and not current_user.is_admin:
+        abort(403)
+    db.session.delete(report)
+    db.session.commit()
+    # CAN ADD HERE A "CANCEL" OPTION FOR NORMAL USERS
+    flash('!הדיווח נמחק בהצלחה', 'success')
+    return redirect(url_for('reports'))
+
+
+@app.route('/reports/view_report/<int:report_id>/respond', methods=['GET', 'POST'])
+@login_required
+@admin_access
+def respond_to_report(report_id):
+    report = Report.query.get_or_404(report_id)
+    if not report.is_open:
+        return redirect(url_for('edit_respond', report_id=report.id)) #LOOK AGAIN
+    form = RespondReportForm()
+    if form.validate_on_submit():
+        report.is_open = False
+        report.response = form.response.data
+        report.response_time = datetime.datetime.utcnow()
+        db.session.commit()
+        flash('!הדיווח נענה בהצלחה', 'success')
+        return redirect(url_for('reports'))
+    return render_template('/report_response.html', report=report, form=form, legend="מענה לדיווח")
+
+
+@app.route('/reports/view_report/<int:report_id>/edit_response', methods=['GET', 'POST'])
+@login_required
+@admin_access
+def edit_response(report_id):
+    report = Report.query.get_or_404(report_id)
+    if not report.response:
+        abort(403)
+    form = RespondReportForm()
+    if form.validate_on_submit():
+        report.response = form.response.data
+        report.response_time = datetime.datetime.utcnow()
+        db.session.commit()
+        flash('!המענה לדיווח עודכן בהצלחה', 'success')
+        return redirect(url_for('view_report', report_id=report.id))
+    elif request.method == 'GET':
+        form.response.data = report.response
+    return render_template('/report_response.html', report=report, form=form, legend="עריכת מענה")
 
 
 if __name__ == '__main__':

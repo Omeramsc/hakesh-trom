@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div id="subtitle_container">
+        <h3> {{ legend }}</h3>
+    </div>
+    <main id="main_layout" class="unified_layout">
+        <div class="report_form">
+            <section id="report_info">
+                <p>
+                <ul class="center_text no_deco">
+                    <li><b>כתובת:</b> {{ report.address }}</li>
+                    <li><b>קטגוריה:</b> {{ report.category }}</li>
+                    <li><b>תיאור:</b> {{ report.description }}</li>
+                    <li><b>כותב הדיווח:</b> {{ "צוות %s" % (report.team_id) if report.team_id else "אחראי ארצי" }}</li>
+                    {# replace with team name + link to page #}
+                    <li><b>מועד יצירה:</b> {{ report.creation_time.replace(microsecond=0) }}</li>
+                    <li><b>סטטוס: </b> {{ "פתוח" if report.is_open else "סגור" }}</li>
+                </ul>
+                </p>
+            </section>
+            {% if report.response %}
+                <li><b>מועד המענה:</b> {{ report.response_time.replace(microsecond=0) }}</li>
+            {% endif %}
+            <form class="report_form" method="POST">
+                {{ form.hidden_tag() }}
+                <section id="response_info">
+                    <div class="form-group">
+                        {{ form.response.label(class="form-control-label") }}
+                        {% if form.response.errors %}
+                            {{ form.response(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.response.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.response(class="form-control") }}
+                        {% endif %}
+                    </div>
+                </section>
+                <div class="control_buttons">
+                    {{ form.submit(class="btn btn-primary btn-lg btn-block") }}
+                    <a href="{{ url_for('view_report', report_id=report.id) }}">
+                        <button type="button" class="btn btn-secondary btn-lg btn-block">חזור</button>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+{% endblock content %}
