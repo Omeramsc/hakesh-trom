@@ -255,7 +255,8 @@ def get_donation():
         elif form.payment_type.data == 'PayPal':
             # Create a paypal payment and redirect to the authorization process via paypal's api
             try:
-                payment = pp.create_payment(form.amount.data, f'{HOST_URL}donation_address/donation/paypal/execute',
+                payment = pp.create_payment(form.amount.data,
+                                            f'{HOST_URL}donation_address/donation/paypal/execute_paypal_donation',
                                             f'{HOST_URL}donation_address/donation')
                 return redirect(pp.authorize_payment(payment))
             except (ConnectionError, RuntimeError):
@@ -280,7 +281,7 @@ def bit_donation():
     return render_template('/bit_donation.html', form=form)
 
 
-@app.route('/donation_address/donation/paypal/execute', methods=['GET', 'POST'])
+@app.route('/donation_address/donation/paypal/execute_paypal_donation', methods=['GET', 'POST'])
 @login_required
 @user_access
 def pp_execute():

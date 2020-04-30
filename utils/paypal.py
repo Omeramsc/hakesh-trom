@@ -9,6 +9,7 @@ paypalrestsdk.configure({
 
 
 def create_payment(amount, return_url, cancel_url, org=ORGANIZATION_NAME):
+    """Creates a PayPal payment with the necessary information & app experience profile ID."""
     try:
         payment = paypalrestsdk.Payment({
             "intent": "sale",
@@ -38,6 +39,7 @@ def create_payment(amount, return_url, cancel_url, org=ORGANIZATION_NAME):
 
 
 def authorize_payment(payment):
+    """Activate client's payment authorization page from a PayPal Payment."""
     for link in payment.links:
         if link.rel == "approval_url":
             # Convert to str to avoid Google App Engine Unicode issue
@@ -46,6 +48,7 @@ def authorize_payment(payment):
 
 
 def execute_payment(pp_req):
+    """Executes a payment authorized by the client."""
     payment = paypalrestsdk.Payment.find(pp_req['paymentId'])
     if payment.execute({"payer_id": pp_req['PayerID']}):
         return True
