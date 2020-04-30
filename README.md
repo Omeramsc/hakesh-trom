@@ -75,7 +75,7 @@ heroku local web -f Procfile.windows
 
 ### Paying with PayPal:
 You HAVE to set the following environment variables with the respected info:
-```PAYPAL_CLIENT```
-```PAYPAL_TOKEN```
+* `PAYPAL_CLIENT`
+* `PAYPAL_TOKEN`
 
 Since this version is using the sandbox environment of PayPal's API, a payment can be accepted only by users defined in PayPal's web console.
