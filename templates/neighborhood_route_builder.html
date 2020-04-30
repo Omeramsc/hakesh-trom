@@ -50,6 +50,7 @@
         </div>
         <div class="hidden"></div>
     </main>
+    <script type="application/javascript" src="{{ url_for('static', filename='scripts/geo-utils.js') }}"></script>
     <script>
         // Building colors
         const NOT_AVAILABLE_COLOR = '#a2a4a6';
@@ -79,13 +80,6 @@
         let selectedTeamId;
         let buildingLayerByTeamId = {};
         let selectedTeamBuildings = [];
-
-        function convertPointToLatLng(point) {
-            return {
-                lng: point[0],
-                lat: point[1]
-            }
-        }
 
         function updateTeamId(newTeamId) {
             if (!buildingLayerByTeamId[newTeamId]) buildingLayerByTeamId[newTeamId] = [];

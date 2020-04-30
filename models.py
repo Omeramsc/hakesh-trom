@@ -28,6 +28,7 @@ class Building(db.Model):
         "Team",
         secondary=buildings_teams_association_table,
         back_populates="buildings")
+    donations = db.relationship("Donation", back_populates="building")
 
     def get_encoded_input(self):
         return {
@@ -199,12 +200,15 @@ class Donation(db.Model):
     team = db.relationship("Team", back_populates="donations")
     transaction_id = db.Column(db.String(), nullable=True)
     invoice = db.relationship("Invoice", back_populates="donation")
+    building_id = db.Column(db.Integer, db.ForeignKey('buildings.id'))
+    building = db.relationship("Building", back_populates="donations")
 
-    def __init__(self, amount, payment_type, team_id, transaction_id):
+    def __init__(self, amount, payment_type, team_id, transaction_id, building_id):
         self.amount = amount
         self.payment_type = payment_type
         self.team_id = team_id
         self.transaction_id = transaction_id
+        self.building_id = building_id
 
     def serialize(self):
         return {

@@ -1,15 +1,181 @@
 {% extends "layout.html" %}
 {% block content %}
-<div id="subtitle_container">
-  <h3>תרומה</h3>
-</div>
-<main id="main_layout" class="unified_layout">
-  <button class="guide_btn" id="btnShow"><i class="fa fa-question-circle-o"></i></button>
-  {% include "donation_guidance.html" %}
-  <p class="center_text">עמוד זה נוצר בשביל הזרימה של התהליך, בפועל עמוד זה יכלול בחירה של כתובת לביצוע התרומה.</p>
-  <a class="finish_btn flex_me" href="#">
-    <a class="finish_btn flex_me" href="{{ url_for('get_donation') }}">
-      <button type="button" class="btn btn-primary btn-lg" >המשך</button> </a>
-    </a>
-</main>
+    <div id="subtitle_container">
+        <h3>תרומה</h3>
+    </div>
+    <main id="main_layout" class="unified_layout">
+        <button class="guide_btn" id="btnShow"><i class="fa fa-question-circle-o"></i></button>
+        {% include "donation_guidance.html" %}
+        <br/>
+        <div class="donation-address">
+            <div id="map" class="donation-address-map"></div>
+            <div class="donation-address-selection">
+                <input class="donation-address-selection__search" id="building-search">
+                <div class="donation-address-selection__building-list">
+                    <ul id="buildings-list">
+                        <li class="selected">בניין אחד</li>
+                        <li>בניין שני</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <a class="finish_btn flex_me" href="#">
+            <a class="finish_btn flex_me" href="#" id="next-link">
+                <button type="button" class="btn btn-primary btn-lg" id="next-button" disabled>המשך</button>
+            </a>
+        </a>
+    </main>
+    <script type="application/javascript" src="{{ url_for('static', filename='scripts/geo-utils.js') }}"></script>
+    <script>
+        const buildings = {{ buildings | tojson  }};
+        const neighborhood =  {{ neighborhood | tojson }};
+        const buildingListElm = document.getElementById('buildings-list');
+        const buildingSearchElm = document.getElementById('building-search');
+        const nextButtonElm = document.getElementById('next-button');
+        const nextLinkElm = document.getElementById('next-link');
+
+        const NOT_AVAILABLE_COLOR = '#a2a4a6';
+        const PICKED_TEAM_COLOR = '#4287f5';
+        const ABOVE_AVG_COLOR = '#55eb34';
+        const BUILDING_ID_PLACEHOLDER = 'BUILDING_ID'
+        const SET_BUILDING_URL = "{{ url_for('set_current_building_id', building_id=-1) }}".replace("-1", BUILDING_ID_PLACEHOLDER);
+
+        const buildingPolygons = {};
+        let selectedBuildingId = null;
+
+
+        buildingSearchElm.addEventListener('keyup', renderBuildingList);
+
+        function selectBuilding(buildingId) {
+            // Cleanup
+            const buildingElms = buildingListElm.getElementsByTagName('li');
+            for (const b of buildingElms) {
+                const bId = parseInt(b.getAttribute('data-id'), 10)
+                if (bId === buildingId) {
+                    // Set the building as selected
+                    b.classList.add("selected");
+                    if (buildingPolygons[bId]) {
+                        buildingPolygons[bId].setOptions({
+                            fillColor: PICKED_TEAM_COLOR,
+                            strokeColor: PICKED_TEAM_COLOR
+                        });
+                    }
+
+                    continue;
+                }
+
+                // Not the selected building, removing the selected class
+                b.classList.remove("selected");
+                if (buildingPolygons[bId]) {
+                    buildingPolygons[bId].setOptions({
+                        fillColor: getBuildingColor(buildingPolygons[bId].building),
+                        strokeColor: getBuildingColor(buildingPolygons[bId].building)
+                    });
+                }
+            }
+
+            // Color the building
+            if (buildingPolygons[buildingId]) {
+                buildingPolygons[buildingId].setOptions({fillColor: PICKED_TEAM_COLOR, strokeColor: PICKED_TEAM_COLOR})
+            }
+
+            // Make the button clickable
+            nextButtonElm.disabled = false;
+
+            // Update the link
+            nextLinkElm.href = SET_BUILDING_URL.replace(BUILDING_ID_PLACEHOLDER, buildingId);
+
+            // Set the the global var
+            selectedBuildingId = buildingId;
+        }
+
+        function renderBuildingList() {
+            const searchText = buildingSearchElm.value ? buildingSearchElm.value.trim() : "";
+
+            // Cleanup
+            buildingListElm.innerHTML = '';
+
+            // Searching the buildings
+            const buildingsToRender = buildings.filter(building => building.address.includes(searchText));
+
+            // If we don't have buildings to show
+            if (buildingsToRender.length === 0) {
+                buildingListElm.innerHTML = '<span>לא נמצאו בניינים</span>'
+                return;
+            }
+
+            // Append the buildings
+            for (const building of buildingsToRender) {
+                const buildingElm = document.createElement('li');
+
+                buildingElm.innerText = building.address;
+                buildingElm.id = `building-element-${building.id}`;
+                buildingElm.setAttribute('data-id', building.id);
+
+                buildingElm.addEventListener('click', () => selectBuilding(building.id));
+
+                buildingListElm.appendChild(buildingElm);
+            }
+        }
+
+        function getBuildingColor(building) {
+            if (building.have_donations) {
+                return NOT_AVAILABLE_COLOR;
+            }
+            return ABOVE_AVG_COLOR;
+
+        }
+
+        function addPolygon(map, building) {
+            const polygon = new google.maps.Polygon({
+                fillOpacity: 0.38,
+                map,
+                building,
+                paths: building.geometry.map(convertPointToLatLng),
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                strokeColor: getBuildingColor(building),
+                fillColor: getBuildingColor(building),
+            });
+
+            google.maps.event.addListener(polygon, "click", function () {
+                buildingSearchElm.value = '';
+                renderBuildingList();
+                selectBuilding(building.id)
+            });
+
+            buildingPolygons[building.id] = polygon;
+        }
+
+        function initMap() {
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 16,
+                center: convertPointToLatLng(buildings.length > 0 ? buildings[0].center_point : neighborhood.center_point),
+                mapTypeId: "terrain"
+            });
+
+            const neighborhoodPolygon = new google.maps.Polygon({
+                map,
+                paths: neighborhood.geometry.map(convertPointToLatLng),
+                fillOpacity: 0,
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                strokeColor: "#FF0000",
+                fillColor: "#FF0000"
+            });
+
+
+            for (const building of buildings) {
+                addPolygon(map, building);
+            }
+        }
+
+        renderBuildingList();
+    </script>
+
+    <script
+            async
+            defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCeQSgOmTLHNxGk4Vg3JlTNCGD8BEO992Y&callback=initMap">
+    </script>
 {% endblock content %}
