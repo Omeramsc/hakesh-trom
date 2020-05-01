@@ -5,7 +5,7 @@
     </div>
     <main id="main_layout" class="unified_layout">
         <div class="report_form">
-            <section id="report_info">
+            <section id="report_info" class="report_info_box center_marg">
                 <p>
                 <ul class="center_text no_deco">
                     <li><b>כתובת:</b> {{ report.address }}</li>
@@ -18,12 +18,9 @@
                 </ul>
                 </p>
             </section>
-            {% if report.response %}
-                <li><b>מועד המענה:</b> {{ report.response_time.replace(microsecond=0) }}</li>
-            {% endif %}
             <form class="report_form" method="POST">
                 {{ form.hidden_tag() }}
-                <section id="response_info">
+                <section id="response_info" class="center_marg center_text">
                     <div class="form-group">
                         {{ form.response.label(class="form-control-label") }}
                         {% if form.response.errors %}
@@ -38,6 +35,10 @@
                         {% endif %}
                     </div>
                 </section>
+                {% if report.response %}
+                    <li class="center_text no_deco"><b>מועד המענה:</b> {{ report.response_time.replace(microsecond=0) }}
+                    </li>
+                {% endif %}
                 <div class="control_buttons">
                     {{ form.submit(class="btn btn-primary btn-lg btn-block") }}
                     <a href="{{ url_for('view_report', report_id=report.id) }}">

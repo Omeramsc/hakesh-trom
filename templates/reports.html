@@ -20,7 +20,7 @@
         </section>
         <section class="boxes_container flex_me">
             <section class="box search">
-                <h3 class=center_text><u>חיפוש דיווחים:</u></h3>
+                <h3 class=center_text><u>חפש דיווחים:</u></h3>
                 <form method="POST">
                     {{ form.hidden_tag() }}
                     <div class="form-row">
@@ -51,7 +51,7 @@
                             <a id='report_summary'
                                class='hide_link' href="{{ url_for('view_report', report_id=report.id) }}">
                                 {{ report.creation_time.replace(microsecond=0) }}<br><strong>{{ report.category }}
-                            </strong><br>{{ report.address }}, {{ report.team_id if report.team_id else "אחראי ארצי" }}
+                            </strong><br>{{ report.address }}, {{ "צוות %s" % (report.team_id) if report.team_id else "אחראי ארצי" }}
                             </a>
                         </li>
                     {% endfor %}

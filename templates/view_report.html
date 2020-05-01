@@ -5,7 +5,7 @@
     </div>
     <main id="main_layout" class="unified_layout">
         <div class="report_form">
-            <section id="report_info">
+            <section id="report_info" class="report_info_box center_marg">
                 <p>
                 <ul class="center_text no_deco">
                     <li><b>כתובת:</b> {{ report.address }}</li>
@@ -18,13 +18,18 @@
                 </ul>
                 </p>
             </section>
-            <section id="response_info">
+            <section id="response_info" class="center_marg center_text">
                 {% if report.response %}
-                    <li><b>מענה:</b> {{ report.response }}</li>
-                    <li><b>מועד המענה:</b> {{ report.response_time.replace(microsecond=0) }}</li>
+                    <h2><b>מענה:</b></h2>
+                    <div class="report_info_box response_info_box center_marg">
+                        <ul class="no_deco">
+                            <li> {{ report.response }}</li>
+                            <li><b>מועד המענה:</b> {{ report.response_time.replace(microsecond=0) }}</li>
+                        </ul>
+                    </div>
                 {% endif %}
             </section>
-            <div class="control_buttons">
+            <div class="control_buttons control_buttons_watch">
                 {% if report.is_open %}
                     {% if current_user.is_admin %}
                         <a href="{{ url_for('respond_to_report', report_id=report.id) }}">
@@ -36,6 +41,7 @@
                             <button type="button" class="btn btn-primary btn-lg btn-block">ערוך דיווח</button>
                         </a>
                         <form action="{{ url_for('delete_report', report_id=report.id) }}" method="POST">
+                            <input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}">
                             <input type="submit" class="btn btn-danger btn-lg btn-block" name="" value="מחק דיווח">
                         </form>
                     {% endif %}
@@ -44,6 +50,7 @@
                         <button type="button" class="btn btn-primary btn-lg btn-block">ערוך מענה</button>
                     </a>
                     <form action="{{ url_for('delete_report', report_id=report.id) }}" method="POST">
+                        <input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}">
                         <input type="submit" class="btn btn-danger btn-lg btn-block" name="" value="מחק דיווח">
                     </form>
                 {% endif %}

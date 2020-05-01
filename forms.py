@@ -108,7 +108,7 @@ class RespondReportForm(FlaskForm):
                                                                           message='אנא הזן תיאור עד 200 תווים.')],
                              default="קיבלתי, תודה.")
 
-    submit = SubmitField('ענה לדיווח')
+    submit = SubmitField('שמור מענה')
 
 
 class SearchReportForm(FlaskForm):

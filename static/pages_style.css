@@ -207,8 +207,7 @@ main {
 /*----------- Create Report ------------*/
 .unified_layout .report_form {
     margin: auto;
-    padding: 1% 0%;
-    padding-top: 4%;
+    padding: 1% 0% 1%;
     width: 70%;
     text-align: right;
     font-family: Arial, Helvetica, sans-serif;
@@ -223,6 +222,33 @@ main {
     padding: 1px;
 }
 
+.control_buttons_watch{
+    width: 60%;
+    margin: auto;
+}
+
+/*----------- View Report ------------*/
+
+.report_info_box {
+    width: 30%;
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px outset gray;
+    padding: 4px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.response_info_box{
+    width: 95%;
+    border-radius: 10px;
+}
+
+.report_info{
+
+}
+.response_info{
+    margin: auto;
+}
 
 /*----------- Reports ------------*/
 .options {
@@ -303,6 +329,7 @@ li:hover {
 .report_list img {
     padding: 5px 4px;
 }
+
 
 /*----------- First steps ------------*/
 .slide-container {
@@ -839,6 +866,10 @@ hr {
         width: 50%;
     }
 
+    .report_info_box{
+        width:60%;
+    }
+
     /* Donation */
     .ctrl {
         width: 35%;
@@ -895,6 +926,10 @@ hr {
         border: none;
         overflow-y: auto;
         margin: 0px 4px;
+    }
+
+    .report_info_box{
+        width: 100%;
     }
 
     /* Create report */
