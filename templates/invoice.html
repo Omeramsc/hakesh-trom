@@ -23,6 +23,10 @@
     <div class="invalid-feedback d-block center_text">
         <span>ישנה תקלה בשרת החשבונית הירוקה, אנא הנפק חשבונית נייר ופנה לאחראי הארצי</span>
     </div>
+    {% elif session['current_donation']['payment_type'] == "PayPal" %}
+    <div class="text-success d-block center_text">
+        <span>תשלום ה-PayPal התקבל בהצלחה!</span>
+    </div>
     {% endif %}
     <form id="paper" class="hide_inv" method="post">
         {{ paper_form.hidden_tag() }}

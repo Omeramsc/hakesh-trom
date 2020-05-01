@@ -4,6 +4,7 @@ from utils.consts import ORGANIZATION_NAME, PAYMENT_TYPES
 import os
 import json
 
+
 def get_bearer_token():
     """
     Creates the bearer key in order to perform requests from the Green Invoice API.
