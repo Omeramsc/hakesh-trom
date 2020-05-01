@@ -7,13 +7,14 @@ from models import Campaign
 from utils.consts import INVOICE_REF_LENGTH, BIT_ACCOUNT_NUM
 from utils.forms_helpers import report_categories, read_cities
 
+
 class CreateCampaignForm(FlaskForm):
     name = StringField('*שם הקמפיין:',
                        validators=[DataRequired(message='שדה זה הינו שדה חובה'),
                                    Length(min=3, max=50, message='על שם הקמפיין להכיל בין 3 ל-50 תווים')],
                        render_kw={"placeholder": "הכנס שם לקמפיין"})
     start_date = DateField('*תאריך:', validators=[DataRequired(message='שדה זה הינו שדה חובה')], format='%Y-%m-%d')
-    goal = IntegerField('ייעד כספי', validators=[], render_kw={"placeholder": "הכנס יעד", "value": 0})
+    goal = IntegerField('ייעד כספי', render_kw={"placeholder": "הכנס יעד", "value": 0})
     city = SelectField('*עיר:', choices=read_cities(), validators=[DataRequired(message='שדה זה הינו שדה חובה')])
 
     submit = SubmitField('צור קמפיין')
@@ -93,19 +94,19 @@ class DigitalInvoiceForm(FlaskForm):
 
 
 class ReportForm(FlaskForm):
-    address = StringField('כתובת:', validators=[DataRequired()],
+    address = StringField('כתובת:', validators=[DataRequired(message='שדה זה הינו שדה חובה')],
                           render_kw={"placeholder": "הזן את כתובת המיקום של האירוע"})
     category = SelectField('סוג הדיווח:', choices=[(value, value) for value in report_categories],
-                           validators=[DataRequired()])
-    description = TextAreaField('תיאור:', validators=[DataRequired(), Length(max=200,
-                                                                             message='אנא הזן תיאור עד 200 תווים.')])
+                           validators=[DataRequired(message='שדה זה הינו שדה חובה')])
+    description = TextAreaField('תיאור:', validators=[DataRequired(message='שדה זה הינו שדה חובה'), Length(max=200,
+                                                                                                           message='אנא הזן תיאור עד 200 תווים.')])
 
     submit = SubmitField('שמור דיווח')
 
 
 class RespondReportForm(FlaskForm):
-    response = TextAreaField('תשובה:', validators=[DataRequired(), Length(max=200,
-                                                                          message='אנא הזן תיאור עד 200 תווים.')],
+    response = TextAreaField('תשובה:', validators=[DataRequired(message='שדה זה הינו שדה חובה'), Length(max=200,
+                                                                                                        message='אנא הזן תיאור עד 200 תווים.')],
                              default="קיבלתי, תודה.")
 
     submit = SubmitField('שמור מענה')
@@ -115,5 +116,3 @@ class SearchReportForm(FlaskForm):
     category = SelectField('סוג הדיווח:', choices=[(value, value) for value in report_categories], default="")
     status = RadioField(choices=[("open", 'פתוח'), ("closed", 'סגור')])
     submit = SubmitField('בצע חיפוש')
-
-

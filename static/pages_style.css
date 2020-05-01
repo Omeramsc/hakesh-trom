@@ -207,7 +207,7 @@ main {
 /*----------- Create Report ------------*/
 .unified_layout .report_form {
     margin: auto;
-    padding: 1% 0% 1%;
+    padding: 1% 0 1%;
     width: 70%;
     text-align: right;
     font-family: Arial, Helvetica, sans-serif;
@@ -222,7 +222,7 @@ main {
     padding: 1px;
 }
 
-.control_buttons_watch{
+.control_buttons_watch {
     width: 60%;
     margin: auto;
 }
@@ -238,15 +238,12 @@ main {
     overflow-x: hidden;
 }
 
-.response_info_box{
+.response_info_box {
     width: 95%;
     border-radius: 10px;
 }
 
-.report_info{
-
-}
-.response_info{
+.response_info {
     margin: auto;
 }
 
@@ -866,8 +863,8 @@ hr {
         width: 50%;
     }
 
-    .report_info_box{
-        width:60%;
+    .report_info_box {
+        width: 60%;
     }
 
     /* Donation */
@@ -928,7 +925,7 @@ hr {
         margin: 0px 4px;
     }
 
-    .report_info_box{
+    .report_info_box {
         width: 100%;
     }
 
