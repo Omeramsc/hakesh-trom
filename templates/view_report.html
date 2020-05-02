@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div id="subtitle_container">
+        <h3>פרטי הדיווח</h3>
+    </div>
+    <main id="main_layout" class="unified_layout">
+        <div class="report_form">
+            <section id="report_info" class="report_info_box center_marg">
+                <p>
+                <ul class="center_text no_deco">
+                    <li><b>כתובת:</b> {{ report.address }}</li>
+                    <li><b>קטגוריה:</b> {{ report.category }}</li>
+                    <li><b>תיאור:</b> {{ report.description }}</li>
+                    <li><b>כותב הדיווח:</b> {{ "צוות %s" % (report.team_id) if report.team_id else "אחראי ארצי" }}</li>
+                    {# replace with team name + link to page #}
+                    <li><b>מועד יצירה:</b> {{ report.creation_time.replace(microsecond=0) }}</li>
+                    <li><b>סטטוס: </b> {{ "פתוח" if report.is_open else "סגור" }}</li>
+                </ul>
+                </p>
+            </section>
+            <section id="response_info" class="center_marg center_text">
+                {% if report.response %}
+                    <h2><b>מענה:</b></h2>
+                    <div class="report_info_box response_info_box center_marg">
+                        <ul class="no_deco">
+                            <li> {{ report.response }}</li>
+                            <li><b>מועד המענה:</b> {{ report.response_time.replace(microsecond=0) }}</li>
+                        </ul>
+                    </div>
+                {% endif %}
+            </section>
+            <div class="control_buttons control_buttons_watch">
+                {% if report.is_open %}
+                    {% if current_user.is_admin %}
+                        <a href="{{ url_for('respond_to_report', report_id=report.id) }}">
+                            <button type="button" class="btn btn-primary btn-lg btn-block">ענה לדיווח</button>
+                        </a>
+                    {% endif %}
+                    {% if current_user.team_id == report.team_id or current_user.is_admin %}
+                        <a href="{{ url_for('edit_report', report_id=report.id) }}">
+                            <button type="button" class="btn btn-primary btn-lg btn-block">ערוך דיווח</button>
+                        </a>
+                        <form action="{{ url_for('delete_report', report_id=report.id) }}" method="POST">
+                            <input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}">
+                            <input type="submit" class="btn btn-danger btn-lg btn-block" name="" value="מחק דיווח">
+                        </form>
+                    {% endif %}
+                {% elif not report.is_open and current_user.is_admin %}
+                    <a href="{{ url_for('edit_response', report_id=report.id) }}">
+                        <button type="button" class="btn btn-primary btn-lg btn-block">ערוך מענה</button>
+                    </a>
+                    <form action="{{ url_for('delete_report', report_id=report.id) }}" method="POST">
+                        <input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}">
+                        <input type="submit" class="btn btn-danger btn-lg btn-block" name="" value="מחק דיווח">
+                    </form>
+                {% endif %}
+                <a href="{{ url_for('reports') }}">
+                    <button type="button" class="btn btn-secondary btn-lg btn-block">חזור</button>
+                </a>
+            </div>
+        </div>
+    </main>
+{% endblock content %}
