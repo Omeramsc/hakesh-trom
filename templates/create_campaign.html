@@ -1,69 +1,69 @@
 {% extends "layout.html" %}
 {% block content %}
-<div id="subtitle_container">
-    <h3>יצירת קמפיין</h3>
-</div>
-<main id="main_layout" class="unified_layout">
-    <form class="report_form" method="POST">
-        {{ form.hidden_tag() }}
-        <div class="form-group">
-            {{ form.name.label(class="form-control-label") }}
-            {% if form.name.errors %}
-                {{ form.name(class="form-control is-invalid") }}
-                <div class="invalid-feedback">
-                    {% for error in form.name.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% else %}
-                {{ form.name(class="form-control") }}
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.start_date.label(class="form-control-label") }}
-            {% if form.start_date.errors %}
-                {{ form.start_date(class="form-control date_field is-invalid") }}
-                <div class="invalid-feedback">
-                    {% for error in form.start_date.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% else %}
-                {{ form.start_date(class="form-control date_field") }}
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.goal.label(class="form-control-label") }}
-            {% if form.goal.errors %}
-                {{ form.goal(class="form-control is-invalid") }}
-                <div class="invalid-feedback">
-                    {% for error in form.goal.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% else %}
-                {{ form.goal(class="form-control") }}
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.city.label(class="form-control-label") }}
-            {% if form.city.errors %}
-                {{ form.city(class="form-control is-invalid") }}
-                <div class="invalid-feedback">
-                    {% for error in form.city.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% else %}
-                {{ form.city(class="form-control") }}
-            {% endif %}
-        </div>
-        <div class="control_buttons">
-            {{ form.submit(class="btn btn-primary btn-lg btn-block") }}
-            <a href="{{ url_for('manage_campaign') }}">
-                <button type="button" class="btn btn-secondary btn-lg btn-block">בטל</button>
-            </a>
-        </div>
-    </form>
-</main>
+    <div id="subtitle_container">
+        <h3>יצירת קמפיין</h3>
+    </div>
+    <main id="main_layout" class="unified_layout">
+        <form class="report_form" method="POST">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.name.label(class="form-control-label") }}
+                {% if form.name.errors %}
+                    {{ form.name(class="form-control is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.name.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.name(class="form-control") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.start_date.label(class="form-control-label") }}
+                {% if form.start_date.errors %}
+                    {{ form.start_date(class="form-control date_field is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.start_date.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.start_date(class="form-control date_field") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.goal.label(class="form-control-label") }}
+                {% if form.goal.errors %}
+                    {{ form.goal(class="form-control is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.goal.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.goal(class="form-control") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.city.label(class="form-control-label") }}
+                {% if form.city.errors %}
+                    {{ form.city(class="form-control is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.city.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.city(class="form-control") }}
+                {% endif %}
+            </div>
+            <div class="control_buttons">
+                {{ form.submit(class="btn btn-primary btn-lg btn-block") }}
+                <a href="{{ url_for('manage_campaign') }}">
+                    <button type="button" class="btn btn-secondary btn-lg btn-block">בטל</button>
+                </a>
+            </div>
+        </form>
+    </main>
 {% endblock content %}

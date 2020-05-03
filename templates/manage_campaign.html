@@ -1,54 +1,55 @@
 {% extends "layout.html" %}
 {% block content %}
-  <div id="subtitle_container">
-    <h3>ניהול קמפיין</h3>
-  </div>
-  <main id="main_layout" class="unified_layout">
-    <section class="boxes_container flex_me">
-      <section class="box search manage_search">
-        <h3 class=center_text> <u>חפש קמפייניים:</u></h3>
-        <form method="POST" >
-          {{ form.hidden_tag() }}
-          <div class="form-row">
-            <div class="col-md-8 mb-3">
-            {{ form.name.label() }}
-            {{ form.name(class="form-control")}}
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="col-md-8 mb-3">
-              {{ form.city.label() }}
-              {{ form.city(class="form-control")}}
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="custom-control custom-radio custom-control-inline">
-              {% for subfield in form.status %}
-                <tr>
-                  <td>{{ subfield }}</td>
-                  <td>{{ subfield.label }}</td>
-                </tr>
-              {% endfor %}
-            </div>
-          </div>
-          {{ form.submit(class="btn btn-primary btn-lg big_src") }}
-        </form>
-      </section>
-      <section class="box report_list manage_box">
-        <h3 class=center_text> <u> בחר קמפיין:</u></h3>
-        <ul>
-            {% for campaign in campaigns %}
-              <li>
-                <img src="{{ get_icon(campaign.start_date) }}">
-                <a id='report_summary'
-                class='hide_link' href="{{ url_for('campaign_control_panel', campaign_id=campaign.id) }}">
-                {{ campaign.start_date }}<br><strong>{{ campaign.name }}
-                </strong><br>{{ campaign.city }} || יעד: {{ "₪{:,.0f}".format(campaign.goal) }}
-                </a>
-              </li>
-            {% endfor %}
-        </ul>
-      </section>
-    </section>
-  </main>
+    <div id="subtitle_container">
+        <h3>ניהול קמפיין</h3>
+    </div>
+    <main id="main_layout" class="unified_layout">
+        <section class="boxes_container flex_me">
+            <section class="box search manage_search">
+                <h3 class=center_text><u>חפש קמפייניים:</u></h3>
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="form-row">
+                        <div class="col-md-8 mb-3">
+                            {{ form.name.label() }}
+                            {{ form.name(class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md-8 mb-3">
+                            {{ form.city.label() }}
+                            {{ form.city(class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            {% for subfield in form.status %}
+                                <tr>
+                                    <td>{{ subfield }}</td>
+                                    <td>{{ subfield.label }}</td>
+                                </tr>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {{ form.submit(class="btn btn-primary btn-lg big_src") }}
+                </form>
+            </section>
+            <section class="box report_list manage_box">
+                <h3 class=center_text><u> בחר קמפיין:</u></h3>
+                <ul>
+                    {% for campaign in campaigns %}
+                        <li>
+                            <img src="{{ get_icon(campaign.start_date) }}">
+                            <a id='report_summary'
+                               class='hide_link'
+                               href="{{ url_for('campaign_control_panel', campaign_id=campaign.id) }}">
+                                {{ campaign.start_date }}<br><strong>{{ campaign.name }}
+                            </strong><br>{{ campaign.city }} || יעד: {{ "₪{:,.0f}".format(campaign.goal) }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </section>
+    </main>
 {% endblock content %}
