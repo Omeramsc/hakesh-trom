@@ -30,6 +30,7 @@ body {
     color: unset;
     text-decoration: none;
 }
+
 .hide_link:hover {
     text-decoration: none;
 }
@@ -84,6 +85,11 @@ body {
 
 .disabledSelect {
     background-color: lightgray;
+}
+
+.img_btn {
+    border: 0;
+    background: transparent;
 }
 
 #hamburger a:hover,

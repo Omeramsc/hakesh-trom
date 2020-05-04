@@ -120,3 +120,5 @@ function donation() {
     // init
     var controls = new ctrls();
     document.addEventListener('DOMContentLoaded', controls.ready);
+}
+

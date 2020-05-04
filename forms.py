@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FloatField, SelectField, RadioField, PasswordField, BooleanField, \
-    IntegerField, TextAreaField, HiddenField
+    IntegerField, TextAreaField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, Length, ValidationError, NumberRange, Email, Regexp
 from models import Campaign
