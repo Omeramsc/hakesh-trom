@@ -17,7 +17,7 @@ class CreateCampaignForm(FlaskForm):
     goal = IntegerField('ייעד כספי', render_kw={"placeholder": "הכנס יעד", "value": 0})
     city = SelectField('*עיר:', choices=read_cities(), validators=[DataRequired(message='שדה זה הינו שדה חובה')])
 
-    submit = SubmitField('צור קמפיין')
+    submit = SubmitField('שמור קמפיין')
 
     def validate_name(self, name):
         campaign_name = Campaign.query.filter_by(name=name.data).first()

@@ -97,7 +97,30 @@ def create_campaign():
         db.session.add(campaign)
         db.session.commit()
         return redirect(url_for('home'))
-    return render_template('/create_campaign.html', form=form)
+    return render_template('/create_campaign.html', form=form, legend="יצירת קמפיין")
+
+
+@app.route('/manage_campaign/campaign_control_panel/<int:campaign_id>/edit_campaign', methods=['GET', 'POST'])
+@login_required
+@admin_access
+def edit_campaign(campaign_id):
+    campaign = Campaign.query.get_or_404(campaign_id)
+    form = CreateCampaignForm()
+    form.city.render_kw = {"readonly": True}
+    if form.validate_on_submit():
+        campaign.name = form.name.data
+        campaign.city = form.city.data
+        campaign.start_date = form.start_date.data
+        campaign.goal = form.goal.data
+        db.session.commit()
+        flash('!הקמפיין עודכן בהצלחה', 'success')
+        return redirect(url_for('campaign_control_panel', campaign_id=campaign.id))
+    elif request.method == 'GET':
+        form.name.data = campaign.name
+        form.city.data = campaign.city
+        form.start_date.data = campaign.start_date
+        form.goal.data = campaign.goal
+    return render_template('/create_campaign.html', form=form, legend="עריכת קמפיין")
 
 
 @app.route('/manage_campaign', methods=['GET', 'POST'])
@@ -205,7 +228,12 @@ def upsert_routes(campaign_id, neighborhood_id):
 @admin_access
 def campaign_control_panel(campaign_id):
     campaign = Campaign.query.get_or_404(campaign_id)
-    return render_template('/campaign_control_panel.html', campaign=campaign)
+    total = {'teams': 0, 'donations': 0}
+    for team in campaign.teams:
+        total['teams'] += 1
+        for donation in team.donations:
+            total['donations'] += donation.amount
+    return render_template('/campaign_control_panel.html', campaign=campaign, total=total)
 
 
 @app.route('/donation_address', methods=['GET'])
