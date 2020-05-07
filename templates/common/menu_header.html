@@ -22,8 +22,9 @@
     {% if current_user.is_authenticated %}
         <img class="user_type" src="{{ url_for('static', filename='default_team.png') }}">
     {% endif %}
-    <a href="{{ url_for('home') }}" class="logo"><img src="{{ url_for('static', filename='header_logo.png') }}"
-                                                      alt="חזור לעמוד הראשי"></a>
+    <a href="{{ url_for('home') }}" class="logo" style="margin:auto;"><img
+            src="{{ url_for('static', filename='header_logo.png') }}"
+            alt="חזור לעמוד הראשי"></a>
     {% if current_user.is_authenticated %}
         <button class="nav_btn" onclick="toggleSideNav()"><i class="fa fa-bars"></i></button>
     {% endif %}

@@ -52,7 +52,11 @@ def delete_campaign(campaign_id):
 @app.route('/home')
 @login_required
 def home():
-    return render_template('/index.html')
+    total = 0
+    if not current_user.is_admin:
+        for donation in current_user.team.donations:
+            total += donation.amount
+    return render_template('/home.html', total=total)
 
 
 @app.route('/login', methods=['GET', 'POST'])

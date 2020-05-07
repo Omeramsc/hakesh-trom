@@ -88,6 +88,11 @@ body {
     text-decoration: none;
 }
 
+.hover_scale:hover {
+    transform: scale(1.05);
+    transition: 0.4s;
+}
+
 /*----------- Scrollbar design -----------*/
 ::-webkit-scrollbar {
     width: 10px;
@@ -310,11 +315,6 @@ ul {
     display: flex;
     /* I wrote this despite the flex class, so we won't copy the class for each and every li */
     justify-content: flex-start;
-}
-
-li:hover {
-    transform: scale(1.05);
-    transition: 0.4s;
 }
 
 #report_summary {

@@ -53,11 +53,13 @@
         </section>
         {% if not current_user.is_admin %}
             <section class="usr_progress">
-                <span id="earned_money"></span>
+                <span id="earned_money">₪סכום שנאסף: {{ total }} </span>
                 <div class="usr_bar">
-                    <span id="prog_precen"></span>
+                    <span id="prog_precen" style="width: 0%">X%</span>
+                    {#add dynamic precentage information here#}
                 </div>
             </section>
         {% endif %}
     </main>
+
 {% endblock content %}
