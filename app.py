@@ -53,10 +53,11 @@ def delete_campaign(campaign_id):
 @login_required
 def home():
     total = 0
+    percentage = 0
     if not current_user.is_admin:
         for donation in current_user.team.donations:
             total += donation.amount
-    return render_template('/home.html', total=total)
+    return render_template('/home.html', total=total, percentage=percentage)
 
 
 @app.route('/login', methods=['GET', 'POST'])
