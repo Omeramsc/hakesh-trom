@@ -6,13 +6,17 @@
                 {% if current_user.is_admin %}
                     <img class="flex_me" src="{{ url_for('static', filename='default_admin.png') }}" alt="Admin photo">
                 {% else %}
-                    <img class="flex_me" src="{{ url_for('static', filename='default_team.png') }}" alt="Team photo">
+                    <a class="hide_link" href="{{ url_for('view_team', team_id=current_user.team.id) }}">
+                        <img class="flex_me" src="{{ url_for('static', filename='default_team.png') }}"
+                             alt="Team photo">
+                    </a>
                 {% endif %}
             </div>
             {% if not current_user.is_admin %}
                 <div class="usernames flex_me">
-                    <div>ישראל ישראלי</div>
-                    <div>יעקב יעקבי</div>
+                    <div>{{ current_user.team.first_teammate_name if current_user.team.first_teammate_name }}</div>
+                    <div style="color: #459cef;">{{ current_user.team.name if current_user.team.name }}</div>
+                    <div>{{ current_user.team.second_teammate_name if current_user.team.second_teammate_name }}</div>
                 </div>
             {% endif %}
         </section>
@@ -38,8 +42,9 @@
                         תרומות</a>
                 </div>
                 <div class="icon">
-                    <a class="hide_link not_allowed" href="#"><img src="{{ url_for('static', filename='teams.png') }}"
-                                                                   alt="לא פעיל"><br>
+                    <a class="hide_link" href="{{ url_for('view_team', team_id=current_user.team.id) }}"><img
+                            src="{{ url_for('static', filename='teams.png') }}"
+                            alt="הצוות שלי"><br>
                         הצוות שלי</a>
                 </div>
             {% endif %}

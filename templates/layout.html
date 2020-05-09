@@ -21,6 +21,11 @@
             integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
     </script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <meta property="og:url" content="{{ HOST_URL }}"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:title" content="הקש ותרום"/>
+    <meta property="og:description" content="גם אני משתתף בקמפיין התרמה של {{ ORGANIZATION_NAME }} עם הקש ותרום!"/>
+    <meta property="og:image" content="{{ url_for('static', filename='favicon.ico') }}"/>
     {% block header %}{% endblock %}
 </head>
 <body class="flex_me">

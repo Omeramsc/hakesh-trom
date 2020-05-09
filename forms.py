@@ -120,3 +120,12 @@ class SearchReportForm(FlaskForm):
     category = SelectField('סוג הדיווח:', choices=[(value, value) for value in report_categories], default="")
     status = RadioField(choices=[("all", "הכל"), ("open", "פתוח"), ("closed", "סגור")], default="all")
     submit = SubmitField('בצע חיפוש')
+
+
+class TeamForm(FlaskForm):
+    name = StringField('שם הצוות:',
+                       validators=[Length(min=2, max=50, message='על שם הצוות להכיל בין 2 ל-50 תווים')],
+                       render_kw={"placeholder": "הזן שם לצוות"})
+    first_teammate_name = StringField(':שם חבר צוות 1', render_kw={"placeholder": "שם לחבר הצוות"})
+    second_teammate_name = StringField(':שם חבר צוות 2', render_kw={"placeholder": "שם לחבר הצוות"})
+    submit = SubmitField('שמור פרטים')
