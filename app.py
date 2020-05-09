@@ -9,6 +9,7 @@ from utils.forms_helpers import get_campaign_icon, get_report_status_icon
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users
 from utils.app_decorators import admin_access, user_access
 from utils.consts import INVOICE_TYPES, HOST_URL
+from sqlalchemy import func
 import utils.green_invoice as gi
 import utils.paypal as pp
 import datetime
@@ -52,12 +53,13 @@ def delete_campaign(campaign_id):
 @app.route('/home')
 @login_required
 def home():
-    total = 0
-    percentage = 0
+    progress = {}
     if not current_user.is_admin:
-        for donation in current_user.team.donations:
-            total += donation.amount
-    return render_template('/home.html', total=total, percentage=percentage)
+        total_earnings = db.session.query(func.sum(Donation.amount)).join(Team).filter(
+            Team.id == current_user.team.id).scalar()
+        progress['total_earnings'] = total_earnings if total_earnings else 0
+        # add dynamic percentage information here
+    return render_template('/home.html', progress=progress)
 
 
 @app.route('/login', methods=['GET', 'POST'])
