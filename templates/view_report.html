@@ -8,7 +8,9 @@
             <section id="report_info" class="report_info_box center_marg">
                 <p>
                 <ul class="center_text no_deco">
-                    <li><b>כתובת:</b> {{ report.address }}</li>
+                    {% if report.address != 'ללא כתובת' %}
+                        <li><b>כתובת:</b> {{ report.address }}</li>
+                    {% endif %}
                     <li><b>קטגוריה:</b> {{ report.category }}</li>
                     <li><b>תיאור:</b> {{ report.description }}</li>
                     <li><b>כותב הדיווח:</b> {{ "צוות %s" % (report.team_id) if report.team_id else "אחראי ארצי" }}</li>

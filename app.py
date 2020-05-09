@@ -375,6 +375,7 @@ def get_donation():
                 return redirect(pp.authorize_payment(payment))
             except (ConnectionError, RuntimeError):
                 conn_error = True  # if there's a connection error / unexpected error, display an error in the donation page
+                automate_report('paypal')
         if not conn_error:
             return redirect(url_for('send_invoice'))
     return render_template('/donation.html', form=form, conn_error=conn_error)
@@ -449,6 +450,7 @@ def send_invoice():
                 new_invoice.reference_id = reference_id
         except (ConnectionError, RuntimeError, KeyError):
             conn_error = True  # if there's a connection error or unexpected error, display an error in the invoice page
+            automate_report('invoice')
         except ValueError:
             digital_form.donor_id.errors.append("מספר ת.ז אינו תקין")
         else:
@@ -501,9 +503,9 @@ def reports():
 def create_report():
     form = ReportForm()
     if form.validate_on_submit():
-        report = Report(address=form.address.data,
-                        category=form.category.data,
-                        description=form.description.data)
+        report = Report(category=form.category.data,
+                        description=form.description.data,
+                        address=form.address.data)
         if current_user.team_id:
             report.team_id = current_user.team_id
         db.session.add(report)
@@ -560,7 +562,7 @@ def delete_report(report_id):
 def respond_to_report(report_id):
     report = Report.query.get_or_404(report_id)
     if not report.is_open:
-        return redirect(url_for('edit_respond', report_id=report.id))  # LOOK AGAIN
+        return redirect(url_for('edit_respond', report_id=report.id))
     form = RespondReportForm()
     if form.validate_on_submit():
         report.is_open = False

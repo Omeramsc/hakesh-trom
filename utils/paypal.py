@@ -2,10 +2,13 @@ import paypalrestsdk
 import os
 from utils.consts import ORGANIZATION_NAME
 
-paypalrestsdk.configure({
-    "mode": "sandbox",  # sandbox or live
-    "client_id": os.environ['PAYPAL_CLIENT'],
-    "client_secret": os.environ['PAYPAL_TOKEN']})
+try:
+    paypalrestsdk.configure({
+        "mode": "sandbox",  # sandbox or live
+        "client_id": os.environ['PAYPAL_CLIENT'],
+        "client_secret": os.environ['PAYPAL_TOKEN']})
+except KeyError as e:
+    pass  # Since we have no actual logs, There's nothing to do here, just make sure the app won't break.
 
 
 def create_payment(amount, return_url, cancel_url, org=ORGANIZATION_NAME):
@@ -34,7 +37,7 @@ def create_payment(amount, return_url, cancel_url, org=ORGANIZATION_NAME):
             return payment
         else:
             raise RuntimeError
-    except paypalrestsdk.exceptions.UnauthorizedAccess:
+    except (paypalrestsdk.exceptions.UnauthorizedAccess, paypalrestsdk.exceptions.MissingConfig):
         raise ConnectionError
 
 

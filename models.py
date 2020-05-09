@@ -257,7 +257,7 @@ class Report(db.Model):
     team_id = db.Column(db.Integer, db.ForeignKey('teams.id'))
     team = db.relationship("Team", back_populates="reports")
 
-    def __init__(self, address, category, description):
+    def __init__(self, category, description, address="ללא כתובת"):
         self.address = address
         self.category = category
         self.description = description

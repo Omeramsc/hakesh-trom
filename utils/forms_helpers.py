@@ -1,8 +1,27 @@
 import datetime
 import json
+from flask_login import current_user
+from models import Report
+from db import db
 
 report_categories = ["", "אין גישה", "בניין נעול", "הצפה", "כלב משוחרר", "מפגע", "רחוב חסום", "תקלה באפליקציה",
                      "אחר"]
+
+
+def automate_report(category):
+    if category == 'paypal':
+        description = 'תקלת מערכת בשירות PayPal'
+    elif category == 'invoice':
+        description = 'תקלת מערכת בשירות החשבונית הירוקה'
+    # Post the report only if It's there isn't already an open one with the same description:
+    reports_query = Report.query.filter(Report.description == description, Report.is_open == True)
+    if not reports_query.count():
+        report = Report(category='תקלה באפליקציה',
+                        description=description)
+        if current_user.team_id:
+            report.team_id = current_user.team_id
+        db.session.add(report)
+        db.session.commit()
 
 
 def get_campaign_icon(d1):
