@@ -34,8 +34,8 @@
                     <li><b>מועד הקמפיין:</b> {{ campaign.start_date }}</li>
                     <li><b>עיר משתתפת:</b> {{ campaign.city }}</li>
                     <li><b>יעוד כספי:</b> {{ "₪{:,.0f}".format(campaign.goal) }}</li>
-                    <li><b>תרומות שהתקבלו:</b> {{ "₪{:,.0f}".format(total['donations']) }}</li>
-                    <li><b>מספר צוותי תרומה:</b> {{ total['teams'] }}</li>
+                    <li><b>מספר צוותי תרומה:</b> {{ total.get('teams', 0) }}</li>
+                    <li><b>תרומות שהתקבלו:</b> {{ "₪{:,.0f}".format(total.get('donations', 0)) }}</li>
                     <li><b>מועד יצירה:</b> {{ campaign.creation_date.replace(microsecond=0) }}</li>
                 </ul>
                 </p>

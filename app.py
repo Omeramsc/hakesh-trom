@@ -9,6 +9,7 @@ from utils.forms_helpers import get_campaign_icon, get_report_status_icon
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users
 from utils.app_decorators import admin_access, user_access
 from utils.consts import INVOICE_TYPES, HOST_URL
+from sqlalchemy import func
 import utils.green_invoice as gi
 import utils.paypal as pp
 import datetime
@@ -228,11 +229,12 @@ def upsert_routes(campaign_id, neighborhood_id):
 @admin_access
 def campaign_control_panel(campaign_id):
     campaign = Campaign.query.get_or_404(campaign_id)
-    total = {'teams': 0, 'donations': 0}
-    for team in campaign.teams:
-        total['teams'] += 1
-        for donation in team.donations:
-            total['donations'] += donation.amount
+
+    # Get dynamic values for the total teams and donations information:
+    donations = db.session.query(func.sum(Donation.amount)).join(Team).filter(
+        Team.campaign_id == campaign_id).scalar()
+    total = {'teams': db.session.query(func.count(Team.id)).filter(Team.campaign_id == campaign_id).scalar(),
+             'donations': donations if donations else 0}
     return render_template('/campaign_control_panel.html', campaign=campaign, total=total)
 
 
