@@ -28,7 +28,8 @@ class CreateCampaignForm(FlaskForm):
 class SearchCampaignForm(FlaskForm):
     name = StringField('שם הקמפיין:', render_kw={"placeholder": "הכנס את שם הקמפיין"})
     city = SelectField('עיר:', choices=[("", "בחר עיר")] + read_cities(), default="")
-    status = RadioField(choices=[("past", 'הסתיים'), ("present", 'מתרחש'), ("future", 'עתידי')])
+    status = RadioField(choices=[("all", "הכל"), ("past", "הסתיים"), ("present", "מתרחש"), ("future", "עתידי")],
+                        default="all")
 
     submit = SubmitField('בצע חיפוש')
 
@@ -114,5 +115,5 @@ class RespondReportForm(FlaskForm):
 
 class SearchReportForm(FlaskForm):
     category = SelectField('סוג הדיווח:', choices=[(value, value) for value in report_categories], default="")
-    status = RadioField(choices=[("open", 'פתוח'), ("closed", 'סגור')])
+    status = RadioField(choices=[("all", "הכל"), ("open", "פתוח"), ("closed", "סגור")], default="all")
     submit = SubmitField('בצע חיפוש')

@@ -37,17 +37,21 @@
             <section class="box report_list manage_box">
                 <h3 class=center_text><u> בחר קמפיין:</u></h3>
                 <ul>
-                    {% for campaign in campaigns %}
-                        <li>
-                            <img src="{{ get_icon(campaign.start_date) }}">
-                            <a id='report_summary'
-                               class='hide_link'
-                               href="{{ url_for('campaign_control_panel', campaign_id=campaign.id) }}">
-                                {{ campaign.start_date }}<br><strong>{{ campaign.name }}
-                            </strong><br>{{ campaign.city }} || יעד: {{ "₪{:,.0f}".format(campaign.goal) }}
-                            </a>
-                        </li>
-                    {% endfor %}
+                    {% if campaigns %}
+                        {% for campaign in campaigns %}
+                            <li>
+                                <img src="{{ get_icon(campaign.start_date) }}">
+                                <a id='report_summary'
+                                   class='hide_link'
+                                   href="{{ url_for('campaign_control_panel', campaign_id=campaign.id) }}">
+                                    {{ campaign.start_date }}<br><strong>{{ campaign.name }}
+                                </strong><br>{{ campaign.city }} || יעד: {{ "₪{:,.0f}".format(campaign.goal) }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        <div class="center_text">לא נמצאו תוצאות תואמות לחיפוש</div>
+                    {% endif %}
                 </ul>
             </section>
         </section>
