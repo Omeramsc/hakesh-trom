@@ -80,7 +80,7 @@ def create_new_client(token, name, email, tax_id, address='רחוב סוקולו
             client_id = data['errorMessage']
             if get_client_information(token, client_id)['taxId'] == tax_id:
                 return client_id  # If the existing client has the same ID number, return it's user id.
-            return create_new_client(token, name + '.', email, tax_id)
+            return create_new_client(token, name + '.', email, tax_id, address=address, city=city)
             # If it has a different ID number, recourse to create a new client, adding a dot to the requested name.
         elif data['errorCode'] == 1111:  # Invalid ID
             raise ValueError()

@@ -313,6 +313,7 @@ def send_invoice():
                             team_id=session['current_donation']['team_id'],
                             transaction_id=session['current_donation'].get('transaction_id'),
                             building_id=session['current_building_id'])
+        building = Building.query.get_or_404(session['current_building_id'])
 
         # checking what kind of invoice was requested, validate It's information and commit it:
         new_invoice = Invoice()
@@ -321,11 +322,13 @@ def send_invoice():
                 new_invoice.reference_id = paper_form.reference_id.data
                 new_invoice.type = INVOICE_TYPES['PAPER']
             else:
-
+                clean_address = building.address.split(",")[0].strip()
+                clean_city = building.address.split(",")[1].strip()
                 # Try to create a client in Green Invoice API and send the invoice to the client
                 token = gi.get_bearer_token()
                 client_id = gi.create_new_client(token, digital_form.donor_name.data,
-                                                 digital_form.mail_address.data, digital_form.donor_id.data)
+                                                 digital_form.mail_address.data, digital_form.donor_id.data,
+                                                 address=clean_address, city=clean_city)
                 reference_id = gi.send_invoice(token, digital_form.mail_address.data, client_id, donation.amount,
                                                donation.payment_type)
                 new_invoice.type = INVOICE_TYPES['DIGITAL']
