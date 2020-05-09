@@ -45,16 +45,20 @@
             <section class="box report_list">
                 <h3 class=center_text><u> בחר דיווח:</u></h3>
                 <ul>
-                    {% for report in reports %}
-                        <li>
-                            <img src="{{ get_icon(report.is_open) }}">
-                            <a id='report_summary'
-                               class='hide_link' href="{{ url_for('view_report', report_id=report.id) }}">
-                                {{ report.creation_time.replace(microsecond=0) }}<br><strong>{{ report.category }}
-                            </strong><br>{{ report.address }}, {{ "צוות %s" % (report.team_id) if report.team_id else "אחראי ארצי" }}
-                            </a>
-                        </li>
-                    {% endfor %}
+                    {% if reports %}
+                        {% for report in reports %}
+                            <li>
+                                <img src="{{ get_icon(report.is_open) }}">
+                                <a id='report_summary'
+                                   class='hide_link' href="{{ url_for('view_report', report_id=report.id) }}">
+                                    {{ report.creation_time.replace(microsecond=0) }}<br><strong>{{ report.category }}
+                                </strong><br>{{ report.address }}, {{ "צוות %s" % (report.team_id) if report.team_id else "אחראי ארצי" }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        <div class="center_text">לא נמצאו תוצאות תואמות לחיפוש</div>
+                    {% endif %}
                 </ul>
             </section>
         </section>
