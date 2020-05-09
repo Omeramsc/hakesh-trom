@@ -443,7 +443,7 @@ def delete_report(report_id):
 def respond_to_report(report_id):
     report = Report.query.get_or_404(report_id)
     if not report.is_open:
-        return redirect(url_for('edit_respond', report_id=report.id)) #LOOK AGAIN
+        return redirect(url_for('edit_respond', report_id=report.id))  # LOOK AGAIN
     form = RespondReportForm()
     if form.validate_on_submit():
         report.is_open = False
