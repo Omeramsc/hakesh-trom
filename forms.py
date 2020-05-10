@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FloatField, SelectField, RadioField, PasswordField, BooleanField, \
-    IntegerField, TextAreaField
+    IntegerField, TextAreaField, HiddenField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, Length, ValidationError, NumberRange, Email, Regexp
 from models import Campaign
@@ -16,12 +16,13 @@ class CreateCampaignForm(FlaskForm):
     start_date = DateField('*תאריך:', validators=[DataRequired(message='שדה זה הינו שדה חובה')], format='%Y-%m-%d')
     goal = IntegerField('ייעד כספי', render_kw={"placeholder": "הכנס יעד", "value": 0})
     city = SelectField('*עיר:', choices=read_cities(), validators=[DataRequired(message='שדה זה הינו שדה חובה')])
+    camp_id = HiddenField()
 
     submit = SubmitField('שמור קמפיין')
 
     def validate_name(self, name):
-        campaign_name = Campaign.query.filter_by(name=name.data).first()
-        if campaign_name:
+        campaign = Campaign.query.filter_by(name=name.data).first()
+        if campaign:
             raise ValidationError('קמפיין בשם הזה כבר קיים, אנא בחר שם אחר.')
 
 

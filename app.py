@@ -107,10 +107,10 @@ def create_campaign():
 def edit_campaign(campaign_id):
     campaign = Campaign.query.get_or_404(campaign_id)
     form = CreateCampaignForm()
-    form.city.render_kw = {"readonly": True}
+    city = campaign.city
+    del form.city
     if form.validate_on_submit():
         campaign.name = form.name.data
-        campaign.city = form.city.data
         campaign.start_date = form.start_date.data
         campaign.goal = form.goal.data
         db.session.commit()
@@ -118,10 +118,10 @@ def edit_campaign(campaign_id):
         return redirect(url_for('campaign_control_panel', campaign_id=campaign.id))
     elif request.method == 'GET':
         form.name.data = campaign.name
-        form.city.data = campaign.city
         form.start_date.data = campaign.start_date
         form.goal.data = campaign.goal
-    return render_template('/create_campaign.html', form=form, legend="עריכת קמפיין")
+        form.camp_id.data = campaign.id
+    return render_template('/create_campaign.html', form=form, city=city, legend="עריכת קמפיין")
 
 
 @app.route('/manage_campaign', methods=['GET', 'POST'])
