@@ -887,6 +887,61 @@ ul {
     cursor: pointer;
 }
 
+/*------------------------- Leaderbored -------------------------*/
+.leaderbored_stats {
+    height: 55%;
+    width: 80%;
+    margin: auto;
+    display: flex;
+}
+
+#top_x_div {
+    height: 95%;
+    width: 80%;
+    margin: 5px auto;
+    border: 1px solid black;
+    padding: 10px;
+    background-color: white;
+}
+
+.tabs_container {
+    width: 90%;
+    height: 40%;
+    margin: 1% auto;
+    flex-direction: column;
+    flex-wrap: wrap;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.5);
+    padding: 20px 5px;
+    border: 1px solid black;
+    border-radius: 20px;
+    justify-content: center;
+}
+
+.leaderbored_tabs {
+    width: 300px;
+    height: 35px;
+    border: 1px solid #dddddd;
+    background-color: #ffffff;
+    margin: 0 2px;
+}
+
+.lb_team {
+    direction: rtl;
+    float: right;
+    margin: 3px;
+}
+
+.trophy {
+    height: 30px;
+}
+
+.lb_money {
+    text-align: center;
+    float: left;
+    margin: 3px;
+}
+
 /*------------------------- Errors -------------------------*/
 .error_pic {
     width: 35%;
@@ -1108,6 +1163,15 @@ hr {
         margin: 10% auto;
     }
 
+    .tabs_container {
+        height: 62%;
+        flex-wrap: nowrap;
+    }
+
+    .leaderboard_tabs {
+        width: 95%;
+        margin: auto;
+    }
 }
 
 
@@ -1187,5 +1251,11 @@ hr {
     .error_pic {
         width: 80%;
         margin: 10% auto;
+    }
+
+    .tabs_container {
+        height: 90%;
+        overflow-y: auto;
+        flex-wrap: nowrap;
     }
 }
