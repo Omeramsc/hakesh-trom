@@ -8,6 +8,14 @@ from utils.consts import INVOICE_REF_LENGTH, BIT_ACCOUNT_NUM
 from utils.forms_helpers import report_categories, read_cities
 
 
+def validate_name(name, current_name=None):
+    if not current_name or name != current_name:  # run the validation only if It's a new campaign, or the name changed
+        campaign = Campaign.query.filter_by(name=name).first()
+        if campaign:
+            return False
+    return True
+
+
 class CreateCampaignForm(FlaskForm):
     name = StringField('*שם הקמפיין:',
                        validators=[DataRequired(message='שדה זה הינו שדה חובה'),
@@ -19,11 +27,6 @@ class CreateCampaignForm(FlaskForm):
     camp_id = HiddenField()
 
     submit = SubmitField('שמור קמפיין')
-
-    def validate_name(self, name):
-        campaign = Campaign.query.filter_by(name=name.data).first()
-        if campaign:
-            raise ValidationError('קמפיין בשם הזה כבר קיים, אנא בחר שם אחר.')
 
 
 class SearchCampaignForm(FlaskForm):

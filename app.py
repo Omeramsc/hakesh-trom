@@ -1,7 +1,7 @@
 from flask import render_template, jsonify, flash, redirect, url_for, request, session, abort
 from flask_login import login_user, current_user, logout_user, login_required
 from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood, DonationForm, PaperInvoiceForm, \
-    DigitalInvoiceForm, BitForm, ReportForm, SearchReportForm, RespondReportForm
+    DigitalInvoiceForm, BitForm, ReportForm, SearchReportForm, RespondReportForm, validate_name
 from app_init import app, bcrypt
 from models import Campaign, User, Neighborhood, Team, Donation, Invoice, Building, Report
 from db import db
@@ -90,14 +90,16 @@ def about_org():
 def create_campaign():
     form = CreateCampaignForm()
     if form.validate_on_submit():
-        campaign = Campaign(name=form.name.data,
-                            city=form.city.data,
-                            start_date=form.start_date.data,
-                            goal=form.goal.data)
-        flash(f'!קמפיין "{campaign.name}" נוצר בהצלחה', 'success')
-        db.session.add(campaign)
-        db.session.commit()
-        return redirect(url_for('home'))
+        if validate_name(form.name.data):
+            campaign = Campaign(name=form.name.data,
+                                city=form.city.data,
+                                start_date=form.start_date.data,
+                                goal=form.goal.data)
+            flash(f'!קמפיין "{campaign.name}" נוצר בהצלחה', 'success')
+            db.session.add(campaign)
+            db.session.commit()
+            return redirect(url_for('home'))
+        form.name.errors.append('קמפיין בשם הזה כבר קיים, אנא בחר שם אחר.')
     return render_template('/create_campaign.html', form=form, legend="יצירת קמפיין")
 
 
@@ -110,12 +112,14 @@ def edit_campaign(campaign_id):
     city = campaign.city
     del form.city
     if form.validate_on_submit():
-        campaign.name = form.name.data
-        campaign.start_date = form.start_date.data
-        campaign.goal = form.goal.data
-        db.session.commit()
-        flash('!הקמפיין עודכן בהצלחה', 'success')
-        return redirect(url_for('campaign_control_panel', campaign_id=campaign.id))
+        if validate_name(form.name.data, campaign.name):
+            campaign.name = form.name.data
+            campaign.start_date = form.start_date.data
+            campaign.goal = form.goal.data
+            db.session.commit()
+            flash('!הקמפיין עודכן בהצלחה', 'success')
+            return redirect(url_for('campaign_control_panel', campaign_id=campaign.id))
+        form.name.errors.append('קמפיין בשם הזה כבר קיים, אנא בחר שם אחר.')
     elif request.method == 'GET':
         form.name.data = campaign.name
         form.start_date.data = campaign.start_date
