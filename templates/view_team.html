@@ -14,7 +14,7 @@
                 {# Will work only with a valid URL, therefor can't be tested on localhost #}
                 <div class="option_button" style="padding-right:10px;" data-href="{{ HOST_URL }}">
                     <a target="_blank"
-                       href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2F{{ HOST_URL }}&amp;src=sdkpreparse"
+                       href="https://www.facebook.com/sharer/sharer.php?u={{ HOST_URL }}'&amp;src=sdkpreparse"
                        class="fb-xfbml-parse-ignore"><img
                             class="flex_me" src="{{ url_for('static', filename='fb_share.png') }}" alt="Share"></a>
                 </div>
