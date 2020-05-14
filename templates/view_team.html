@@ -10,7 +10,7 @@
             </div>
         </section>
         <div class="flex_me" style="justify-content: center">
-            {% if current_user.team.id == team.id %}
+            {% if current_user.team_id == team.id %}
                 {# Will work only with a valid URL, therefor can't be tested on localhost #}
                 <div class="option_button" style="padding-right:10px;" data-href="{{ HOST_URL }}">
                     <a target="_blank"
@@ -19,7 +19,7 @@
                             class="flex_me" src="{{ url_for('static', filename='fb_share.png') }}" alt="Share"></a>
                 </div>
             {% endif %}
-            {% if current_user.team.id == team.id or current_user.is_admin %}
+            {% if current_user.team_id == team.id or current_user.is_admin %}
                 <a class="option_button hide_link" href={{ url_for('edit_team', team_id=team.id) }}><img
                         src="{{ url_for('static', filename='edit.png') }}" alt="עריכת פרטים"><br>
                 </a>
@@ -28,15 +28,15 @@
         <section id="report_info" class="team_info_box center_marg">
             <p>
             <ul class="center_text no_deco" style="direction: rtl">
-                {% if current_user.team.id == team.id %}
+                {% if current_user.team_id == team.id %}
                     <li><b>שם משתמש:</b> {{ current_user.username }}</li>
                 {% endif %}
-                <li><b>שם הצוות:</b> {{ team.name if team.name else 'לא הוזן' }}</li>
+                <li><b>שם הצוות:</b> {{ team.name or 'לא הוזן' }}</li>
                 <li><b>חבר צוות 1:</b>
-                    {{ team.first_teammate_name if team.first_teammate_name else 'לא הוזן' }}
+                    {{ team.first_teammate_name or 'לא הוזן' }}
                 </li>
                 <li><b>חבר צוות 2:</b>
-                    {{ team.second_teammate_name if team.second_teammate_name else 'לא הוזן' }}
+                    {{ team.second_teammate_name or 'לא הוזן' }}
                 </li>
             </ul>
             </p>
