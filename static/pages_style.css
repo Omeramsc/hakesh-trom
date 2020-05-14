@@ -79,6 +79,10 @@ body {
     visibility: hidden;
 }
 
+.disabledSelect {
+    background-color: lightgray;
+}
+
 #hamburger a:hover,
 .nav_btn:hover,
 .option_button a:hover,

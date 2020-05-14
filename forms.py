@@ -1,11 +1,19 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FloatField, SelectField, RadioField, PasswordField, BooleanField, \
-    IntegerField, TextAreaField
+    IntegerField, TextAreaField, HiddenField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, Length, ValidationError, NumberRange, Email, Regexp
 from models import Campaign
 from utils.consts import INVOICE_REF_LENGTH, BIT_ACCOUNT_NUM
 from utils.forms_helpers import report_categories, read_cities
+
+
+def validate_name(name, current_name=None):
+    if not current_name or name != current_name:  # run the validation only if It's a new campaign, or the name changed
+        campaign = Campaign.query.filter_by(name=name).first()
+        if campaign:
+            return False
+    return True
 
 
 class CreateCampaignForm(FlaskForm):
@@ -17,12 +25,7 @@ class CreateCampaignForm(FlaskForm):
     goal = IntegerField('ייעד כספי', render_kw={"placeholder": "הכנס יעד", "value": 0})
     city = SelectField('*עיר:', choices=read_cities(), validators=[DataRequired(message='שדה זה הינו שדה חובה')])
 
-    submit = SubmitField('צור קמפיין')
-
-    def validate_name(self, name):
-        campaign_name = Campaign.query.filter_by(name=name.data).first()
-        if campaign_name:
-            raise ValidationError('קמפיין בשם הזה כבר קיים, אנא בחר שם אחר.')
+    submit = SubmitField('שמור קמפיין')
 
 
 class SearchCampaignForm(FlaskForm):
