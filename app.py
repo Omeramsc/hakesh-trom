@@ -237,8 +237,8 @@ def campaign_control_panel(campaign_id):
     # Get dynamic values for the total teams and donations information:
     donations = db.session.query(func.sum(Donation.amount)).join(Team).filter(
         Team.campaign_id == campaign_id).scalar()
-    total = {'teams': db.session.query(func.count(Team.id)).filter(Team.campaign_id == campaign_id).scalar(),
-             'donations': donations if donations else 0}
+    teams = db.session.query(func.count(Team.id)).filter(Team.campaign_id == campaign_id).scalar()
+    total = {'teams': teams, 'donations': donations if donations else 0}
     return render_template('/campaign_control_panel.html', campaign=campaign, total=total)
 
 

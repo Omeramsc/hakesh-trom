@@ -24,7 +24,6 @@ class CreateCampaignForm(FlaskForm):
     start_date = DateField('*תאריך:', validators=[DataRequired(message='שדה זה הינו שדה חובה')], format='%Y-%m-%d')
     goal = IntegerField('ייעד כספי', render_kw={"placeholder": "הכנס יעד", "value": 0})
     city = SelectField('*עיר:', choices=read_cities(), validators=[DataRequired(message='שדה זה הינו שדה חובה')])
-    camp_id = HiddenField()
 
     submit = SubmitField('שמור קמפיין')
 
