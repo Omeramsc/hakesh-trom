@@ -5,7 +5,7 @@ import os
 import json
 import logging
 
-log = logging.getLogger('green_invoice.py')
+log = logging.getLogger(__name__)
 
 
 def get_bearer_token():

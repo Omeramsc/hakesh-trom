@@ -11,7 +11,7 @@ from sqlalchemy import func
 from utils.ui_helpers import get_campaign_icon, get_report_status_icon
 from utils.app_decorators import admin_access, user_access
 from utils.consts import INVOICE_TYPES, HOST_URL
-from utils.db_helpers import automate_report
+from utils.automate_report import generate_automate_report
 import utils.green_invoice as gi
 import utils.paypal as pp
 import datetime

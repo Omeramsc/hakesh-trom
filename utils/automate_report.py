@@ -3,7 +3,7 @@ from models import Report
 from db import db
 
 
-def automate_report(category):
+def generate_automate_report(category):
     if category == 'paypal':
         description = 'תקלת מערכת בשירות PayPal'
     elif category == 'invoice':

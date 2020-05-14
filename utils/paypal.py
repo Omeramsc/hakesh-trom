@@ -3,7 +3,7 @@ import os
 from utils.consts import ORGANIZATION_NAME
 import logging
 
-log = logging.getLogger('paypal.py')
+log = logging.getLogger(__name__)
 
 try:
     paypalrestsdk.configure({
