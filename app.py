@@ -1,4 +1,4 @@
-from flask import render_template, jsonify, flash, redirect, url_for, request, session, abort
+from flask import render_template, jsonify, flash, redirect, url_for, request, session, abort, Response
 from flask_login import login_user, current_user, logout_user, login_required
 from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood, DonationForm, PaperInvoiceForm, \
     DigitalInvoiceForm, BitForm, ReportForm, SearchReportForm, RespondReportForm, validate_name
@@ -6,7 +6,8 @@ from app_init import app, bcrypt
 from models import Campaign, User, Neighborhood, Team, Donation, Invoice, Building, Report
 from db import db
 from utils.forms_helpers import get_campaign_icon, get_report_status_icon
-from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users
+from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users, reset_and_export_users
+from utils.teams import delete_team_dependencies
 from utils.app_decorators import admin_access, user_access
 from utils.consts import INVOICE_TYPES, HOST_URL
 from sqlalchemy import func
@@ -42,6 +43,10 @@ def delete_campaign(campaign_id):
     for team in campaign.teams:
         for user in team.users:
             db.session.delete(user)
+        for donation in team.donations:
+            for invoice in donation.invoice:
+                db.session.delete(invoice)
+            db.session.delete(donation)
         db.session.delete(team)
 
     db.session.delete(campaign)
@@ -206,6 +211,75 @@ def manage_neighborhood_route(campaign_id, neighborhood_id):
     return render_template('/neighborhood_route_builder.html', neighborhood_teams=serialized_neighborhood_teams,
                            neighborhood_data=neighborhood.serialize(), campaign_id=campaign_id,
                            neighborhood_id=neighborhood_id, neighborhood_buildings=serialized_neighborhood_buildings)
+
+
+@app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>/team', methods=['POST'])
+@admin_access
+@login_required
+def create_new_team_for_route(campaign_id, neighborhood_id):
+    # Safe guards
+    Campaign.query.get_or_404(campaign_id)
+    Neighborhood.query.get_or_404(neighborhood_id)
+
+    # Create 1 new team
+    new_team_user_data = create_teams_and_users(campaign_id, neighborhood_id, 1)[0]
+    new_team_data = db.session.query(Team).join(User).filter(
+        User.username == new_team_user_data['username']).first().serialize()
+
+    return jsonify({'user': new_team_user_data, 'team': new_team_data})
+
+
+@app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>/team/<int:team_id>', methods=['DELETE'])
+@admin_access
+@login_required
+def delete_team_route(campaign_id, neighborhood_id, team_id):
+    # Safe guards
+    Campaign.query.get_or_404(campaign_id)
+    Neighborhood.query.get_or_404(neighborhood_id)
+    team = Team.query.get_or_404(team_id)
+    delete_team_dependencies(team)
+
+    db.session.commit()
+    db.session.delete(team)
+    db.session.commit()
+
+    return jsonify({'status': 'OK'})
+
+
+@app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>', methods=['DELETE'])
+@admin_access
+@login_required
+def delete_neighborhood(campaign_id, neighborhood_id):
+    # Safe guards
+    Campaign.query.get_or_404(campaign_id)
+    neighborhood = Neighborhood.query.get_or_404(neighborhood_id)
+
+    for team in neighborhood.teams:
+        delete_team_dependencies(team)
+
+    db.session.commit()
+    for team in neighborhood.teams:
+        db.session.delete(team)
+    db.session.commit()
+
+    return jsonify({'status': 'OK'})
+
+
+@app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>/export_user_data', methods=['GET'])
+@admin_access
+@login_required
+def export_user_data(campaign_id, neighborhood_id):
+    # Safe guards
+    Campaign.query.get_or_404(campaign_id)
+    Neighborhood.query.get_or_404(neighborhood_id)
+
+    csv_data = reset_and_export_users(campaign_id, neighborhood_id)
+
+    return Response(
+        csv_data,
+        mimetype="text/csv",
+        headers={"Content-disposition":
+                     "attachment; filename=user_data.csv"})
 
 
 @app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>/routes', methods=['POST'])

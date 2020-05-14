@@ -27,12 +27,13 @@ WHERE neighborhoods.id = 1;
     results = res.fetchall()
     team_ids_to_delete = [str(r[0]) for r in results]
 
-    # Delete the teams' building
-    conn.execute(f"""
+    if team_ids_to_delete:
+        # Delete the teams' building
+        conn.execute(f"""
 DELETE 
 FROM buildings_teams
 WHERE buildings_teams.team_id in ({",".join(team_ids_to_delete)});
-    """)
+        """)
 
     # Delete the teams' donations
     conn.execute("""
