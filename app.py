@@ -56,8 +56,8 @@ def home():
     progress = {}
     if not current_user.is_admin:
         total_earnings = db.session.query(func.sum(Donation.amount)).join(Team).filter(
-            Team.id == current_user.team.id).scalar()
-        progress['total_earnings'] = total_earnings if total_earnings else 0
+            Team.id == current_user.team_id).scalar()
+        progress['total_earnings'] = total_earnings or 0
         # add dynamic percentage information here
     return render_template('/home.html', progress=progress)
 
