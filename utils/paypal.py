@@ -1,6 +1,9 @@
 import paypalrestsdk
 import os
 from utils.consts import ORGANIZATION_NAME
+import logging
+
+log = logging.getLogger('paypal.py')
 
 try:
     paypalrestsdk.configure({
@@ -8,7 +11,8 @@ try:
         "client_id": os.environ['PAYPAL_CLIENT'],
         "client_secret": os.environ['PAYPAL_TOKEN']})
 except KeyError as e:
-    pass  # Since we have no actual logs, There's nothing to do here, just make sure the app won't break.
+    log.warning(f'KeyError: PayPal environment variable is missing or invalid! Error code: {e}')
+    raise KeyError  # We want the app to break if the environment variables are not set.
 
 
 def create_payment(amount, return_url, cancel_url, org=ORGANIZATION_NAME):

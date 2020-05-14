@@ -5,12 +5,13 @@ from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighbor
 from app_init import app, bcrypt
 from models import Campaign, User, Neighborhood, Team, Donation, Invoice, Building, Report
 from db import db
-from utils.forms_helpers import get_campaign_icon, get_report_status_icon
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users, reset_and_export_users
 from utils.teams import delete_team_dependencies
+from sqlalchemy import func
+from utils.ui_helpers import get_campaign_icon, get_report_status_icon
 from utils.app_decorators import admin_access, user_access
 from utils.consts import INVOICE_TYPES, HOST_URL
-from sqlalchemy import func
+from utils.db_helpers import automate_report
 import utils.green_invoice as gi
 import utils.paypal as pp
 import datetime
@@ -448,7 +449,7 @@ def send_invoice():
                                                donation.payment_type)
                 new_invoice.type = INVOICE_TYPES['DIGITAL']
                 new_invoice.reference_id = reference_id
-        except (ConnectionError, RuntimeError, KeyError):
+        except (ConnectionError, RuntimeError):
             conn_error = True  # if there's a connection error or unexpected error, display an error in the invoice page
             automate_report('invoice')
         except ValueError:
