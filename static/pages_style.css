@@ -888,7 +888,7 @@ ul {
 }
 
 /*------------------------- Leaderbored -------------------------*/
-.leaderbored_stats {
+.leaderboard_stats {
     height: 55%;
     width: 80%;
     margin: auto;
@@ -908,6 +908,7 @@ ul {
     width: 90%;
     height: 40%;
     margin: 1% auto;
+    direction: rtl;
     flex-direction: column;
     flex-wrap: wrap;
     overflow-y: auto;
@@ -915,15 +916,16 @@ ul {
     padding: 20px 5px;
     border: 1px solid black;
     border-radius: 20px;
-    justify-content: center;
 }
 
-.leaderbored_tabs {
-    width: 300px;
-    height: 35px;
+.leaderboard_tabs {
+    height: 30px;
     border: 1px solid #dddddd;
-    background-color: #ffffff;
-    margin: 0 2px;
+    border-radius: 7px;
+    background-color: rgba(255, 255, 255, 0.3);
+    margin: 0 4px -1px;
+    padding-bottom: 1px;
+    min-width: 200px;
 }
 
 .lb_team {
@@ -1164,13 +1166,23 @@ hr {
     }
 
     .tabs_container {
-        height: 62%;
+        height: 95%;
         flex-wrap: nowrap;
     }
 
     .leaderboard_tabs {
         width: 95%;
-        margin: auto;
+        height: 35px;
+        margin: 0px auto;
+        margin: 0 auto -1px;
+    }
+
+    .leaderboard_stats {
+        display: none;
+    }
+
+    #user_tabs_container {
+        height: 45%;
     }
 }
 
@@ -1257,5 +1269,9 @@ hr {
         height: 90%;
         overflow-y: auto;
         flex-wrap: nowrap;
+    }
+
+    #user_tabs_container {
+        height: 72%;
     }
 }

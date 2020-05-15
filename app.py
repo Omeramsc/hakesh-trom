@@ -630,23 +630,39 @@ def edit_team(team_id):
 @app.route('/leaderboard', methods=['GET', 'POST'])
 @login_required
 def leaderboard():
+    campaign_id = request.args.get('campaign_id', None)
     team_query = Team.query
     current_team_money = 0
+
+    # If the user is a team, show only teams within the same campaign and neighborhood
     if not current_user.is_admin:
-        team_query = team_query.filter(Team.campaign_id == current_user.team.campaign_id)
+        team_query = team_query.filter(
+            Team.campaign_id == current_user.team.campaign_id and Team.neighborhood_id == current_user.team.neighborhood_id)
+
+    # If the user is an admin, query neighborhoods for graph. 
+    else:
+        # TODO: query neighborhoods
+
+        # If an admin chose a specific-campaign leaderboard, query the related neighborhoods. 
+        if campaign_id:
+            # TODO: filter query with this specific campaign's neighborhoods
+            team_query = team_query.filter(Team.campaign_id == campaign_id)
     campaign_teams = [t.__dict__ for t in team_query.all()]
+
+    # Calculate total earned money for each team on the leaderboard
     for team in campaign_teams:
         total_earnings = db.session.query(func.sum(Donation.amount)).join(Team).filter(
             Team.id == team['id']).scalar()
-        team['total_earnings'] = total_earnings if total_earnings else 0
-        if current_user.team.id == team['id']:
+        team['total_earnings'] = total_earnings or 0
+        if not current_user.is_admin and current_user.team_id == team['id']:
             current_team_money == team['total_earnings']
     campaign_teams = sorted(campaign_teams, key=lambda k: k['total_earnings'], reverse=True)
-    app.logger.info(campaign_teams)
-    neighborhoods = [{'name': "זבוטינסקי", 'sum': 13000}, {'name': "דיזינגוף", 'sum': 10000},
-                     {'name': "יאללה", 'sum': 135000}, ]
+
+    # TODO: Insert real information instead of mock
+    mock_neighborhoods = [{'name': "זבוטינסקי", 'sum': 13000}, {'name': "דיזינגוף", 'sum': 10000},
+                          {'name': "טרכטנברג", 'sum': 135000}, ]
     return render_template('/leaderboard.html', teams=campaign_teams, current_team_money=current_team_money,
-                           neighborhoods=neighborhoods)
+                           neighborhoods=mock_neighborhoods)
 
 
 if __name__ == '__main__':

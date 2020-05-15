@@ -1,39 +1,46 @@
 {% extends "layout.html" %}
 {% block content %}
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-        google.charts.load('current', {'packages': ['bar']});
-        google.charts.setOnLoadCallback(drawChart);
+    {% if current_user.is_admin %}
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+            google.charts.load('current', {'packages': ['bar']});
+            google.charts.setOnLoadCallback(drawChart);
 
-        function drawChart() {
-            var data = new google.visualization.arrayToDataTable([
-                ['Opening Move', 'Percentage'],
-                {% for neighborhood in neighborhoods %}
-                    ['{{ neighborhood['name']}}', {{ neighborhood['sum'] }}],
-                {% endfor %}
+            function drawChart() {
+                if (getComputedStyle(document.getElementById('leaderboard_stats')).display != 'none') {
+                    var data = new google.visualization.arrayToDataTable([
+                        ['Opening Move', 'Percentage'],
+                        {% for neighborhood in neighborhoods %}
+                            ['{{ neighborhood['name']}}', {{ neighborhood['sum'] }}],
+                        {% endfor %}
 
-            ]);
+                    ]);
 
-            var options = {
-                legend: {position: 'none'},
-                bars: 'vertical',
-                axes: {
-                    x: {
-                        0: {side: 'bottom', label: 'שכונות משתתפות'}
-                    },
-                    y: {
-                        0: {side: 'top', label: 'סכום שנאסף'}
-                    }
+                    var options = {
+                        legend: {position: 'none'},
+                        bars: 'vertical',
+                        axes: {
+                            x: {
+                                0: {side: 'bottom', label: 'שכונות משתתפות'}
+                            },
+                            y: {
+                                0: {side: 'top', label: 'סכום שנאסף'}
+                            }
+                        }
+                    };
+
+                    var chart = new google.charts.Bar(document.getElementById('top_x_div'));
+                    chart.draw(data, options);
                 }
-            };
+                ;
+            }
 
-            var chart = new google.charts.Bar(document.getElementById('top_x_div'));
-            chart.draw(data, options);
-        };
-    </script>
+            window.addEventListener('resize', drawChart, false);
+        </script>
+    {% endif %}
     <main id="main_layout" class="quick_trans center_text">
         {% if current_user.is_admin %}
-            <section class="leaderboard_stats">
+            <section id="leaderboard_stats" class="leaderboard_stats">
                 <div id="top_x_div"></div>
             </section>
         {% else %}
@@ -48,7 +55,11 @@
                 {% endif %}
             </section>
         {% endif %}
-        <div class="tabs_container flex_me">
+        <div class="tabs_container flex_me"
+                {% if not current_user.is_admin %}
+             id="user_tabs_container"
+                {% endif %}
+        >
             {% for team in teams %}
                 <div class="leaderboard_tabs">
                     <span class="lb_team">
