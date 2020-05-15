@@ -35,47 +35,50 @@
             <div class="neighborhoods-control-container">
                 {% if campaign_neighborhoods %}
                     {% for campaign_neighborhood in campaign_neighborhoods %}
-                        <div class="col-md-4 neighborhoods-control-row center_marg">
+                        <div class="neighborhoods-control-row center_marg">
                             <span class="neighborhoods-control-row__neighborhood-name">{{ campaign_neighborhood['neighborhood_name'] }}</span>
                             <span>
                         | צוותים: {{ campaign_neighborhood['number_of_teams'] }} |
                         מסלולים: {{ campaign_neighborhood['number_of_routes'] }}
                     </span>
-                            <a class="hide_link neighborhoods-control-row__icon_link"
-                               href="{{ url_for('manage_neighborhood_route', campaign_id=campaign_id, neighborhood_id=campaign_neighborhood['neighborhood_id']) }}">
-                                <svg class="bi bi-map neighborhoods-control-row__icon" viewBox="0 0 16 16"
-                                     fill="currentColor"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd"
-                                          d="M15.817.613A.5.5 0 0116 1v13a.5.5 0 01-.402.49l-5 1a.502.502 0 01-.196 0L5.5 14.51l-4.902.98A.5.5 0 010 15V2a.5.5 0 01.402-.49l5-1a.5.5 0 01.196 0l4.902.98 4.902-.98a.5.5 0 01.415.103zM10 2.41l-4-.8v11.98l4 .8V2.41zm1 11.98l4-.8V1.61l-4 .8v11.98zm-6-.8V1.61l-4 .8v11.98l4-.8z"
-                                          clip-rule="evenodd"/>
-                                </svg>
-                            </a>
-                            <a class="hide_link neighborhoods-control-row__icon_link" href="#"
-                               onclick="deleteNeighborhood({{ campaign_neighborhood['neighborhood_id'] }})">
-                                <svg class="bi bi-trash neighborhoods-control-row__icon" viewBox="0 0 16 16"
-                                     fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z"/>
-                                    <path fill-rule="evenodd"
-                                          d="M14.5 3a1 1 0 01-1 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 01-1-1V2a1 1 0 011-1H6a1 1 0 011-1h2a1 1 0 011 1h3.5a1 1 0 011 1v1zM4.118 4L4 4.059V13a1 1 0 001 1h6a1 1 0 001-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
-                                          clip-rule="evenodd"/>
-                                </svg>
-                            </a>
-                            <a class="hide_link neighborhoods-control-row__icon_link"
-                               href="{{ url_for('export_user_data', campaign_id=campaign_id, neighborhood_id=campaign_neighborhood['neighborhood_id']) }}">
-                                <svg class="bi bi-box-arrow-down neighborhoods-control-row__icon" viewBox="0 0 16 16"
-                                     fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd"
-                                          d="M4.646 11.646a.5.5 0 01.708 0L8 14.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z"
-                                          clip-rule="evenodd"/>
-                                    <path fill-rule="evenodd" d="M8 4.5a.5.5 0 01.5.5v9a.5.5 0 01-1 0V5a.5.5 0 01.5-.5z"
-                                          clip-rule="evenodd"/>
-                                    <path fill-rule="evenodd"
-                                          d="M2.5 2A1.5 1.5 0 014 .5h8A1.5 1.5 0 0113.5 2v7a1.5 1.5 0 01-1.5 1.5h-1.5a.5.5 0 010-1H12a.5.5 0 00.5-.5V2a.5.5 0 00-.5-.5H4a.5.5 0 00-.5.5v7a.5.5 0 00.5.5h1.5a.5.5 0 010 1H4A1.5 1.5 0 012.5 9V2z"
-                                          clip-rule="evenodd"/>
-                                </svg>
-
-                            </a>
+                            <div class="neighborhoods-control-row__icons-wrapper">
+                                <a class="hide_link neighborhoods-control-row__icon_link"
+                                   href="{{ url_for('manage_neighborhood_route', campaign_id=campaign_id, neighborhood_id=campaign_neighborhood['neighborhood_id']) }}">
+                                    <svg class="bi bi-map neighborhoods-control-row__icon" viewBox="0 0 16 16"
+                                         fill="currentColor"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd"
+                                              d="M15.817.613A.5.5 0 0116 1v13a.5.5 0 01-.402.49l-5 1a.502.502 0 01-.196 0L5.5 14.51l-4.902.98A.5.5 0 010 15V2a.5.5 0 01.402-.49l5-1a.5.5 0 01.196 0l4.902.98 4.902-.98a.5.5 0 01.415.103zM10 2.41l-4-.8v11.98l4 .8V2.41zm1 11.98l4-.8V1.61l-4 .8v11.98zm-6-.8V1.61l-4 .8v11.98l4-.8z"
+                                              clip-rule="evenodd"/>
+                                    </svg>
+                                </a>
+                                <a class="hide_link neighborhoods-control-row__icon_link" href="#"
+                                   onclick="deleteNeighborhood({{ campaign_neighborhood['neighborhood_id'] }})">
+                                    <svg class="bi bi-trash neighborhoods-control-row__icon" viewBox="0 0 16 16"
+                                         fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z"/>
+                                        <path fill-rule="evenodd"
+                                              d="M14.5 3a1 1 0 01-1 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 01-1-1V2a1 1 0 011-1H6a1 1 0 011-1h2a1 1 0 011 1h3.5a1 1 0 011 1v1zM4.118 4L4 4.059V13a1 1 0 001 1h6a1 1 0 001-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
+                                              clip-rule="evenodd"/>
+                                    </svg>
+                                </a>
+                                <a class="hide_link neighborhoods-control-row__icon_link"
+                                   href="{{ url_for('export_user_data', campaign_id=campaign_id, neighborhood_id=campaign_neighborhood['neighborhood_id']) }}">
+                                    <svg class="bi bi-box-arrow-down neighborhoods-control-row__icon"
+                                         viewBox="0 0 16 16"
+                                         fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd"
+                                              d="M4.646 11.646a.5.5 0 01.708 0L8 14.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z"
+                                              clip-rule="evenodd"/>
+                                        <path fill-rule="evenodd"
+                                              d="M8 4.5a.5.5 0 01.5.5v9a.5.5 0 01-1 0V5a.5.5 0 01.5-.5z"
+                                              clip-rule="evenodd"/>
+                                        <path fill-rule="evenodd"
+                                              d="M2.5 2A1.5 1.5 0 014 .5h8A1.5 1.5 0 0113.5 2v7a1.5 1.5 0 01-1.5 1.5h-1.5a.5.5 0 010-1H12a.5.5 0 00.5-.5V2a.5.5 0 00-.5-.5H4a.5.5 0 00-.5.5v7a.5.5 0 00.5.5h1.5a.5.5 0 010 1H4A1.5 1.5 0 012.5 9V2z"
+                                              clip-rule="evenodd"/>
+                                    </svg>
+                                </a>
+                            </div>
                         </div>
                     {% endfor %}
                 {% else %}
@@ -146,7 +149,7 @@
                 $("#are-you-sure").dialog({
                     modal: true,
                     autoOpen: true,
-                    title: "<span style='direction: rtl;'>האם את/ה בטוח/ה?</span>",
+                    title: "<span style='direction: rtl; text-align: center;'>האם את/ה בטוח/ה?</span>",
                 });
                 document.getElementById('are-you-sure').classList.remove('hidden')
             }
