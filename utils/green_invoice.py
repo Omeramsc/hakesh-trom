@@ -19,7 +19,7 @@ def get_bearer_token():
     try:
         payload = {'id': 'cf4eb537-6eec-4900-affe-e49be73112d3', 'secret': os.environ['GREEN_INV_TOKEN']}
     except KeyError as e:
-        log.warning(f'KeyError: Green Invoice environment variable is missing or invalid! Error code: {e}')
+        log.error(f'KeyError: Green Invoice environment variable is missing or invalid! Error code: {e}')
         raise KeyError  # We want the app to break if the environment variables are not set.
     headers = {
         'Authorization': f'Basic OWNkMTEyYzItYjRkNi00OTYwLTk2OTQtY2NiMDkyODBjM2Q0OlgyczhXcW5za2JFaVNtbnhvQkUtb0E=',

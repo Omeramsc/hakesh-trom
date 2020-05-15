@@ -11,7 +11,7 @@ try:
         "client_id": os.environ['PAYPAL_CLIENT'],
         "client_secret": os.environ['PAYPAL_TOKEN']})
 except KeyError as e:
-    log.warning(f'KeyError: PayPal environment variable is missing or invalid! Error code: {e}')
+    log.error(f'KeyError: PayPal environment variable is missing or invalid! Error code: {e}')
     raise KeyError  # We want the app to break if the environment variables are not set.
 
 

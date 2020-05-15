@@ -376,7 +376,7 @@ def get_donation():
                 return redirect(pp.authorize_payment(payment))
             except (ConnectionError, RuntimeError):
                 conn_error = True  # if there's a connection error / unexpected error, display an error in the donation page
-                automate_report('paypal')
+                generate_automate_report('paypal')
         if not conn_error:
             return redirect(url_for('send_invoice'))
     return render_template('/donation.html', form=form, conn_error=conn_error)
@@ -451,7 +451,7 @@ def send_invoice():
                 new_invoice.reference_id = reference_id
         except (ConnectionError, RuntimeError):
             conn_error = True  # if there's a connection error or unexpected error, display an error in the invoice page
-            automate_report('invoice')
+            generate_automate_report('invoice')
         except ValueError:
             digital_form.donor_id.errors.append("מספר ת.ז אינו תקין")
         else:

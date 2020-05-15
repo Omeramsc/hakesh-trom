@@ -4,6 +4,7 @@ from db import db
 
 
 def generate_automate_report(category):
+    description = 'ישנה תקלת מערכת לא צפויה'
     if category == 'paypal':
         description = 'תקלת מערכת בשירות PayPal'
     elif category == 'invoice':
