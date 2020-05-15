@@ -79,6 +79,10 @@ body {
     visibility: hidden;
 }
 
+.disabledSelect {
+    background-color: lightgray;
+}
+
 #hamburger a:hover,
 .nav_btn:hover,
 .option_button a:hover,
@@ -86,6 +90,11 @@ body {
 .guide_btn:hover {
     color: #659cef;
     text-decoration: none;
+}
+
+.hover_scale:hover {
+    transform: scale(1.05);
+    transition: 0.4s;
 }
 
 /*----------- Scrollbar design -----------*/
@@ -310,11 +319,6 @@ ul {
     display: flex;
     /* I wrote this despite the flex class, so we won't copy the class for each and every li */
     justify-content: flex-start;
-}
-
-li:hover {
-    transform: scale(1.05);
-    transition: 0.4s;
 }
 
 #report_summary {

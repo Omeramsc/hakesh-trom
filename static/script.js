@@ -1,28 +1,4 @@
-function totalProgressImitation() {
-    // This JS is meant to imitate a real-time senario, instead of using hard-coded numbers
-    var earnedMoneyImitation = Math.floor(Math.random() * 1000) + 1;
-    var progressImitation = Math.ceil(earnedMoneyImitation / 10);
-    document.getElementById("earned_money").innerHTML = '₪' + 'סכום שנאסף: ' + earnedMoneyImitation;
-    document.getElementById("prog_precen").style.width = progressImitation + '%';
-    document.getElementById("prog_precen").innerHTML = progressImitation + '%';
-
-    if (progressImitation > 80) {
-        document.getElementById("prog_precen").style.backgroundColor = '#35d10d';
-        if (progressImitation == 100) {
-            window.onload = () => alert("הגעתם ליעד, כל הכבוד!");
-        }
-    }
-}
-
-function sucessful_report() {
-    alert("הדיווח התקבל בהצלחה! אנא המתן למענה מהאחראי");
-    window.location.href = "report.php";
-}
-
-function version_error() {
-    alert("פונקציה זו לא פעילה בגרסא הייעודית לקורס זה.");
-}
-
+// about_org's slide show:
 function showSlides(currentSlideIndex) {
     let slideIndex = currentSlideIndex;
     const slides = document.getElementsByClassName("slide-container");
@@ -42,20 +18,16 @@ function showSlides(currentSlideIndex) {
     return slideIndex;
 }
 
-$(function activate_box() {
-    $("#guide_box").dialog({
-        modal: true,
-        autoOpen: false,
-        title: "<div style='padding: 0px 100px;'>אופן ביצוע התרומה<div>",
-        width: 400,
-        height: 500,
-    });
-    $("#btnShow").click(function () {
-        $('#guide_box').dialog('open');
-    });
-});
+function onLoad() {
+    let slideIndex = showSlides(0);
 
-(function donation() {
+    setInterval(() => {
+        slideIndex = showSlides(slideIndex)
+    }, 5000); // 5 seconds
+}
+
+// Donation's donation box&buttons:
+function donation() {
     'use strict';
 
     function ctrls() {
@@ -148,12 +120,4 @@ $(function activate_box() {
     // init
     var controls = new ctrls();
     document.addEventListener('DOMContentLoaded', controls.ready);
-})();
-
-function onLoad() {
-    let slideIndex = showSlides(0);
-
-    setInterval(() => {
-        slideIndex = showSlides(slideIndex)
-    }, 5000); // 5 seconds
 }
