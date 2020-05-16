@@ -600,7 +600,7 @@ def edit_response(report_id):
     return render_template('/report_response.html', report=report, form=form, legend="עריכת מענה")
 
 
-@app.route('/view_team/<int:team_id>')
+@app.route('/team/<int:team_id>', methods=['GET'])
 @login_required
 def view_team(team_id):
     progress = {}
@@ -610,9 +610,11 @@ def view_team(team_id):
     return render_template('/view_team.html', team=team, progress=progress)
 
 
-@app.route('/view_team/<int:team_id>/edit', methods=['GET', 'POST'])
+@app.route('/team/<int:team_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_team(team_id):
+    if not current_user.is_admin and not current_user.team_id == team_id:
+        abort(403)
     team = Team.query.get_or_404(team_id)
     form = TeamForm()
     if form.validate_on_submit():

@@ -12,13 +12,11 @@
                     </a>
                 {% endif %}
             </div>
-            {% if not current_user.is_admin %}
-                <div class="usernames flex_me">
-                    <div>{{ current_user.team.first_teammate_name if current_user.team.first_teammate_name }}</div>
-                    <div style="color: #459cef;">{{ current_user.team.name if current_user.team.name }}</div>
-                    <div>{{ current_user.team.second_teammate_name if current_user.team.second_teammate_name }}</div>
-                </div>
-            {% endif %}
+            <div class="usernames flex_me">
+                <div>{{ current_user.team.first_teammate_name if current_user.team.first_teammate_name }}</div>
+                <div style="color: #459cef;">{{ current_user.team.name if current_user.team.name }}</div>
+                <div>{{ current_user.team.second_teammate_name if current_user.team.second_teammate_name }}</div>
+            </div>
         </section>
         <section class="buttons flex_me">
             {% if current_user.is_admin %}

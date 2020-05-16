@@ -10,11 +10,6 @@
             </div>
         </section>
         <div class="flex_me" style="justify-content: center">
-            <div class="option_button" data-href="{{ HOST_URL }}">
-                <a target="_blank"
-                   href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2F{{ HOST_URL }}&amp;src=sdkpreparse"
-                   class="fb-xfbml-parse-ignore"><img
-                        class="flex_me" src="{{ url_for('static', filename='fb_share.png') }}" alt="Share"></a></div>
             <a class="option_button hide_link not_allowed" href=#><img
                     src="{{ url_for('static', filename='edit.png') }}" alt="עריכת פרטים"><br>
             </a>
@@ -67,13 +62,5 @@
                 </a>
             </form>
         </section>
-        {% if not current_user.is_admin %}
-            <section class="usr_progress">
-                <span id="earned_money"></span>
-                <div class="usr_bar">
-                    <span id="prog_precen"></span>
-                </div>
-            </section>
-        {% endif %}
     </main>
 {% endblock content %}

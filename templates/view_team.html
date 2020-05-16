@@ -27,8 +27,8 @@
         <section id="report_info" class="team_info_box center_marg">
             <p>
             <ul class="center_text no_deco" style="direction: rtl">
-                {% if current_user.team_id == team.id %}
-                    <li><b>שם משתמש:</b> {{ current_user.username }}</li>
+                {% if current_user.is_admin or current_user.team_id == team.id %}
+                    <li><b>שם משתמש:</b> {{ team.users[0].username }}</li>
                 {% endif %}
                 <li><b>שם הצוות:</b> {{ team.name or 'לא הוזן' }}</li>
                 <li><b>חבר צוות 1:</b>
