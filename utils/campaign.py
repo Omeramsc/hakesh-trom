@@ -1,7 +1,7 @@
-from models import Neighborhood, Team, User
+from models import Neighborhood, Team, User, buildings_teams_association_table, Campaign
 from db import db
 from .consts import DEFAULT_TEAM_USER_PASSWORD
-import functools
+from sqlalchemy import func, distinct
 
 
 def serialize_campaign_neighborhoods(neighborhood, campaign_teams):
@@ -11,14 +11,17 @@ def serialize_campaign_neighborhoods(neighborhood, campaign_teams):
     :param campaign_teams: All the campaign's teams
     :return:
     """
-    # Represent each team in `1` or `0` if related to the current neighborhood
-    teams_representation = map(lambda t: (1 if t.neighborhood_id == neighborhood.id else 0), campaign_teams)
+
+    teams_in_neighborhood = list(filter(lambda t: t.neighborhood_id == neighborhood.id, campaign_teams))
+    number_of_routes = db.session.query(
+        func.count(distinct(buildings_teams_association_table.columns.team_id))).join(
+        Team).filter(Team.id.in_([team.id for team in teams_in_neighborhood])).scalar() or 0
 
     return {
         'neighborhood_id': neighborhood.id,
         'neighborhood_name': neighborhood.name,
-        'number_of_teams': functools.reduce(lambda x, y: x + y, teams_representation),
-        'number_of_routes': 0
+        'number_of_teams': len(teams_in_neighborhood),
+        'number_of_routes': number_of_routes
     }
 
 
@@ -80,3 +83,19 @@ def create_team_and_user(campaign_id, neighborhood_id):
         'username': team_user.username,
         'password': DEFAULT_TEAM_USER_PASSWORD
     }
+
+
+def reset_and_export_users(campaign_id, neighborhood_id):
+    users = db.session.query(User).join(Team).join(Campaign).join(Neighborhood).filter(
+        Campaign.id == campaign_id).filter(Neighborhood.id == neighborhood_id)
+
+    # Reset passwords
+    for user in users:
+        user.set_password(DEFAULT_TEAM_USER_PASSWORD)
+
+    db.session.commit()
+
+    headers = ['Username', 'Password']
+    rows = [','.join([user.username, DEFAULT_TEAM_USER_PASSWORD]) for user in users]
+
+    return ','.join(headers) + '\n' + '\n'.join(rows) + '\n'

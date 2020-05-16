@@ -30,6 +30,9 @@ body {
     color: unset;
     text-decoration: none;
 }
+.hide_link:hover {
+    text-decoration: none;
+}
 
 .flex_me {
     display: flex;
@@ -629,8 +632,7 @@ ul {
 }
 
 .neighborhoods-add-form {
-    padding-top: 1em;
-    padding-right: 1em;
+    padding: 1em 1em 0 1em;
     text-align: right;
 }
 
@@ -652,6 +654,10 @@ ul {
     border-radius: 5px;
     border: solid 2px #90D6F4;
     margin-bottom: 0.5em;
+    max-width: 33.333333%;
+    min-width: 350px;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 .neighborhoods-control-row__neighborhood-name {
@@ -659,6 +665,9 @@ ul {
 }
 
 .neighborhoods-control-row__icon_link {
+}
+
+.neighborhoods-control-row__icons-wrapper {
     float: left;
 }
 
@@ -671,6 +680,16 @@ ul {
     text-align: right;
     direction: rtl;
 }
+
+#are-you-sure {
+    direction: rtl;
+    text-align: right;
+}
+
+.are-you-sure__btn-wrapper {
+    text-align: center;
+}
+
 
 /*------------------------- Route Builder -------------------------*/
 
@@ -689,9 +708,19 @@ ul {
     padding-left: 10px;
 }
 
-.route-builder-team-panel__save-btn {
-    width: 100%;
+.route-builder-team-panel__buttons-wrapper {
     margin-bottom: 0.5em;
+    text-align: center;
+}
+
+.route-builder-team-panel__save-btn {
+    width: 65%;
+    min-width: 6em;
+}
+
+.route-builder-team-panel__add-btn, .route-builder-team-panel__remove-btn {
+    width: 15%;
+    min-width: 3em;
 }
 
 .route-builder-team-panel__team {
@@ -707,6 +736,19 @@ ul {
 .route-builder-team-panel__team_title {
     text-decoration: underline;
     font-weight: bolder;
+}
+
+.route-builder-team-panel__total-line {
+    position: absolute;
+    bottom: 0;
+    border-top: solid;
+    width: calc(20% - 40px);
+    height: 1.2em;
+}
+
+.route-builder-team-panel__routes {
+    overflow: auto;
+    height: 80%;
 }
 
 .route-builder-team-panel__team_title__no_route, .route-builder-team-panel__team_title__unclean {
@@ -907,6 +949,14 @@ hr {
     }
 }
 
+@media (max-width: 768px) {
+    .neighborhoods-control-row {
+        min-width: unset;
+        max-width: unset;
+    }
+}
+
+
 @media screen and (max-width: 600px) {
     /* Login */
     .login_layout {
@@ -1003,6 +1053,19 @@ hr {
         margin: 10% auto;
     }
 
+}
+
+
+@media screen and (max-width: 390px) {
+    .neighborhoods-control-row__icons-wrapper {
+        float: unset;
+        text-align: center;
+    }
+
+    .neighborhoods-control-row {
+        min-width: unset;
+        max-width: unset;
+    }
 }
 
 @media screen and (max-width: 360px) {

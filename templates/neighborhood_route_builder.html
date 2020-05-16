@@ -16,35 +16,48 @@
     </div>
     <main id="main_layout" class="unified_layout route-builder">
         <div class="route-builder-team-panel">
-            <button type="button" class="btn btn-info route-builder-team-panel__save-btn" id="save-button">שמור</button>
-            {% for team in neighborhood_teams %}
-                <div class="route-builder-team-panel__team" data-id="{{ team['id'] }}" id="team-{{ team['id'] }}">
-                <span class="route-builder-team-panel__team_title">
-                    <span class="h3">
-                        צוות {{ team['id'] }}
-                    </span>
-                    {% if not team['buildings'] %}
-                        <span class="route-builder-team-panel__team_title__no_route">!</span>
-                    {% endif %}
-                </span>
-                    <div class="route-builder-team-panel__team_route collapse">
-                        {% if team['buildings'] %}
-                            <ul>
-                                {% for building in team['buildings'] %}
-                                    <li>
-                                        {{ building['address'] }} - צפי: {{ building['predicted_earnings'] }}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                            <span><b>סה"כ צפי רווח</b>:
-                            {{ team['predicted_total'] }}
+            <div class="route-builder-team-panel__buttons-wrapper">
+                <button type="button" class="btn btn-info route-builder-team-panel__save-btn" id="save-button">שמור
+                </button>
+                <button type="button" class="btn btn-success route-builder-team-panel__add-btn" id="add-button">
+                    +
+                </button>
+                <button type="button" class="btn btn-danger route-builder-team-panel__remove-btn" id="remove-button"
+                        disabled>-
+                </button>
+            </div>
+            <div class="route-builder-team-panel__routes">
+                {% for team in neighborhood_teams %}
+                    <div class="route-builder-team-panel__team" data-id="{{ team['id'] }}" id="team-{{ team['id'] }}">
+                        <span class="route-builder-team-panel__team_title">
+                            <span class="h3">
+                                צוות {{ team['id'] }} - {{ "₪{:.2f}".format(team['predicted_total']) }}
                             </span>
-                        {% else %}
-                            לא נבחר מסלול
-                        {% endif %}
+                            {% if not team['buildings'] %}
+                                <span class="route-builder-team-panel__team_title__no_route">!</span>
+                            {% endif %}
+                        </span>
+                        <div class="route-builder-team-panel__team_route collapse">
+                            {% if team['buildings'] %}
+                                <ul>
+                                    {% for building in team['buildings'] %}
+                                        <li>
+                                            {{ building['address'] }} - צפי: {{ building['predicted_earnings'] }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                                <span><b>סה"כ צפי רווח</b>:
+                            {{ "₪{:.2f}".format(team['predicted_total']) }}
+                            </span>
+                            {% else %}
+                                לא נבחר מסלול
+                            {% endif %}
+                        </div>
                     </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
+            <span class="h4 route-builder-team-panel__total-line"
+                  id="totalPredicted">סה"כ: {{ "₪{:.2f}".format(neighborhood_teams | sum(attribute='predicted_total')) }}</span>
         </div>
         <div class="route-builder-map-panel" id="map">
         </div>
@@ -62,13 +75,19 @@
 
         const teamELms = document.getElementsByClassName('route-builder-team-panel__team');
         const saveButtonElm = document.getElementById('save-button');
+        const deleteButtonElm = document.getElementById('remove-button');
+        const addButtonElm = document.getElementById('add-button');
         const buildings = {{ neighborhood_buildings | tojson  }};
         const neighborhood =  {{ neighborhood_data | tojson }};
         const _teams = {{ neighborhood_teams | tojson }};
-        const teams = _teams.map(t => ({...t, buildingIds: t.buildings.map(b => b.id)}));
+        let teams = _teams.map(t => ({...t, buildingIds: t.buildings.map(b => b.id)}));
+        const csrfToken = "{{ csrf_token() }}";
         const avgPredictedEarnings = Math.floor(buildings.reduce((accumulator, currentValue) => accumulator + currentValue.predicted_earnings, 0) / buildings.length);
+
         saveButtonElm.disabled = true;
         saveButtonElm.addEventListener('click', saveChanges);
+        addButtonElm.addEventListener('click', createTeam);
+        deleteButtonElm.addEventListener('click', deleteTeam);
 
         // check if should prevent the user to exit the tab if there are any unsaved changes
         window.onbeforeunload = () => {
@@ -86,7 +105,7 @@
 
             if (selectedTeamId) {
                 // Preforming clean up
-                for (const polygon of buildingLayerByTeamId[selectedTeamId]) {
+                for (const polygon of (buildingLayerByTeamId[selectedTeamId] || [])) {
                     polygon.setOptions({'fillColor': NOT_AVAILABLE_COLOR, strokeColor: NOT_AVAILABLE_COLOR})
                 }
             }
@@ -102,6 +121,9 @@
             if (window.infoWindow) {
                 window.infoWindow.close();
             }
+
+            // Allows to delete the team
+            deleteButtonElm.disabled = false;
         }
 
         function closeAllRoutes() {
@@ -112,40 +134,47 @@
             })
         }
 
-        for (const teamElm of teamELms) {
-            teamElm.addEventListener('click', async function () {
-                const newSelectedTeamId = parseInt(this.getAttribute('data-id'), 10);
-
-                if (newSelectedTeamId === selectedTeamId) {
-                    return;
-                }
-
-                // Reset all the other teams
-                for (const teamElm of teamELms) {
-                    teamElm.classList.remove('route-builder-team-panel__team__selected')
-                }
-                // Turn on the selected team
-                this.classList.add('route-builder-team-panel__team__selected')
-
-                const routeElm = $(this).find('.route-builder-team-panel__team_route')
-
-                if (selectedTeamId) {
-                    // Close all the other routes
-                    const closeAllRoutesOtherRoutes = closeAllRoutes()
-                    $('.route-builder-team-panel__team_route').collapse('hide');
-                    // Waiting for the close animation to close
-                    await closeAllRoutesOtherRoutes;
-                }
-
-                // Open route for the selected team
-                routeElm.collapse('show');
-
-                // Update the selected team ID
-                updateTeamId(newSelectedTeamId)
-            })
+        function getTotalPredictedEarnings(buildings) {
+            return buildings.reduce((accumulator, currentValue) => accumulator + currentValue.predicted_earnings, 0)
         }
 
-        function showLoading(parent) {
+        async function handleTeamClick() {
+            const newSelectedTeamId = parseInt(this.getAttribute('data-id'), 10);
+
+            if (newSelectedTeamId === selectedTeamId) {
+                return;
+            }
+
+            // Reset all the other teams
+            for (const teamElm of teamELms) {
+                teamElm.classList.remove('route-builder-team-panel__team__selected')
+            }
+            // Turn on the selected team
+            this.classList.add('route-builder-team-panel__team__selected')
+
+            const routeElm = $(this).find('.route-builder-team-panel__team_route')
+
+            if (selectedTeamId) {
+                // Close all the other routes
+                const closeAllRoutesOtherRoutes = closeAllRoutes()
+                $('.route-builder-team-panel__team_route').collapse('hide');
+                // Waiting for the close animation to close
+                await closeAllRoutesOtherRoutes;
+            }
+
+            // Open route for the selected team
+            routeElm.collapse('show');
+
+            // Update the selected team ID
+            updateTeamId(newSelectedTeamId)
+        }
+
+        for (const teamElm of teamELms) {
+            teamElm.addEventListener('click', handleTeamClick);
+        }
+
+        function showLoading() {
+            const parent = document.getElementsByClassName('hidden')[0];
             parent.innerHTML = '<div id="modal-content" style="text-align: center;direction: rtl;"><h3>שומר...</h3><div class="lds-dual-ring"></div>';
             $('#modal-content').modal({
                 escapeClose: false,
@@ -164,17 +193,59 @@
         }
 
         function showSuccess() {
-            $.modal.getCurrent().$elm[0].innerHTML = "<h3>המסלולים נשמרו!</h3><div>המסלולים נשמרו בהצלחה!</div><a href='#close' rel='modal:close'><button class='btn btn-secondary'>סגור</button></a>";
+            $.modal.getCurrent().$elm[0].innerHTML = '';
+
             $('#modal-content').modal({
                 escapeClose: true,
                 clickClose: true,
                 showClose: false
-            })
+            });
+
+            $.modal.getCurrent().$elm[0].innerHTML = "<h3>המסלולים נשמרו!</h3><div>המסלולים נשמרו בהצלחה!</div><a href='#close' rel='modal:close'><button class='btn btn-secondary'>סגור</button></a>";
+        }
+
+        function showTeamCreatedSuccess(newUser) {
+            $.modal.getCurrent().$elm[0].innerHTML = '';
+
+            $('#modal-content').modal({
+                escapeClose: true,
+                clickClose: true,
+                showClose: false
+            });
+
+            $.modal.getCurrent().$elm[0].innerHTML = `
+            <h3>צוות נוצר בהצלחה</h3>
+            <div>
+                פרטי התחברות:
+                <br />
+שם משתמש:                ${newUser.username}
+                <br />
+                סיסמה: <code>${newUser.password}</code>
+                <br/>
+            </div>
+            <a href='#close' rel='modal:close'>
+                <button class='btn btn-secondary'>סגור</button>
+            </a>`;
         }
 
 
+        function showTeamDeletedSuccess() {
+            $.modal.getCurrent().$elm[0].innerHTML = '';
+
+            $('#modal-content').modal({
+                escapeClose: true,
+                clickClose: true,
+                showClose: false
+            });
+
+            $.modal.getCurrent().$elm[0].innerHTML = `
+            <h3>הצוות נמחק בהצלחה</h3>
+            <a href='#close' rel='modal:close'>
+                <button class='btn btn-secondary'>סגור</button>
+            </a>`;
+        }
+
         async function saveChanges() {
-            const csrfToken = "{{ csrf_token() }}";
             const url = "{{ url_for('upsert_routes', campaign_id=campaign_id, neighborhood_id=neighborhood_id) }}";
             const unsavedTeams = teams.filter(t => t.unclean);
             const parsedUpdate = unsavedTeams.reduce((accumulator, currentValue) => {
@@ -182,11 +253,10 @@
                 return accumulator;
             }, {});
 
-            const modalContentPlaceholder = document.getElementsByClassName('hidden')[0]
-            showLoading(modalContentPlaceholder);
+            showLoading();
 
             try {
-                // Excute the API call
+                // Execute the API call
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
@@ -205,7 +275,7 @@
                     return;
                 }
 
-                // Throw an error if we got a bad response fron the BE
+                // Throw an error if we got a bad response from the BE
                 throw new Error(`Got ${response.statusText} (${response.status}) response`);
             } catch (e) {
                 // There is an error :(
@@ -254,6 +324,15 @@
             }
         }
 
+        function petrifyPredictedEarnings(totalPredictedEarnings) {
+            return `₪${totalPredictedEarnings.toFixed(2)}`;
+        }
+
+        function calculateAndRenderTotalPredicted() {
+            const totalPredicted = teams.reduce((accumulator, currentValue) => accumulator + getTotalPredictedEarnings(currentValue.buildings), 0);
+            document.getElementById('totalPredicted').innerText = `סה"כ: ${petrifyPredictedEarnings(totalPredicted)}`;
+        }
+
         function renderTeamRoute(team) {
             const teamDiv = document.getElementById(`team-${team.id}`);
             const teamRouteDiv = teamDiv.getElementsByClassName("route-builder-team-panel__team_route")[0];
@@ -267,6 +346,24 @@
                 removeUncleanIndicator(teamDiv);
             }
 
+            // Generate the route list and sum the predicted earnings
+            const routeUL = document.createElement('ul');
+            let totalPredictedEarnings = 0;
+
+            for (const building of team.buildings) {
+                const buildingLi = document.createElement('li');
+                buildingLi.innerText = `${building.address} - צפי: ${petrifyPredictedEarnings(building.predicted_earnings)}`;
+                routeUL.appendChild(buildingLi)
+                totalPredictedEarnings += building.predicted_earnings;
+            }
+            const prettyTotalPredictedEarnings = petrifyPredictedEarnings(totalPredictedEarnings);
+
+            // Updating the team title
+            const teamTitle = teamDiv.querySelector('span.h3');
+            teamTitle.innerText = `צוות ${team.id} - ${prettyTotalPredictedEarnings}`;
+
+            calculateAndRenderTotalPredicted();
+
             if ((team.buildings || []).length === 0) {
                 teamRouteDiv.innerText = 'לא נבחר מסלול';
                 checkAndRenderNoRouteIndicator(teamDiv);
@@ -277,21 +374,13 @@
 
             // Cleanup the div
             teamRouteDiv.innerHTML = '';
-            let totalPredictedEarnings = 0;
 
-            // Adding the route list
-            const routeUL = document.createElement('ul');
-            for (const building of team.buildings) {
-                const buildingLi = document.createElement('li');
-                buildingLi.innerText = `${building.address} - צפי: ${building.predicted_earnings}`;
-                routeUL.appendChild(buildingLi)
-                totalPredictedEarnings += building.predicted_earnings;
-            }
+            // Render the new route
             teamRouteDiv.appendChild(routeUL);
 
             // Adding to total predicted_earnings
             const totalPredictedEarningsSpan = document.createElement('span');
-            totalPredictedEarningsSpan.innerHTML = `<b>סה"כ צפי רווח</b>: ${totalPredictedEarnings.toFixed(2)}`;
+            totalPredictedEarningsSpan.innerHTML = `<b>סה"כ צפי רווח</b>: ${prettyTotalPredictedEarnings}`;
             teamRouteDiv.appendChild(totalPredictedEarningsSpan);
         }
 
@@ -464,6 +553,127 @@
 
             for (const building of buildings) {
                 addPolygon(map, infoWindow, building);
+            }
+        }
+
+
+        function rerenderTeams() {
+            const teamPanel = document.getElementsByClassName('route-builder-team-panel__routes')[0];
+            teamPanel.innerHTML = '';
+
+            for (const team of teams) {
+                appendTeam(team)
+            }
+
+        }
+
+        function appendTeam(newTeam) {
+            const newTeamDiv = document.createElement('div');
+            newTeamDiv.id = `team-${newTeam.id}`;
+            newTeamDiv.classList.add('route-builder-team-panel__team');
+            newTeamDiv.setAttribute('data-id', newTeam.id);
+            newTeamDiv.innerHTML = `
+                <span class="route-builder-team-panel__team_title">
+                    <span class="h3">
+                        צוות ${newTeam.id} - ${petrifyPredictedEarnings(getTotalPredictedEarnings(newTeam.buildings))}
+                    </span>
+                </span>
+                <div class="route-builder-team-panel__team_route collapse">
+                    לא נבחר מסלול
+                </div>
+            `;
+            newTeamDiv.addEventListener('click', handleTeamClick);
+
+
+            const teamPanel = document.getElementsByClassName('route-builder-team-panel__routes')[0];
+            teamPanel.appendChild(newTeamDiv);
+
+            renderTeamRoute(newTeam)
+        }
+
+        async function createTeam() {
+            const url = "{{ url_for('create_new_team_for_route', campaign_id=campaign_id, neighborhood_id=neighborhood_id) }}";
+
+            showLoading();
+
+            try {
+                // Execute the API call
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                    },
+                });
+
+                if (response.ok) {
+                    const newTeamData = await response.json();
+                    // Deep clone the team object
+                    teams.push({...newTeamData.team, buildingIds: []});
+
+                    showTeamCreatedSuccess(newTeamData.user);
+                    appendTeam(newTeamData.team);
+                    return;
+                }
+
+                // Throw an error if we got a bad response from the BE
+                throw new Error(`Got ${response.statusText} (${response.status}) response`);
+            } catch (e) {
+                // There is an error :(
+                console.error(e);
+                showError();
+            }
+        }
+
+        async function deleteTeam() {
+            const url = "{{ url_for('delete_team_route', campaign_id=campaign_id, neighborhood_id=neighborhood_id, team_id=-1) }}".replace('-1', selectedTeamId);
+
+            showLoading();
+
+            try {
+                // Execute the API call
+                const response = await fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                    },
+                });
+
+                if (response.ok) {
+                    showTeamDeletedSuccess();
+
+                    // Clear the building color
+                    const polygons = buildingLayerByTeamId[selectedTeamId] || [];
+                    for (const polygon of polygons) {
+                        polygon.setOptions({
+                            fillColor: calculatePolygonColor(polygon.building, null),
+                            strokeColor: calculatePolygonColor(polygon.building, null)
+                        });
+                    }
+
+                    // Remove the building layer
+                    if (buildingLayerByTeamId[selectedTeamId]) {
+                        delete buildingLayerByTeamId[selectedTeamId];
+                    }
+
+                    // Remove the team
+                    delete teams[teams.findIndex(t => t.id === selectedTeamId)];
+                    teams = teams.filter(Boolean); // Clean the undefined pointer from the array
+
+                    // Update the teamId
+                    updateTeamId(undefined);
+
+                    // Rerender the teams
+                    rerenderTeams();
+
+                    return;
+                }
+
+                // Throw an error if we got a bad response from the BE
+                throw new Error(`Got ${response.statusText} (${response.status}) response`);
+            } catch (e) {
+                // There is an error :(
+                console.error(e);
+                showError();
             }
         }
     </script>
