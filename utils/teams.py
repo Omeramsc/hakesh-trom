@@ -1,4 +1,11 @@
 from db import db
+from sqlalchemy import func
+from models import Team, Donation
+
+
+def get_earned_money(team_id):
+    return db.session.query(func.sum(Donation.amount)).join(Team).filter(
+        Team.id == team_id).scalar()
 
 
 def delete_team_dependencies(team):

@@ -10,7 +10,6 @@
             </div>
         </section>
         <div class="flex_me" style="justify-content: center">
-            {#CAN BE TESTED ONLY ON PROD#}
             <div class="option_button" data-href="{{ HOST_URL }}">
                 <a target="_blank"
                    href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2F{{ HOST_URL }}&amp;src=sdkpreparse"
@@ -63,6 +62,9 @@
                     {% endif %}
                 </div>
                 {{ form.submit(class="btn btn-primary btn-lg big_src") }}
+                <a href="{{ url_for('view_team', team_id=team_id) }}">
+                    <button type="button" class="btn btn-secondary btn-lg big_src" style="margin-top:2px;">חזור</button>
+                </a>
             </form>
         </section>
         {% if not current_user.is_admin %}
