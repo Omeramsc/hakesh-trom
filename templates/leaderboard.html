@@ -8,13 +8,7 @@
 
             function drawChart() {
                 if (getComputedStyle(document.getElementById('leaderboard_stats')).display != 'none') {
-                    var data = new google.visualization.arrayToDataTable([
-                        ['Opening Move', 'Percentage'],
-                        {% for neighborhood in neighborhoods %}
-                            ['{{ neighborhood['name']}}', {{ neighborhood['sum'] }}],
-                        {% endfor %}
-
-                    ]);
+                    var data = new google.visualization.arrayToDataTable({{ neighborhoods | tojson }});
 
                     var options = {
                         legend: {position: 'none'},

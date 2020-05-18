@@ -659,8 +659,9 @@ def leaderboard():
     campaign_teams = sorted(campaign_teams, key=lambda k: k['total_earnings'], reverse=True)
 
     # TODO: Insert real information instead of mock
-    mock_neighborhoods = [{'name': "זבוטינסקי", 'sum': 13000}, {'name': "דיזינגוף", 'sum': 10000},
-                          {'name': "טרכטנברג", 'sum': 135000}, ]
+    mock_neighborhoods = [['Opening Move', 'Percentage'], ["זבוטינסקי", 13000],
+                          ["דיזינגוף", 10000],
+                          ["טרכטנברג", 135000]]
     return render_template('/leaderboard.html', teams=campaign_teams, current_team_money=current_team_money,
                            neighborhoods=mock_neighborhoods)
 
