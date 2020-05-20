@@ -6,14 +6,11 @@
     <main id="main_layout" class="unified_layout">
         <section class="options flex_me center_text">
             <div class="option_button">
-                <form id="labnol" method="POST">
-                    {{ voice_form.hidden_tag() }}
-                    <div class="speech">
-                        <img id="reco_icon" onclick="fastReports('description','labnol')"
-                             src={{ url_for('static', filename='fast_report.png') }}/><br>
-                        דיווח מהיר
-                    </div>
-                </form>
+                <div class="speech">
+                    <img id="reco_icon" onclick="createFastReport('{{ csrf_token() }}')"
+                         src={{ url_for('static', filename='fast_report.png') }}/><br>
+                    דיווח מהיר
+                </div>
             </div>
             <div class="option_button">
                 <a class="hide_link" href="{{ url_for('create_report') }}"><img
@@ -43,7 +40,7 @@
                             {% endfor %}
                         </div>
                     </div>
-                    {{ form.submit_search(class="btn btn-primary btn-lg big_src") }}
+                    {{ form.submit(class="btn btn-primary btn-lg big_src") }}
                 </form>
             </section>
             <section class="box report_list">
@@ -67,5 +64,4 @@
             </section>
         </section>
     </main>
-    <script type="text/javascript" src="http://maps.google.com/maps/api/js?key=AIzaSyCeQSgOmTLHNxGk4Vg3JlTNCGD8BEO992Y&language=iw"></script>
 {% endblock content %}

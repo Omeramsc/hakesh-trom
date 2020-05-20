@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"/>
+    {# js_fast_reports_overhaul#}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css"/>
+    {# js_fast_reports_overhaul#}
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link href="{{ url_for('static', filename='pages_style.css') }}" rel="stylesheet" type="text/css"/>
     <link href="{{ url_for('static', filename='main_page.css') }}" rel="stylesheet" type="text/css"/>
@@ -24,9 +29,156 @@
     {% block header %}{% endblock %}
 </head>
 <body class="flex_me">
+<script>
+    // ------------------------------- Fast Reports: ------------------------------------- //
+    async function createFastReport(csrfToken) {
+        const address = await getCurrentAddress();
+        console.log("in createFastReport");
+        console.log(csrfToken);
+        recordAndPostQuickReport(address, csrfToken);
+    }
+
+    function getCurrentAddress() {
+        console.log("in getCurrentAddress");
+        return new Promise(function (resolve) {
+            if (navigator.geolocation) {
+                console.log("GETTING GEO");
+                navigator.geolocation.getCurrentPosition((position) => handleCurrentPosition(position, resolve), () => resolve('שירותי המיקום לא פעילים'));
+            } else {
+                console.log("NO GEO");
+                resolve('שירותי המיקום לא פעילים');
+            }
+        })
+    }
+
+    async function handleCurrentPosition(position, resolve) {
+        console.log("in handleCurrentPosition");
+        const {latitude, longitude} = position.coords;
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyCeQSgOmTLHNxGk4Vg3JlTNCGD8BEO992Y&language=iw`;
+        try {
+            const response = await fetch(url, {method: 'GET'});
+
+            if (response.ok) {
+                console.log("YES GEO");
+                const responseJson = await response.json();
+                let address = (responseJson.results[0].formatted_address);
+                address = address.substring(0, address.indexOf(','))
+                resolve(address);
+            }
+            resolve('לא ניתן לאתר מיקום');
+        } catch (e) {
+            console.error(e)
+            resolve('לא ניתן לאתר מיקום');
+        }
+    }
+
+    function toggleRecordIcon() {
+        console.log("in toggleRecordIcon");
+        const icon = document.getElementById('reco_icon');
+        const not_recording_icon = "{{ url_for('static', filename='fast_report.png') }}";
+        const recording_icon = "{{ url_for('static', filename='fast_report_recording.png') }}";
+        if (icon.src.includes(not_recording_icon)) {
+            icon.src = recording_icon;
+        } else {
+            icon.src = not_recording_icon;
+        }
+    }
+
+    function recordAndPostQuickReport(address, csrfToken) {
+        console.log("in recordAndPostQuickReport");
+        if (window.hasOwnProperty('webkitSpeechRecognition')) { // WHEN I DIDN'T USE WEBKIT IT RETURNED FALSE!
+            const recognition = new webkitSpeechRecognition();
+
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.lang = "he-IL"; // spoken language: hebrew
+            toggleRecordIcon();
+            console.log("in recognition.start");
+            recognition.start();
+
+            recognition.onnomatch = function () {
+                console.log('on no match', arguments);
+            }
+            {# this is not working ^ #}
+
+            // If voice recognition succeeded
+            recognition.onresult = function (e) {
+                const {transcript} = e.results[0][0];
+                recognition.stop();
+                console.log("in recognition.onresult");
+                console.log(transcript);
+                toggleRecordIcon();
+                submitQuickReport(transcript, address, csrfToken);
+            };
+
+            // If voice recognition failed (for example: no voice at all)
+            recognition.onerror = function (e) {
+                recognition.stop();
+                console.log("in recognition.onerror");
+                handleTextToSpeechError();
+            }
+            // If voice recognition is not available on the device
+        } else {
+            console.log("in recognition.else");
+            handleTextToSpeechError();
+        }
+    }
+
+    async function submitQuickReport(transcript, address, csrfToken) {
+        console.log("in submitQuickReport");
+        const url = "{{ url_for('save_quick_report') }}";
+        console.log(url)
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({transcript, address})
+        });
+        if (response.ok) {
+            console.log("response ok in submitQuickReport");
+            const responseJson = await response.json();
+            handleTextToSpeechSuccess(responseJson);
+        } else {
+            //TODO: show error (error in SENDING the report)
+            console.log("error in submitQuickReport");
+            handleTextToSpeechError();
+        }
+    }
+
+    function handleTextToSpeechSuccess(responseJson) {
+        console.log(" in handleTextToSpeechSuccess")
+        toggleRecordIcon();
+        const parent = document.getElementsByClassName('hidden')[0];
+        const report_url = '{{ url_for('view_report', report_id=-1) }}'.replace('-1', responseJson['id']);
+        parent.innerHTML = '<div id="modal-content" style="text-align: center;direction: rtl;"><h3>הדיווח נשמר!</h3><div>הדיווח הקולי נשמר בהצלחה!</div><div><a href="' + report_url + '"><a>לחץ כאן </a>בכדי לצפות בו<a href="#close" rel="modal:close"><button class="btn btn-secondary">סגור</button></a>';
+        $('#modal-content').modal({
+            escapeClose: true,
+            clickClose: true,
+            showClose: false
+        })
+
+    }
+
+    function handleTextToSpeechError() {
+        toggleRecordIcon();
+        //TODO: Add error message
+        const parent = document.getElementsByClassName('hidden')[0];
+        parent.innerHTML = '<div id="modal-content" style="text-align: center;direction: rtl;"><h3>אופס...</h3><div>התרחשה שגיאה, אנא נסה/י שוב במעוד מאוחר יותר</div><a href=\'#close\' rel=\'modal:close\'><button class=\'btn btn-secondary\'>סגור</button></a>";<div class="lds-dual-ring"></div>';
+        $('#modal-content').modal({
+            escapeClose: true,
+            clickClose: true,
+            showClose: false
+        })
+    }
+
+</script>
 {% include "common/flash_handler.html" %}
 {% include "common/menu_header.html" %}
 {% include "common/menu.html" %}
+<div class="hidden"></div>
 {% block content %}{% endblock %}
 <footer id="unified_footer" class="quick_trans center_text">
     <hr>

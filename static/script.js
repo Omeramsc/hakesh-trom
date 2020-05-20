@@ -121,4 +121,3 @@ function donation() {
     var controls = new ctrls();
     document.addEventListener('DOMContentLoaded', controls.ready);
 }
-

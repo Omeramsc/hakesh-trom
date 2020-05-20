@@ -480,7 +480,7 @@ def reports():
     form = SearchReportForm()
     # Start with an empty query
     reports_query = Report.query
-    if form.submit_search.data:
+    if form.submit:
         # If the user added category, add it to the query
         if form.category.data:
             reports_query = reports_query.filter(Report.category == form.category.data)
@@ -492,8 +492,22 @@ def reports():
             elif form.status.data == "closed":
                 reports_query = reports_query.filter(Report.is_open == False)  # 'is false' or 'not' are not working.
 
-        # Preforming the fetch from the DB now
+    # Preforming the fetch from the DB now
     return render_template('/reports.html', reports=reports_query.all(), get_icon=get_report_status_icon, form=form)
+
+
+@app.route('/reports/quick', methods=['POST'])
+@login_required
+def save_quick_report():
+    body = request.get_json()
+    report = Report(address=body.get('address'),
+                    category='דיווח מהיר',
+                    description=body.get('transcript'))
+    if current_user.team_id:
+        report.team_id = current_user.team_id
+    db.session.add(report)
+    db.session.commit()
+    return jsonify({'id': report.id})
 
 
 @app.route('/reports/create_report', methods=['GET', 'POST'])
