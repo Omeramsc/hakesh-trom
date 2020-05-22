@@ -87,6 +87,11 @@ body {
     background-color: lightgray;
 }
 
+.img_btn {
+    border: 0;
+    background: transparent;
+}
+
 #hamburger a:hover,
 .nav_btn:hover,
 .option_button a:hover,

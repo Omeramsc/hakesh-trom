@@ -18,6 +18,11 @@
                 {% else %}
                     {{ form.address(class="form-control") }}
                 {% endif %}
+                <div>
+                    <button type="button" class="img_btn" alt="מיקום אוטומטי" onclick="fillFormAddress()">
+                        <img src="/static/current_location.png" width="30px"/> מיקום אוטומטי
+                    </button>
+                </div>
             </div>
             <div class="form-group">
                 {{ form.category.label(class="form-control-label") }}
@@ -53,4 +58,10 @@
             </div>
         </form>
     </main>
+    <script>
+        async function fillFormAddress() {
+            const address = await getCurrentAddress();
+            document.getElementById("address").value = address;
+        }
+    </script>
 {% endblock content %}

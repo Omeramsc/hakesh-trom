@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FloatField, SelectField, RadioField, PasswordField, BooleanField, \
-    IntegerField, TextAreaField, HiddenField
+    IntegerField, TextAreaField
 from wtforms.fields.html5 import DateField
-from wtforms.validators import DataRequired, Length, ValidationError, NumberRange, Email, Regexp
+from wtforms.validators import DataRequired, Length, NumberRange, Email, Regexp
 from models import Campaign
 from utils.consts import INVOICE_REF_LENGTH, BIT_ACCOUNT_NUM
 from utils.forms_helpers import report_categories, read_cities
