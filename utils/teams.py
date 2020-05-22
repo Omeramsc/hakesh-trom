@@ -8,6 +8,18 @@ def get_earned_money(team_id):
         Team.id == team_id).scalar()
 
 
+def get_team_progress(team):
+    progress = {
+        'total_earnings': get_earned_money(team.id) or 0,
+        'predicted_total': team.serialize()['predicted_total'],
+    }
+    if progress['predicted_total']:
+        progress['percentage'] = progress['total_earnings'] / progress['predicted_total'] * 100
+    else:
+        progress['percentage'] = 0
+    return progress
+
+
 def delete_team_dependencies(team):
     # Delete the team's building
     team.buildings = []

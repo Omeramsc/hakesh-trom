@@ -9,11 +9,6 @@
                 <img class="flex_me" src="{{ url_for('static', filename='default_team.png') }}" alt="Team photo">
             </div>
         </section>
-        <div class="flex_me" style="justify-content: center">
-            <a class="option_button hide_link not_allowed" href=#><img
-                    src="{{ url_for('static', filename='edit.png') }}" alt="עריכת פרטים"><br>
-            </a>
-        </div>
         <section id="report_info" class="team_info_box center_marg">
             <form method="POST">
                 {{ form.hidden_tag() }}

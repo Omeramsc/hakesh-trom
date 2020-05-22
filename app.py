@@ -6,7 +6,7 @@ from app_init import app, bcrypt
 from models import Campaign, User, Neighborhood, Team, Donation, Invoice, Building, Report
 from db import db
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users, export_neighborhood_to_excel
-from utils.teams import delete_team_dependencies, get_earned_money
+from utils.teams import delete_team_dependencies, get_team_progress
 from utils.ui_helpers import get_campaign_icon, get_report_status_icon
 from utils.app_decorators import admin_access, user_access
 from utils.consts import INVOICE_TYPES, HOST_URL, ORGANIZATION_NAME
@@ -66,9 +66,7 @@ def delete_campaign(campaign_id):
 def home():
     progress = {}
     if not current_user.is_admin:
-        total_earnings = get_earned_money(current_user.team_id)
-        progress['total_earnings'] = total_earnings or 0
-        # add dynamic percentage information here
+        progress = get_team_progress(current_user.team)
     return render_template('/home.html', progress=progress)
 
 
@@ -603,10 +601,8 @@ def edit_response(report_id):
 @app.route('/team/<int:team_id>', methods=['GET'])
 @login_required
 def view_team(team_id):
-    progress = {}
     team = Team.query.get_or_404(team_id)
-    progress['total_earnings'] = get_earned_money(team_id) or 0
-    # add dynamic percentage information here
+    progress = get_team_progress(team)
     return render_template('/view_team.html', team=team, progress=progress)
 
 
