@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div id="subtitle_container">
+        <h3>התראות</h3>
+    </div>
+    <main id="main_layout" class="unified_layout">
+        <section class="boxes_container flex_me">
+            <section class="box report_list">
+                <ul>
+                    {% if notifications %}
+                        {% for notification in notifications %}
+                            <li>
+                                <img src="{{ get_icon(not notification.was_read) }}">
+                                <a id='report_summary'
+                                   class='hide_link'
+                                   href="{{ url_for('view_report', report_id=notification.report_id) }}">
+                                    {{ notification.creation_date.replace(microsecond=0) }}<br>
+                                    {{ notification.description }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        <div class="center_text">לא נמצאו התראות</div>
+                    {% endif %}
+                    <span style="display:none">{{ update_notification_readtime() }}</span>
+                </ul>
+            </section>
+        </section>
+    </main>
+{% endblock content %}

@@ -33,6 +33,9 @@
     {% block header %}{% endblock %}
 </head>
 <body class="flex_me">
+{% if current_user.is_authenticated %}
+    {% set new_notifications = current_user.new_notifications() %}
+{% endif %}
 {% include "common/flash_handler.html" %}
 {% include "common/menu_header.html" %}
 {% include "common/menu.html" %}

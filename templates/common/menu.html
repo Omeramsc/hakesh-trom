@@ -24,6 +24,12 @@
             <a href="{{ url_for('leaderboard') }}">לוח הישגים<img
                     src="{{ url_for('static', filename='leaderboard.png') }}"
                     alt="לוח הישגים"></a>
+            <a href="{{ url_for('notifications') }}">
+                {% if new_notifications %}
+                    <span class="badge badge-pill badge-danger">{{ new_notifications }}</span>
+                {% endif %}
+                התראות<img src="{{ url_for('static', filename='notifications_bell.png') }}" alt="התראות">
+            </a>
             <a href="{{ url_for('about_org') }}">על הארגון<img src="{{ url_for('static', filename='about_org.png') }}"
                                                                alt="על הארגון"></a>
             <hr>

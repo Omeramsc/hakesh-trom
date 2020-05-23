@@ -3,10 +3,11 @@ from flask_login import login_user, current_user, logout_user, login_required
 from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood, DonationForm, PaperInvoiceForm, \
     DigitalInvoiceForm, BitForm, ReportForm, SearchReportForm, RespondReportForm, validate_name, TeamForm
 from app_init import app, bcrypt
-from models import Campaign, User, Neighborhood, Team, Donation, Invoice, Building, Report
+from models import Campaign, User, Neighborhood, Team, Donation, Invoice, Building, Report, Notification
 from db import db
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users, export_neighborhood_to_excel
 from utils.teams import delete_team_dependencies, get_team_progress
+from utils.notifications import update_notification_readtime
 from utils.ui_helpers import get_campaign_icon, get_report_status_icon
 from utils.app_decorators import admin_access, user_access
 from utils.consts import INVOICE_TYPES, HOST_URL, ORGANIZATION_NAME
@@ -530,6 +531,12 @@ def create_report():
             report.team_id = current_user.team_id
         db.session.add(report)
         db.session.commit()
+        if not current_user.is_admin:
+            notification = Notification(recipient_id=1,
+                                        description=f'דיווח חדש מאת צוות {current_user.team_id}',
+                                        report_id=report.id)
+            db.session.add(notification)
+            db.session.commit()
         flash('!הדיווח נוצר בהצלחה', 'success')
         return redirect(url_for('reports'))
     return render_template('/create_report.html', form=form, legend="יצירת דיווח")
@@ -588,6 +595,10 @@ def respond_to_report(report_id):
         report.is_open = False
         report.response = form.response.data
         report.response_time = datetime.datetime.utcnow()
+        notification = Notification(recipient_id=report.team.users[0].id,
+                                    description='הדיווח שהזנתם קיבל מענה מהאחראי',
+                                    report_id=report.id)
+        db.session.add(notification)
         db.session.commit()
         flash('!הדיווח נענה בהצלחה', 'success')
         return redirect(url_for('reports'))
@@ -605,6 +616,10 @@ def edit_response(report_id):
     if form.validate_on_submit():
         report.response = form.response.data
         report.response_time = datetime.datetime.utcnow()
+        notification = Notification(recipient_id=report.team.users[0].id,
+                                    description='המענה לדיווח עודכן ע"י האחראי',
+                                    report_id=report.id)
+        db.session.add(notification)
         db.session.commit()
         flash('!המענה לדיווח עודכן בהצלחה', 'success')
         return redirect(url_for('view_report', report_id=report.id))
@@ -688,6 +703,19 @@ def leaderboard():
 
     return render_template('/leaderboard.html', teams=campaign_teams, current_team_money=current_team_money,
                            neighborhoods_graph_info=neighborhoods_graph_info)
+
+
+@app.route('/notifications')
+@login_required
+def notifications():
+    # Query all the user notifications
+    notifications_query = Notification.query
+    notifications_query = notifications_query.filter(Notification.recipient_id == current_user.id).order_by(
+        Notification.creation_date.desc())
+    # Preforming the fetch from the DB now
+    return render_template('/notifications.html', notifications=notifications_query.all(),
+                           get_icon=get_report_status_icon,
+                           update_notification_readtime=update_notification_readtime)
 
 
 if __name__ == '__main__':
