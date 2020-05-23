@@ -5,11 +5,12 @@ from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighbor
 from app_init import app, bcrypt
 from models import Campaign, User, Neighborhood, Team, Donation, Invoice, Building, Report
 from db import db
-from utils.forms_helpers import get_campaign_icon, get_report_status_icon
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users, export_neighborhood_to_excel
 from utils.teams import delete_team_dependencies
+from utils.ui_helpers import get_campaign_icon, get_report_status_icon
 from utils.app_decorators import admin_access, user_access
 from utils.consts import INVOICE_TYPES, HOST_URL
+from utils.automate_report import generate_automate_report
 from sqlalchemy import func
 import utils.green_invoice as gi
 import utils.paypal as pp
@@ -135,7 +136,6 @@ def edit_campaign(campaign_id):
         form.name.data = campaign.name
         form.start_date.data = campaign.start_date
         form.goal.data = campaign.goal
-        form.camp_id.data = campaign.id
     return render_template('/create_campaign.html', form=form, city=city, legend="עריכת קמפיין")
 
 
@@ -378,6 +378,7 @@ def get_donation():
                 return redirect(pp.authorize_payment(payment))
             except (ConnectionError, RuntimeError):
                 conn_error = True  # if there's a connection error / unexpected error, display an error in the donation page
+                generate_automate_report('paypal')
         if not conn_error:
             return redirect(url_for('send_invoice'))
     return render_template('/donation.html', form=form, conn_error=conn_error)
@@ -450,8 +451,9 @@ def send_invoice():
                                                donation.payment_type)
                 new_invoice.type = INVOICE_TYPES['DIGITAL']
                 new_invoice.reference_id = reference_id
-        except (ConnectionError, RuntimeError, KeyError):
+        except (ConnectionError, RuntimeError):
             conn_error = True  # if there's a connection error or unexpected error, display an error in the invoice page
+            generate_automate_report('invoice')
         except ValueError:
             digital_form.donor_id.errors.append("מספר ת.ז אינו תקין")
         else:
@@ -504,9 +506,9 @@ def reports():
 def create_report():
     form = ReportForm()
     if form.validate_on_submit():
-        report = Report(address=form.address.data,
-                        category=form.category.data,
-                        description=form.description.data)
+        report = Report(category=form.category.data,
+                        description=form.description.data,
+                        address=form.address.data)
         if current_user.team_id:
             report.team_id = current_user.team_id
         db.session.add(report)
@@ -563,7 +565,7 @@ def delete_report(report_id):
 def respond_to_report(report_id):
     report = Report.query.get_or_404(report_id)
     if not report.is_open:
-        return redirect(url_for('edit_respond', report_id=report.id))  # LOOK AGAIN
+        return redirect(url_for('edit_respond', report_id=report.id))
     form = RespondReportForm()
     if form.validate_on_submit():
         report.is_open = False
