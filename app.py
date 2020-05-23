@@ -135,7 +135,6 @@ def edit_campaign(campaign_id):
         form.name.data = campaign.name
         form.start_date.data = campaign.start_date
         form.goal.data = campaign.goal
-        form.camp_id.data = campaign.id
     return render_template('/create_campaign.html', form=form, city=city, legend="עריכת קמפיין")
 
 
