@@ -1,9 +1,22 @@
-{% with messages = get_flashed_messages(with_categories=true, category_filter=['danger', 'success']) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <div class="push_notification center_text">
-                <strong>{{ message }}</strong>
-            </div>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
+{% if session['awaiting_notifications']['have_notification'] %}
+    <div class="push_notification center_text">
+        <a class="hide_link" href="{{ url_for('notifications') }}"><strong>
+            {% if session['awaiting_notifications']['amount'] > 1 %}
+                קיבלת {{ session['awaiting_notifications']['amount'] }} נוטיפיקציות חדשות!
+                לחץ כאן לצפייה בהן
+            {% else %}
+                קיבלת נוטיפיקציה חדשה! לחץ כאן לצפייה
+            {% endif %}
+        </strong></a>
+    </div>
+{% else %}
+    {% with messages = get_flashed_messages(with_categories=true, category_filter=['danger', 'success']) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="push_notification center_text">
+                    <strong>{{ message }}</strong>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+{% endif %}

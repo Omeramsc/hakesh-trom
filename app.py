@@ -24,6 +24,21 @@ def inject_content_to_all_routes():
     return dict(HOST_URL=HOST_URL, ORGANIZATION_NAME=ORGANIZATION_NAME)
 
 
+@app.before_request
+def before_request():
+    session['awaiting_notifications'] = {'have_notification': False, 'amount': 0}
+    if current_user.is_authenticated:
+        notifications_query = Notification.query
+        notifications_query = notifications_query.filter(Notification.recipient_id == current_user.id).filter(
+            Notification.notified == False)
+        pending_notifications = notifications_query.all()
+        if pending_notifications:
+            session['awaiting_notifications'] = {'have_notification': True, 'amount': len(pending_notifications)}
+            for notification in pending_notifications:
+                notification.notified = True
+                db.session.commit()
+
+
 @app.errorhandler(403)
 def error_403(error):
     return render_template('errors/403.html'), 403
