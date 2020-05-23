@@ -4,6 +4,7 @@ from app_init import login_manager, bcrypt
 from flask_login import UserMixin
 from sqlalchemy.dialects.postgresql import JSON
 from utils.neural_network import run_network
+from utils.consts import DEFAULT_TEAM_USER_PASSWORD
 from utils.network_input import STANDARDIZE_TYPE_FLOORS, STANDARDIZE_TYPE_EARNINGS, STANDARDIZE_TYPE_HEIGHT, \
     STANDARDIZE_TYPE_NEIGHBORHOOD, encodeInput, decodeInput
 
@@ -172,6 +173,16 @@ class User(db.Model, UserMixin):
 
     def set_password(self, raw_password):
         self.password = bcrypt.generate_password_hash(raw_password).decode('utf-8')
+
+    @staticmethod
+    def reset_passwords(users):
+        """
+        Reset passwords for a the given list of users
+        :param users: list of users
+        :return:
+        """
+        for user in users:
+            user.set_password(DEFAULT_TEAM_USER_PASSWORD)
 
     def __repr__(self):
         return f'id: {self.id}\nusername: {self.username}\nis_active: {self.is_active}\nis_admin: {self.is_admin}\n ' \

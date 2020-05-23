@@ -30,6 +30,7 @@ body {
     color: unset;
     text-decoration: none;
 }
+
 .hide_link:hover {
     text-decoration: none;
 }
@@ -797,6 +798,43 @@ ul {
 
 .route-builder-team-title {
     margin-top: 10px;
+}
+
+#route-builder-map-legend {
+    position: absolute;
+    bottom: 2em;
+    left: 0;
+    margin-left: 3%;
+    border: 1px solid;
+    padding: 0.5em;
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.route-builder-map-legend__color {
+    height: 1em;
+    width: 1em;
+    border: 1px solid;
+    display: inline-block;
+}
+
+.route-builder-map-legend__green {
+    background-color: #55eb34;
+}
+
+.route-builder-map-legend__yellow {
+    background-color: #eef207;
+}
+
+.route-builder-map-legend__red {
+    background-color: #FF0000;
+}
+
+.route-builder-map-legend__grey {
+    background-color: #a2a4a6;
+}
+
+.route-builder-map-legend__blue {
+    background-color: #4287f5;
 }
 
 /*------------------------- Selecting address -------------------------*/

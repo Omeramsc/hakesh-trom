@@ -61,6 +61,22 @@
         </div>
         <div class="route-builder-map-panel" id="map">
         </div>
+        <div id="route-builder-map-legend">
+            <div class="route-builder-map-legend__color route-builder-map-legend__green"></div>
+            מעל הממוצע
+            <br/>
+            <div class="route-builder-map-legend__color route-builder-map-legend__yellow"></div>
+            ממוצע
+            <br/>
+            <div class="route-builder-map-legend__color route-builder-map-legend__red"></div>
+            מתחת לממוצע
+            <br/>
+            <div class="route-builder-map-legend__color route-builder-map-legend__grey"></div>
+            משוייך לצוות אחר
+            <br/>
+            <div class="route-builder-map-legend__color route-builder-map-legend__blue"></div>
+            משוייך לצוות הנוכחי
+        </div>
         <div class="hidden"></div>
     </main>
     <script type="application/javascript" src="{{ url_for('static', filename='scripts/geo-utils.js') }}"></script>
