@@ -218,6 +218,7 @@ class Notification(db.Model):
     creation_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     was_read = db.Column(db.Boolean, default=False, nullable=False)
     report_id = db.Column(db.Integer, db.ForeignKey('reports.id'), nullable=False)
+    report = db.relationship("Report", back_populates="notification")
     notified = db.Column(db.Boolean, default=False, nullable=False)
 
     def __init__(self, recipient_id, description, report_id=None):
@@ -291,6 +292,7 @@ class Report(db.Model):
     response_time = db.Column(db.DateTime, nullable=True)
     team_id = db.Column(db.Integer, db.ForeignKey('teams.id'))
     team = db.relationship("Team", back_populates="reports")
+    notification = db.relationship("Notification", back_populates="report")
 
     def __init__(self, category, description, address="ללא כתובת"):
         self.address = address

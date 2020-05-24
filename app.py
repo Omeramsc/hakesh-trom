@@ -548,7 +548,7 @@ def create_report():
         db.session.commit()
         if not current_user.is_admin:
             notification = Notification(recipient_id=1,
-                                        description=f'דיווח חדש מאת צוות {current_user.team_id}',
+                                        description=f'דיווח חדש מסוג "{report.category}" התקבל מאת צוות {current_user.team_id}',
                                         report_id=report.id)
             db.session.add(notification)
             db.session.commit()
@@ -591,6 +591,8 @@ def delete_report(report_id):
     report = Report.query.get_or_404(report_id)
     if report.team_id != current_user.team_id and not current_user.is_admin:
         abort(403)
+    for notification in report.notification:
+        db.session.delete(notification)
     db.session.delete(report)
     db.session.commit()
     # CAN ADD HERE A "CANCEL" OPTION FOR NORMAL USERS

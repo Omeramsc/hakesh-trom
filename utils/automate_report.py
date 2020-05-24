@@ -1,5 +1,5 @@
 from flask_login import current_user
-from models import Report
+from models import Report, Notification
 from db import db
 
 
@@ -18,4 +18,9 @@ def generate_automate_report(category):
         if current_user.team_id:
             report.team_id = current_user.team_id
         db.session.add(report)
+        db.session.commit()
+        notification = Notification(recipient_id=1,
+                                    description=f'דיווח אוטומטי חדש מסוג "{report.category}"  התקבל בעקבות {description} ',
+                                    report_id=report.id)
+        db.session.add(notification)
         db.session.commit()
