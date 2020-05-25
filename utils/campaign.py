@@ -2,6 +2,8 @@ from models import Neighborhood, Team, User, buildings_teams_association_table, 
 from db import db
 from .consts import DEFAULT_TEAM_USER_PASSWORD
 from sqlalchemy import func, distinct
+import xlsxwriter
+from io import BytesIO
 
 
 def serialize_campaign_neighborhoods(neighborhood, campaign_teams):
@@ -85,17 +87,86 @@ def create_team_and_user(campaign_id, neighborhood_id):
     }
 
 
-def reset_and_export_users(campaign_id, neighborhood_id):
-    users = db.session.query(User).join(Team).join(Campaign).join(Neighborhood).filter(
+def generate_users_data(users):
+    """
+    Generate users' rows (assuming the user's password is the defualt one)
+    :param users:
+    :return:
+    """
+    headers = ['שם משתמש', 'סיסמה']
+    rows = [[user.username, DEFAULT_TEAM_USER_PASSWORD] for user in users]
+    rows.insert(0, headers)
+
+    return rows
+
+
+def generate_teams_data(teams):
+    """
+    Generate teams' rows for the reports with the buildings' data
+    :param teams:
+    :return:
+    """
+    rows = [['צוות', 'כתובות', 'קומות', 'צפי רווח']]
+
+    for team in teams:
+        team_name = team.name or "צוות {}".format(team.id)
+
+        for building in team.buildings:
+            serialized_building = building.serialize()
+            row = [team_name, serialized_building['address'], serialized_building['number_of_floors'],
+                   serialized_building['predicted_earnings']]
+            rows.append(row)
+
+    return rows
+
+
+def write_rows_in_worksheet(worksheet, rows):
+    """
+    Write rows into a given worksheet
+    :param worksheet:
+    :param rows:
+    :return:
+    """
+    # Start from the first cell. Rows and columns are zero indexed.
+    row_index = 0
+    col_index = 0
+
+    # Iterate over the data and write it out row by row.
+    for row in rows:
+        for item in row:
+            worksheet.write(row_index, col_index, item)
+            col_index += 1
+
+        row_index += 1
+        col_index = 0
+
+    return worksheet
+
+
+def export_neighborhood_to_excel(campaign_id, neighborhood_id, users):
+    """
+    Export neighborhood data to excel:
+    * Users with passwords
+    * Teams' routes
+    :param campaign_id:
+    :param neighborhood_id:
+    :param users:
+    :return: BytesIO of excel report
+    """
+
+    output = BytesIO()
+    workbook = xlsxwriter.Workbook(output)
+    users_worksheet = workbook.add_worksheet('משתמשים')
+    users_worksheet.right_to_left()
+    write_rows_in_worksheet(users_worksheet, generate_users_data(users))
+
+    routes_worksheet = workbook.add_worksheet('מסלולים')
+    routes_worksheet.right_to_left()
+    teams = db.session.query(Team).join(Campaign).join(Neighborhood).filter(
         Campaign.id == campaign_id).filter(Neighborhood.id == neighborhood_id)
+    write_rows_in_worksheet(routes_worksheet, generate_teams_data(teams))
 
-    # Reset passwords
-    for user in users:
-        user.set_password(DEFAULT_TEAM_USER_PASSWORD)
+    workbook.close()
+    output.seek(0)
 
-    db.session.commit()
-
-    headers = ['Username', 'Password']
-    rows = [','.join([user.username, DEFAULT_TEAM_USER_PASSWORD]) for user in users]
-
-    return ','.join(headers) + '\n' + '\n'.join(rows) + '\n'
+    return output

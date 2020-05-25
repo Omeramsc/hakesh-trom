@@ -43,6 +43,7 @@
                     </span>
                             <div class="neighborhoods-control-row__icons-wrapper">
                                 <a class="hide_link neighborhoods-control-row__icon_link"
+                                   title="בנה מסלול"
                                    href="{{ url_for('manage_neighborhood_route', campaign_id=campaign_id, neighborhood_id=campaign_neighborhood['neighborhood_id']) }}">
                                     <svg class="bi bi-map neighborhoods-control-row__icon" viewBox="0 0 16 16"
                                          fill="currentColor"
@@ -53,6 +54,7 @@
                                     </svg>
                                 </a>
                                 <a class="hide_link neighborhoods-control-row__icon_link" href="#"
+                                   title="מחק שכונה"
                                    onclick="deleteNeighborhood({{ campaign_neighborhood['neighborhood_id'] }})">
                                     <svg class="bi bi-trash neighborhoods-control-row__icon" viewBox="0 0 16 16"
                                          fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -63,6 +65,7 @@
                                     </svg>
                                 </a>
                                 <a class="hide_link neighborhoods-control-row__icon_link"
+                                   title="יצא לאקסל"
                                    href="{{ url_for('export_user_data', campaign_id=campaign_id, neighborhood_id=campaign_neighborhood['neighborhood_id']) }}">
                                     <svg class="bi bi-box-arrow-down neighborhoods-control-row__icon"
                                          viewBox="0 0 16 16"
@@ -193,5 +196,9 @@
                 onError();
             }
         }
+
+        $(function () {
+            $(".neighborhoods-control-row__icon_link").tooltip();
+        });
     </script>
 {% endblock content %}

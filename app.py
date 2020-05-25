@@ -1,17 +1,17 @@
-from flask import render_template, jsonify, flash, redirect, url_for, request, session, abort, Response
+from flask import render_template, jsonify, flash, redirect, url_for, request, session, abort, send_file
 from flask_login import login_user, current_user, logout_user, login_required
 from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood, DonationForm, PaperInvoiceForm, \
     DigitalInvoiceForm, BitForm, ReportForm, SearchReportForm, RespondReportForm, validate_name
 from app_init import app, bcrypt
 from models import Campaign, User, Neighborhood, Team, Donation, Invoice, Building, Report
 from db import db
-from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users, reset_and_export_users
+from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users, export_neighborhood_to_excel
 from utils.teams import delete_team_dependencies
-from sqlalchemy import func
 from utils.ui_helpers import get_campaign_icon, get_report_status_icon
 from utils.app_decorators import admin_access, user_access
 from utils.consts import INVOICE_TYPES, HOST_URL
 from utils.automate_report import generate_automate_report
+from sqlalchemy import func
 import utils.green_invoice as gi
 import utils.paypal as pp
 import datetime
@@ -273,13 +273,16 @@ def export_user_data(campaign_id, neighborhood_id):
     Campaign.query.get_or_404(campaign_id)
     Neighborhood.query.get_or_404(neighborhood_id)
 
-    csv_data = reset_and_export_users(campaign_id, neighborhood_id)
+    users = db.session.query(User).join(Team).join(Campaign).join(Neighborhood).filter(
+        Campaign.id == campaign_id).filter(Neighborhood.id == neighborhood_id)
 
-    return Response(
-        csv_data,
-        mimetype="text/csv",
-        headers={"Content-disposition":
-                     "attachment; filename=user_data.csv"})
+    # Rest the users' passwords before exporting the file
+    User.reset_passwords(users)
+    db.session.commit()
+
+    excel_data = export_neighborhood_to_excel(campaign_id, neighborhood_id, users)
+
+    return send_file(excel_data, attachment_filename="output.xlsx", as_attachment=True)
 
 
 @app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>/routes', methods=['POST'])
