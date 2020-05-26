@@ -162,9 +162,11 @@ html {
 
 @media screen and (max-width: 360px) {
 
-    .user_info,
-    .usernames,
-    .usr_progress {
+    .icon img {
+        height: 70px;
+    }
+
+    .usernames {
         display: none;
     }
 }

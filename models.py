@@ -64,6 +64,8 @@ class Team(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=True)
+    first_teammate_name = db.Column(db.String, nullable=True)
+    second_teammate_name = db.Column(db.String, nullable=True)
     users = db.relationship("User", back_populates="team")
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'))
     campaign = db.relationship("Campaign", back_populates="teams")

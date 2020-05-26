@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v7.0"></script>
+    <main id="main_layout" class="quick_trans center_text">
+        <section class="user_info">
+            <div class="user">
+                <img class="flex_me" src="{{ url_for('static', filename='default_team.png') }}" alt="Team photo">
+            </div>
+        </section>
+        <section id="report_info" class="team_info_box center_marg">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.name.label() }}
+                    {% if form.name.errors %}
+                        {{ form.name(class="form-control center_text is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.name.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.name(class="form-control center_text") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.first_teammate_name.label() }}
+                    {% if form.first_teammate_name.errors %}
+                        {{ form.first_teammate_name(class="form-control center_text is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.first_teammate_name.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.first_teammate_name(class="form-control center_text") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.second_teammate_name.label() }}
+                    {% if form.second_teammate_name.errors %}
+                        {{ form.second_teammate_name(class="form-control center_text is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.second_teammate_name.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.second_teammate_name(class="form-control center_text") }}
+                    {% endif %}
+                </div>
+                {{ form.submit(class="btn btn-primary btn-lg big_src") }}
+                <a href="{{ url_for('view_team', team_id=team_id) }}">
+                    <button type="button" class="btn btn-secondary btn-lg big_src" style="margin-top:2px;">חזור</button>
+                </a>
+            </form>
+        </section>
+    </main>
+{% endblock content %}

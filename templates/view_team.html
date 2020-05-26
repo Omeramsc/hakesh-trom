@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v7.0"></script>
+    <main id="main_layout" class="quick_trans center_text">
+        <section class="user_info">
+            <div class="user">
+                <img class="flex_me" src="{{ url_for('static', filename='default_team.png') }}" alt="Team photo">
+            </div>
+        </section>
+        <div class="flex_me" style="justify-content: center">
+            {% if current_user.team_id == team.id %}
+                <div class="option_button" style="padding-right:10px;" data-href="{{ HOST_URL }}">
+                    <a target="_blank"
+                       href="https://www.facebook.com/sharer/sharer.php?u={{ HOST_URL }}'&amp;src=sdkpreparse"
+                       class="fb-xfbml-parse-ignore"><img
+                            class="flex_me" src="{{ url_for('static', filename='fb_share.png') }}" alt="Share"></a>
+                </div>
+            {% endif %}
+            {% if current_user.team_id == team.id or current_user.is_admin %}
+                <a class="option_button hide_link" href={{ url_for('edit_team', team_id=team.id) }}><img
+                        src="{{ url_for('static', filename='edit.png') }}" alt="עריכת פרטים"><br>
+                </a>
+            {% endif %}
+        </div>
+        <section id="report_info" class="team_info_box center_marg">
+            <p>
+            <ul class="center_text no_deco" style="direction: rtl">
+                {% if current_user.is_admin or current_user.team_id == team.id %}
+                    <li><b>שם משתמש:</b> {{ team.users[0].username }}</li>
+                {% endif %}
+                <li><b>שם הצוות:</b> {{ team.name or 'לא הוזן' }}</li>
+                <li><b>חבר צוות 1:</b>
+                    {{ team.first_teammate_name or 'לא הוזן' }}
+                </li>
+                <li><b>חבר צוות 2:</b>
+                    {{ team.second_teammate_name or 'לא הוזן' }}
+                </li>
+                <li><b>ייעד תרומה:</b>
+                    {{ "₪{:,.0f}".format(progress.get('predicted_total', 0)) }}
+                </li>
+            </ul>
+            </p>
+        </section>
+        <section class="usr_progress">
+            <span id="earned_money">סכום שנאסף: {{ "₪{:,.0f}".format(progress.get('total_earnings', 0)) }} </span>
+            <div class="usr_bar">
+                <span id="prog_precen" style="width: {{ progress.get('percentage', 0) }}%;">
+                    {{ "{:,.1f}".format(progress.get('percentage', 0)) }}%
+                </span>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

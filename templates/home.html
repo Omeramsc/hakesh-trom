@@ -6,15 +6,17 @@
                 {% if current_user.is_admin %}
                     <img class="flex_me" src="{{ url_for('static', filename='default_admin.png') }}" alt="Admin photo">
                 {% else %}
-                    <img class="flex_me" src="{{ url_for('static', filename='default_team.png') }}" alt="Team photo">
+                    <a class="hide_link" href="{{ url_for('view_team', team_id=current_user.team_id) }}">
+                        <img class="flex_me" src="{{ url_for('static', filename='default_team.png') }}"
+                             alt="Team photo">
+                    </a>
                 {% endif %}
             </div>
-            {% if not current_user.is_admin %}
-                <div class="usernames flex_me">
-                    <div>ישראל ישראלי</div>
-                    <div>יעקב יעקבי</div>
-                </div>
-            {% endif %}
+            <div class="usernames flex_me">
+                <div>{{ current_user.team.first_teammate_name if current_user.team.first_teammate_name }}</div>
+                <div style="color: #459cef;">{{ current_user.team.name if current_user.team.name }}</div>
+                <div>{{ current_user.team.second_teammate_name if current_user.team.second_teammate_name }}</div>
+            </div>
         </section>
         <section class="buttons flex_me">
             {% if current_user.is_admin %}
@@ -38,8 +40,9 @@
                         תרומות</a>
                 </div>
                 <div class="icon">
-                    <a class="hide_link not_allowed" href="#"><img src="{{ url_for('static', filename='teams.png') }}"
-                                                                   alt="לא פעיל"><br>
+                    <a class="hide_link" href="{{ url_for('view_team', team_id=current_user.team_id) }}"><img
+                            src="{{ url_for('static', filename='teams.png') }}"
+                            alt="הצוות שלי"><br>
                         הצוות שלי</a>
                 </div>
             {% endif %}
@@ -59,8 +62,9 @@
             <section class="usr_progress">
                 <span id="earned_money">סכום שנאסף: {{ "₪{:,.0f}".format(progress.get('total_earnings', 0)) }} </span>
                 <div class="usr_bar">
-                    <span id="prog_precen"
-                          style="width: {{ progress.get('percentage', 0) }}%">{{ progress.get('percentage', 0) }}%</span>
+                    <span id="prog_precen" style="width: {{ progress.get('percentage', 0) }}%;">
+                        {{ "{:,.1f}".format(progress.get('percentage', 0)) }}%
+                    </span>
                 </div>
             </section>
         {% endif %}
