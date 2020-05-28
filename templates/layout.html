@@ -8,51 +8,36 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"/>
-    {# js_fast_reports_overhaul#}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css"/>
-    {# js_fast_reports_overhaul#}
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link href="{{ url_for('static', filename='pages_style.css') }}" rel="stylesheet" type="text/css"/>
     <link href="{{ url_for('static', filename='main_page.css') }}" rel="stylesheet" type="text/css"/>
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-            integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
-    </script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
             integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
             crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
             integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
     </script>
+    {# fast report's modal #}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css"/>
+    {# fast report's modal #}
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/fast_reports.js') }}"></script>
     <meta property="og:url" content="{{ HOST_URL }}"/>
     <meta property="og:type" content="website"/>
     <meta property="og:title" content="הקש ותרום"/>
     <meta property="og:description" content="גם אני משתתף בקמפיין התרמה של {{ ORGANIZATION_NAME }} עם הקש ותרום!"/>
     <meta property="og:image" content="{{ url_for('static', filename='hakesh_trom_logo.png') }}"/>
     <meta property="of:alt" content="לוגו הקש ותרום"/>
-    <script src="{{ url_for('static', filename='scripts/fast_reports.js') }}"></script>
     {% block header %}{% endblock %}
 </head>
 <body class="flex_me">
-<script>
-    // ------------------------------- Fast Reports: ------------------------------------- //
-
-
-</script>
 {% include "common/flash_handler.html" %}
 {% include "common/menu_header.html" %}
 {% include "common/menu.html" %}
-{#<div class="hidden"></div> Currently not working#}
+<div class="hidden"></div>
 {% block content %}{% endblock %}
-<footer id="unified_footer" class="quick_trans center_text">
-    <hr>
-    <a href="#" onClick="location.reload()">רענן עמוד</a> | <a href="{{ url_for('home') }}">דף הבית</a><br>
-    <a href="https://www.mta.ac.il"> <img src="{{ url_for('static', filename='mta.png') }}" alt="אתר המכללה"
-                                          height="25px" width="70px"></a><a href="#"><img
-        src="{{ url_for('static', filename='otr.png') }}"></a><br>
-    © כל הזכויות שמורות: רותם, עומר ותומר
-</footer>
+{% include "common/footer.html" %}
 </body>
 </html>

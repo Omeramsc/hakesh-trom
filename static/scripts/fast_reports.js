@@ -34,14 +34,14 @@ async function handleCurrentPosition(position, resolve) {
 function ChangeRecordIconToStopped() {
     const icons = document.getElementsByClassName('reco_icon');
     for (var i = 0; i < icons.length; i++) {
-        icons[i].src = "static/fast_report.png";
+        icons[i].src = "/static/fast_report.png";
     }
 }
 
 function ChangeRecordIconToInProgress() {
     const icons = document.getElementsByClassName('reco_icon');
     for (var i = 0; i < icons.length; i++) {
-        icons[i].src = "static/fast_report_recording.png";
+        icons[i].src = "/static/fast_report_recording.png";
     }
 }
 
@@ -95,8 +95,8 @@ async function submitQuickReport(transcript, address, csrfToken, createUrl) {
 
 function handleTextToSpeechSuccess(responseJson) {
     const parent = document.getElementsByClassName('hidden')[0];
-    const report_url = "{{ url_for('view_report', report_id=-1) }}".replace('-1', responseJson['id']);
-    parent.innerHTML = '<div id="modal-content" style="text-align: center;direction: rtl;"><h3>הדיווח נשמר!</h3><div>הדיווח הקולי נשמר בהצלחה!</div><div><a href="' + report_url + '"><a>לחץ כאן </a>בכדי לצפות בו<a href="#close" rel="modal:close"><button class="btn btn-secondary">סגור</button></a>';
+    const report_url = "/reports/view_report/-1".replace('-1', responseJson['id']);
+    parent.innerHTML = '<div id="modal-content" style="text-align: center;direction: rtl;height:20%"><h3>הדיווח נשמר!</h3><div>הדיווח הקולי נשמר בהצלחה!</div><div><a href="' + report_url + '"><button class="btn btn-primary" style="margin: 2px;">צפייה בדיווח</button></a><a href="#close" rel="modal:close"><button class="btn btn-secondary">סגור</button></a>';
     $('#modal-content').modal({
         escapeClose: true,
         clickClose: true,
@@ -108,7 +108,7 @@ function handleTextToSpeechSuccess(responseJson) {
 function handleTextToSpeechError() {
     ChangeRecordIconToStopped()
     const parent = document.getElementsByClassName('hidden')[0];
-    parent.innerHTML = '<div id="modal-content" style="text-align: center;direction: rtl;"><h3>אופס...</h3><div>התרחשה שגיאה, אנא נסה/י שוב במעוד מאוחר יותר</div><a href=\'#close\' rel=\'modal:close\'><button class=\'btn btn-secondary\'>סגור</button></a>";<div class="lds-dual-ring"></div>';
+    parent.innerHTML = '<div id="modal-content" style="text-align: center;direction: rtl; height:20%"><h3>אופס...</h3><div>התרחשה שגיאה, אנא נסה/י שוב במועד מאוחר יותר</div><a href="#close" rel="modal:close"><button class="btn btn-secondary">סגור</button></a>';
     $('#modal-content').modal({
         escapeClose: true,
         clickClose: true,
