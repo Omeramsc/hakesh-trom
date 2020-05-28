@@ -8,7 +8,7 @@
 
             function drawChart() {
                 if (getComputedStyle(document.getElementById('leaderboard_stats')).display != 'none') {
-                    var data = new google.visualization.arrayToDataTable({{ neighborhoods | tojson }});
+                    var data = new google.visualization.arrayToDataTable({{ neighborhoods_graph_info | tojson }});
 
                     var options = {
                         legend: {position: 'none'},

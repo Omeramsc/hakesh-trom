@@ -633,37 +633,46 @@ def leaderboard():
     campaign_id = request.args.get('campaign_id', None)
     team_query = Team.query
     current_team_money = 0
+    neighborhoods_earnings = {}
 
-    # If the user is a team, show only teams within the same campaign and neighborhood
+    # USE CASE 1: USER = TEAM => show only teams within the same campaign and neighborhood
     if not current_user.is_admin:
         team_query = team_query.filter(
             Team.campaign_id == current_user.team.campaign_id and Team.neighborhood_id == current_user.team.neighborhood_id)
 
-    # If the user is an admin, query neighborhoods for graph. 
-    else:
-        # TODO: query neighborhoods
+    # USE CASE 2: USER = ADMIN => SPECIFIC CAMPAIGN => show only teams within the specific campaign
+    elif campaign_id:
+        team_query = team_query.filter(Team.campaign_id == campaign_id)
 
-        # If an admin chose a specific-campaign leaderboard, query the related neighborhoods. 
-        if campaign_id:
-            # TODO: filter query with this specific campaign's neighborhoods
-            team_query = team_query.filter(Team.campaign_id == campaign_id)
+    # USE CASE 3: USER = ADMIN => ALL CAMPAIGNS => query all teams to a dict
     campaign_teams = [t.__dict__ for t in team_query.all()]
 
-    # Calculate total earned money for each team on the leaderboard
+    # Calculate total earned money for each team on the leaderboard and insert to the teams dict
     for team in campaign_teams:
         total_earnings = db.session.query(func.sum(Donation.amount)).join(Team).filter(
             Team.id == team['id']).scalar()
         team['total_earnings'] = total_earnings or 0
+        # Get the current team earnings to display on the top of the page.
         if not current_user.is_admin and current_user.team_id == team['id']:
-            current_team_money == team['total_earnings']
+            current_team_money = team['total_earnings']
+
+        # If the user has a graph (admin), get neighborhood's earnings information for the graph.
+        if current_user.is_admin:
+            neighborhood_name = Neighborhood.query.get(team['neighborhood_id']).name
+            if neighborhoods_earnings.get(neighborhood_name):
+                neighborhoods_earnings[neighborhood_name] += team['total_earnings']
+            else:
+                neighborhoods_earnings[neighborhood_name] = team['total_earnings']
     campaign_teams = sorted(campaign_teams, key=lambda k: k['total_earnings'], reverse=True)
 
-    # TODO: Insert real information instead of mock
-    mock_neighborhoods = [['Opening Move', 'Percentage'], ["זבוטינסקי", 13000],
-                          ["דיזינגוף", 10000],
-                          ["טרכטנברג", 135000]]
+    # Create the list for the graph information.
+    neighborhoods_graph_info = [['שכונה', 'סכום שנאסף']]
+    if current_user.is_admin:
+        for key, value in neighborhoods_earnings.items():
+            neighborhoods_graph_info.append([key, value])
+
     return render_template('/leaderboard.html', teams=campaign_teams, current_team_money=current_team_money,
-                           neighborhoods=mock_neighborhoods)
+                           neighborhoods_graph_info=neighborhoods_graph_info)
 
 
 if __name__ == '__main__':
