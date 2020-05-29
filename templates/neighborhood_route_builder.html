@@ -87,12 +87,14 @@
         const ABOVE_AVG_COLOR = '#55eb34';
         const AVG_COLOR = '#eef207';
         const BELLOW_AVG_COLOR = '#FF0000';
+        const BULK_SELECTED_COLOR = '#000';
         const AVG_BIAS = 5;
 
         const teamELms = document.getElementsByClassName('route-builder-team-panel__team');
         const saveButtonElm = document.getElementById('save-button');
         const deleteButtonElm = document.getElementById('remove-button');
         const addButtonElm = document.getElementById('add-button');
+        const multiSelectButtonElm = document.getElementById('route-builder-map-multiselect__button');
         const buildings = {{ neighborhood_buildings | tojson  }};
         const neighborhood =  {{ neighborhood_data | tojson }};
         const _teams = {{ neighborhood_teams | tojson }};
@@ -115,6 +117,8 @@
         let selectedTeamId;
         let buildingLayerByTeamId = {};
         let selectedTeamBuildings = [];
+        let selectionBox;
+        let map;
 
         function updateTeamId(newTeamId) {
             if (!buildingLayerByTeamId[newTeamId]) buildingLayerByTeamId[newTeamId] = [];
@@ -122,15 +126,24 @@
             if (selectedTeamId) {
                 // Preforming clean up
                 for (const polygon of (buildingLayerByTeamId[selectedTeamId] || [])) {
-                    polygon.setOptions({'fillColor': NOT_AVAILABLE_COLOR, strokeColor: NOT_AVAILABLE_COLOR})
+                    polygon.setOptions({fillColor: NOT_AVAILABLE_COLOR, strokeColor: NOT_AVAILABLE_COLOR})
                 }
+            }
+
+            // Cleanup multiselect
+            for (const polygon of buildings.map(b => b.polygon).filter(p => p.fillColor === BULK_SELECTED_COLOR)) {
+                const teamForBuilding = teams.find(t => t.buildingIds.includes(polygon.building.id));
+                polygon.setOptions({
+                    fillColor: calculatePolygonColor(polygon.building, teamForBuilding),
+                    strokeColor: calculatePolygonColor(polygon.building, teamForBuilding)
+                });
             }
 
             selectedTeamId = newTeamId
 
             // Color the buildings of the team
             for (const polygon of buildingLayerByTeamId[newTeamId]) {
-                polygon.setOptions({'fillColor': PICKED_TEAM_COLOR, strokeColor: PICKED_TEAM_COLOR})
+                polygon.setOptions({fillColor: PICKED_TEAM_COLOR, strokeColor: PICKED_TEAM_COLOR})
             }
 
             // Close info window
@@ -243,7 +256,6 @@
                 <button class='btn btn-secondary'>סגור</button>
             </a>`;
         }
-
 
         function showTeamDeletedSuccess() {
             $.modal.getCurrent().$elm[0].innerHTML = '';
@@ -481,9 +493,14 @@
             predictedEarningsSpan.innerHTML = `<u><b>צפי רווח</b></u>: ${building.predicted_earnings}`;
             contentDiv.appendChild(predictedEarningsSpan);
 
-            if (selectedTeamId) {
-                const teamIdOfBuildingInRoute = (teams.find(t => t.buildingIds.includes(building.id)) || {}).id;
+            const teamIdOfBuildingInRoute = (teams.find(t => t.buildingIds.includes(building.id)) || {}).id;
+            if (teamIdOfBuildingInRoute) {
+                const teamNameSpan = document.createElement('span');
+                teamNameSpan.innerHTML = `<u><b>משויך</b></u>: לצוות ${teamIdOfBuildingInRoute}`;
+                contentDiv.appendChild(teamNameSpan);
+            }
 
+            if (selectedTeamId) {
                 if (selectedTeamId === teamIdOfBuildingInRoute) {
                     // The selected team is the ones who have this building in the route
                     contentDiv.appendChild(createDeleteBuildingFromRouteButton(building, polygon, infoWindow))
@@ -508,6 +525,8 @@
                 strokeColor: calculatePolygonColor(building, teamForBuilding),
                 fillColor: calculatePolygonColor(building, teamForBuilding),
             });
+
+            building.polygon = polygon;
 
             google.maps.event.addListener(polygon, "click", function (event) {
                 infoWindow.setPosition(event.latLng);
@@ -541,10 +560,11 @@
         }
 
         function initMap() {
-            const map = new google.maps.Map(document.getElementById("map"), {
+            map = new google.maps.Map(document.getElementById("map"), {
                 zoom: 16,
                 center: convertPointToLatLng(neighborhood.center_point),
-                mapTypeId: "terrain"
+                mapTypeId: "terrain",
+                fullscreenControl: false
             });
 
             const neighborhoodPolygon = new google.maps.Polygon({
@@ -570,8 +590,9 @@
             for (const building of buildings) {
                 addPolygon(map, infoWindow, building);
             }
-        }
 
+            renderDrawingManager();
+        }
 
         function rerenderTeams() {
             const teamPanel = document.getElementsByClassName('route-builder-team-panel__routes')[0];
@@ -692,12 +713,108 @@
                 showError();
             }
         }
+
+        function renderDrawingManager() {
+            const drawingManager = new google.maps.drawing.DrawingManager({
+                drawingControl: true,
+                drawingControlOptions: {
+                    position: google.maps.ControlPosition.TOP_RIGHT,
+                    drawingModes: ['rectangle']
+                },
+                map
+            });
+
+            google.maps.event.addListener(drawingManager, 'rectanglecomplete', function (rectangle) {
+                const buildingsInRect = buildings.filter(b => rectangle.bounds.contains(convertPointToLatLng(b.center_point)))
+                const center = rectangle.bounds.getCenter();
+                rectangle.setMap(null);
+
+                // Clear prev selection
+                for (const building of buildings) {
+                    if (building.polygon.fillColor === BULK_SELECTED_COLOR) {
+                        const teamForBuilding = teams.find(t => t.buildingIds.includes(building.id));
+                        building.polygon.setOptions({
+                            fillColor: calculatePolygonColor(building, teamForBuilding),
+                            strokeColor: calculatePolygonColor(building, teamForBuilding)
+                        });
+                    }
+                }
+
+                // No team is selected, exiting
+                if (!selectedTeamId) {
+                    return;
+                }
+
+                const freeSelectedBuildings = buildingsInRect.filter(b => b.polygon.fillColor !== NOT_AVAILABLE_COLOR && b.polygon.fillColor !== PICKED_TEAM_COLOR);
+
+                // No free buildings, exiting
+                if (freeSelectedBuildings.length === 0) {
+                    return;
+                }
+
+                // Color the building
+                for (const building of freeSelectedBuildings) {
+                    building.polygon.setOptions({fillColor: BULK_SELECTED_COLOR, strokeColor: BULK_SELECTED_COLOR});
+                }
+
+                infoWindow.setPosition(center);
+                infoWindow.open(map);
+
+                infoWindow.setContent(generateBulkSelectionInfoWindow(freeSelectedBuildings));
+            });
+
+        }
+
+        function generateBulkSelectionInfoWindow(selectedBuildings) {
+            const contentDiv = document.createElement('div');
+            contentDiv.classList.add('route-builder-map__info_window');
+
+            const numberOfBuildingsSpan = document.createElement('span');
+            numberOfBuildingsSpan.innerHTML = `<u><b>מספר ביניינים</b></u>: ${selectedBuildings.length}`;
+            contentDiv.appendChild(numberOfBuildingsSpan);
+
+            const predictedEarningsSpan = document.createElement('span');
+            const prettyTotalPredictedEarnings = petrifyPredictedEarnings(selectedBuildings.reduce((a, c) => a + c.predicted_earnings, 0));
+            predictedEarningsSpan.innerHTML = `<u><b>צפי רווח</b></u>: ${prettyTotalPredictedEarnings}`;
+            contentDiv.appendChild(predictedEarningsSpan);
+
+            const addBuildingsToRoute = document.createElement('button');
+            addBuildingsToRoute.innerText = "הוסף למסלול";
+            addBuildingsToRoute.classList.add('btn', 'btn-primary');
+            addBuildingsToRoute.disabled = !Boolean(selectedTeamId)
+            addBuildingsToRoute.addEventListener('click', () => {
+                const selectedTeam = teams.find(t => t.id === selectedTeamId);
+
+                // Adding the building
+                selectedTeam.buildingIds.push(...selectedBuildings.map(b => b.id));
+                selectedTeam.buildings.push(...selectedBuildings);
+
+                // Marking the team with as unclean
+                selectedTeam.unclean = true;
+
+                // Color the polygons
+                for (const building of selectedBuildings) {
+                    building.polygon.setOptions({'fillColor': PICKED_TEAM_COLOR, strokeColor: PICKED_TEAM_COLOR});
+                }
+                // Adding the building to the team layer
+                if (!buildingLayerByTeamId[selectedTeamId]) buildingLayerByTeamId[selectedTeamId] = []
+                buildingLayerByTeamId[selectedTeamId].push(...selectedBuildings.map(b => b.polygon))
+
+                // Update the team list
+                renderTeamRoute(selectedTeam);
+
+                infoWindow.close();
+            });
+            contentDiv.appendChild(addBuildingsToRoute);
+
+            return contentDiv;
+        }
     </script>
 
     <script
             async
             defer
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCeQSgOmTLHNxGk4Vg3JlTNCGD8BEO992Y&callback=initMap&libraries=visualization">
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCeQSgOmTLHNxGk4Vg3JlTNCGD8BEO992Y&callback=initMap&libraries=visualization,drawing">
     </script>
 
 {% endblock %}
