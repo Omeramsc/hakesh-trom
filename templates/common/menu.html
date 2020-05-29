@@ -25,8 +25,8 @@
                     src="{{ url_for('static', filename='leaderboard.png') }}"
                     alt="לוח הישגים"></a>
             <a href="{{ url_for('notifications') }}">
-                {% if new_notifications %}
-                    <span class="badge badge-pill badge-danger">{{ new_notifications }}</span>
+                {% if session['awaiting_notifications'].get('badge_notifications') %}
+                    <span class="badge badge-pill badge-danger">{{ session['awaiting_notifications']['badge_notifications'] }}</span>
                 {% endif %}
                 התראות<img src="{{ url_for('static', filename='notifications_bell.png') }}" alt="התראות">
             </a>

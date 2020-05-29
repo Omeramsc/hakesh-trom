@@ -42,9 +42,9 @@
             alt="חזור לעמוד הראשי"></a>
     {% if current_user.is_authenticated %}
         <div>
-            {% if new_notifications %}
+            {% if session['awaiting_notifications'].get('badge_notifications') %}
                 <span class="badge badge-pill badge-danger"
-                      style="position:fixed;">{{ new_notifications }}</span>
+                      style="position:fixed;">{{ session['awaiting_notifications']['badge_notifications'] }}</span>
             {% endif %}
         </div>
         <button class="nav_btn" onclick="toggleSideNav()"><i class="fa fa-bars"></i></button>

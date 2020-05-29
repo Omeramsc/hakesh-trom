@@ -7,7 +7,7 @@ from models import Campaign, User, Neighborhood, Team, Donation, Invoice, Buildi
 from db import db
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users, export_neighborhood_to_excel
 from utils.teams import delete_team_dependencies, get_team_progress
-from utils.notifications import update_notification_readtime
+from utils.notifications import update_notification_status_to_read
 from utils.ui_helpers import get_campaign_icon, get_report_status_icon
 from utils.app_decorators import admin_access, user_access
 from utils.consts import INVOICE_TYPES, HOST_URL, ORGANIZATION_NAME
@@ -26,12 +26,12 @@ def inject_content_to_all_routes():
 
 @app.before_request
 def before_request():
-    session['awaiting_notifications'] = {'have_notification': False, 'amount': 0}
     if current_user.is_authenticated:
-        notifications_query = Notification.query
-        notifications_query = notifications_query.filter(Notification.recipient_id == current_user.id).filter(
+        session['awaiting_notifications'] = {'have_notification': False, 'amount': 0,
+                                             'badge_notifications': current_user.get_num_of_new_notifications()}
+        push_notifications_query = Notification.query.filter(Notification.recipient_id == current_user.id).filter(
             Notification.notified == False)
-        pending_notifications = notifications_query.all()
+        pending_notifications = push_notifications_query.all()
         if pending_notifications:
             session['awaiting_notifications'] = {'have_notification': True, 'amount': len(pending_notifications)}
             for notification in pending_notifications:
@@ -726,13 +726,12 @@ def leaderboard():
 @login_required
 def notifications():
     # Query all the user notifications
-    notifications_query = Notification.query
-    notifications_query = notifications_query.filter(Notification.recipient_id == current_user.id).order_by(
+    notifications_query = Notification.query.filter(Notification.recipient_id == current_user.id).order_by(
         Notification.creation_date.desc())
     # Preforming the fetch from the DB now
     return render_template('/notifications.html', notifications=notifications_query.all(),
                            get_icon=get_report_status_icon,
-                           update_notification_readtime=update_notification_readtime)
+                           update_notification_status_to_read=update_notification_status_to_read)
 
 
 if __name__ == '__main__':

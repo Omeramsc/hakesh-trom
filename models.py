@@ -187,7 +187,7 @@ class User(db.Model, UserMixin):
         for user in users:
             user.set_password(DEFAULT_TEAM_USER_PASSWORD)
 
-    def new_notifications(self):
+    def get_num_of_new_notifications(self):
         return Notification.query.filter_by(recipient=self).filter(Notification.was_read == False).count()
 
     def __repr__(self):
