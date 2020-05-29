@@ -27,8 +27,7 @@ def inject_content_to_all_routes():
 @app.before_request
 def before_request():
     if current_user.is_authenticated:
-        session['awaiting_notifications'] = {'have_notification': False, 'amount': 0,
-                                             'badge_notifications': current_user.get_num_of_new_notifications()}
+        session['awaiting_notifications'] = {'have_notification': False, 'amount': 0}
         push_notifications_query = Notification.query.filter(Notification.recipient_id == current_user.id).filter(
             Notification.notified == False)
         pending_notifications = push_notifications_query.all()
@@ -37,6 +36,7 @@ def before_request():
             for notification in pending_notifications:
                 notification.notified = True
                 db.session.commit()
+        session['awaiting_notifications']['badge_notifications'] = current_user.get_num_of_new_notifications() or 0
 
 
 @app.errorhandler(403)
@@ -727,11 +727,14 @@ def leaderboard():
 def notifications():
     # Query all the user notifications
     notifications_query = Notification.query.filter(Notification.recipient_id == current_user.id).order_by(
-        Notification.creation_date.desc())
-    # Preforming the fetch from the DB now
-    return render_template('/notifications.html', notifications=notifications_query.all(),
-                           get_icon=get_report_status_icon,
-                           update_notification_status_to_read=update_notification_status_to_read)
+        Notification.creation_date.desc()).all()
+    notification_list = []
+    for notification in notifications_query:
+        notification_list.append(
+            {'notification_details_obj': notification,
+             'status_icon': get_report_status_icon(not notification.was_read)})
+    update_notification_status_to_read()
+    return render_template('/notifications.html', notifications=notification_list)
 
 
 if __name__ == '__main__':

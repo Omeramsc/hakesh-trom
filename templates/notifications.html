@@ -10,19 +10,18 @@
                     {% if notifications %}
                         {% for notification in notifications %}
                             <li>
-                                <img src="{{ get_icon(not notification.was_read) }}">
+                                <img src="{{ notification.status_icon }}">
                                 <a id='report_summary'
                                    class='hide_link'
-                                   href="{{ url_for('view_report', report_id=notification.report_id) }}">
-                                    {{ notification.creation_date.replace(microsecond=0) }}<br>
-                                    {{ notification.description }}
+                                   href="{{ url_for('view_report', report_id=notification.notification_details_obj.report_id) }}">
+                                    {{ notification.notification_details_obj.creation_date.replace(microsecond=0) }}<br>
+                                    {{ notification.notification_details_obj.description }}
                                 </a>
                             </li>
                         {% endfor %}
                     {% else %}
                         <div class="center_text">לא נמצאו התראות</div>
                     {% endif %}
-                    <span style="display:none">{{ update_notification_status_to_read() }}</span>
                 </ul>
             </section>
         </section>

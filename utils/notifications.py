@@ -9,4 +9,4 @@ def update_notification_status_to_read():
     notifications_query = notifications_query.all()
     for notification in notifications_query:
         notification.was_read = True
-        db.session.commit()
+    db.session.commit()
