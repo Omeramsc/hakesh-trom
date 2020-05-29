@@ -1,21 +1,26 @@
 from flask import render_template, jsonify, flash, redirect, url_for, request, session, abort, send_file
 from flask_login import login_user, current_user, logout_user, login_required
 from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood, DonationForm, PaperInvoiceForm, \
-    DigitalInvoiceForm, BitForm, ReportForm, SearchReportForm, RespondReportForm, validate_name
+    DigitalInvoiceForm, BitForm, ReportForm, SearchReportForm, RespondReportForm, validate_name, TeamForm
 from app_init import app, bcrypt
 from models import Campaign, User, Neighborhood, Team, Donation, Invoice, Building, Report
 from db import db
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users, export_neighborhood_to_excel
-from utils.teams import delete_team_dependencies
+from utils.teams import delete_team_dependencies, get_team_progress
 from utils.ui_helpers import get_campaign_icon, get_report_status_icon
 from utils.app_decorators import admin_access, user_access
-from utils.consts import INVOICE_TYPES, HOST_URL
+from utils.consts import INVOICE_TYPES, HOST_URL, ORGANIZATION_NAME
 from utils.automate_report import generate_automate_report
 from sqlalchemy import func
 import utils.green_invoice as gi
 import utils.paypal as pp
 import datetime
 import json
+
+
+@app.context_processor
+def inject_content_to_all_routes():
+    return dict(HOST_URL=HOST_URL, ORGANIZATION_NAME=ORGANIZATION_NAME)
 
 
 @app.errorhandler(403)
@@ -61,10 +66,7 @@ def delete_campaign(campaign_id):
 def home():
     progress = {}
     if not current_user.is_admin:
-        total_earnings = db.session.query(func.sum(Donation.amount)).join(Team).filter(
-            Team.id == current_user.team_id).scalar()
-        progress['total_earnings'] = total_earnings or 0
-        # add dynamic percentage information here
+        progress = get_team_progress(current_user.team)
     return render_template('/home.html', progress=progress)
 
 
@@ -594,6 +596,35 @@ def edit_response(report_id):
     elif request.method == 'GET':
         form.response.data = report.response
     return render_template('/report_response.html', report=report, form=form, legend="עריכת מענה")
+
+
+@app.route('/team/<int:team_id>', methods=['GET'])
+@login_required
+def view_team(team_id):
+    team = Team.query.get_or_404(team_id)
+    progress = get_team_progress(team)
+    return render_template('/view_team.html', team=team, progress=progress)
+
+
+@app.route('/team/<int:team_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_team(team_id):
+    if not current_user.is_admin and not current_user.team_id == team_id:
+        abort(403)
+    team = Team.query.get_or_404(team_id)
+    form = TeamForm()
+    if form.validate_on_submit():
+        team.name = form.name.data
+        team.first_teammate_name = form.first_teammate_name.data
+        team.second_teammate_name = form.second_teammate_name.data
+        db.session.commit()
+        flash('!פרטי הצוות עודכנו בהצלחה', 'success')
+        return redirect(url_for('view_team', team_id=team.id))
+    elif request.method == 'GET':
+        form.name.data = team.name
+        form.first_teammate_name.data = team.first_teammate_name
+        form.second_teammate_name.data = team.second_teammate_name
+    return render_template('/edit_team.html', form=form, team_id=team_id)
 
 
 if __name__ == '__main__':

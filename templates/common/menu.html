@@ -1,31 +1,33 @@
-<aside>
-    <nav id="hamburger" class="quick_trans hide_link">
-        <button class="nav_btn" onclick="toggleSideNav()"><i class="fa fa-times"></i></button>
-        <img id="nav_logo" src="{{ url_for('static', filename='header_logo.png') }}"
-             style="width:190px; height: 50px; margin:6px auto;">
-        <hr>
-        {% if current_user.is_admin %}
-            <a href="{{ url_for('create_campaign') }}">צור קמפיין<img
-                    src="{{ url_for('static', filename='CreateCamp.png') }}"
-                    alt="צור קמפיין"></a>
-            <a href="{{ url_for('manage_campaign') }}">נהל קמפיין<img
-                    src="{{ url_for('static', filename='management.png') }}"
-                    alt="נהל קמפיין"></a>
-        {% else %}
-            <a href="{{ url_for('donation_address') }}">תרומות<img
-                    src="{{ url_for('static', filename='donation.png') }}"
-                    alt="תרומות"></a>
-            <a class="not_allowed" href="#">הצוות שלי<img src="{{ url_for('static', filename='teams.png') }}"
-                                                          alt="הצוות שלי"></a>
-        {% endif %}
-        <a href="{{ url_for('reports') }}">דיווחים<img src="{{ url_for('static', filename='report_ico.png') }}"
-                                                       alt="דיווחים"></a>
-        <a class="not_allowed" href="#">לוח הישגים<img src="{{ url_for('static', filename='leaderboard.png') }}"
-                                                       alt="לוח הישגים"></a>
-        <a href="{{ url_for('about_org') }}">על הארגון<img src="{{ url_for('static', filename='about_org.png') }}"
-                                                           alt="על הארגון"></a>
-        <hr>
-        <a href="{{ url_for('logout') }}">התנתקות<img src="{{ url_for('static', filename='dissconnect.png') }}"
-                                                      alt="התנתקות"></a>
-    </nav>
-</aside>
+{% if current_user.is_authenticated %}
+    <aside>
+        <nav id="hamburger" class="quick_trans hide_link">
+            <button class="nav_btn" onclick="toggleSideNav()"><i class="fa fa-times"></i></button>
+            <img id="nav_logo" src="{{ url_for('static', filename='header_logo.png') }}">
+            <hr>
+            {% if current_user.is_admin %}
+                <a href="{{ url_for('create_campaign') }}">צור קמפיין<img
+                        src="{{ url_for('static', filename='CreateCamp.png') }}"
+                        alt="צור קמפיין"></a>
+                <a href="{{ url_for('manage_campaign') }}">נהל קמפיין<img
+                        src="{{ url_for('static', filename='management.png') }}"
+                        alt="נהל קמפיין"></a>
+            {% else %}
+                <a href="{{ url_for('donation_address') }}">תרומות<img
+                        src="{{ url_for('static', filename='donation.png') }}"
+                        alt="תרומות"></a>
+                <a href="{{ url_for('view_team', team_id=current_user.team_id) }}">הצוות שלי<img
+                        src="{{ url_for('static', filename='teams.png') }}"
+                        alt="הצוות שלי"></a>
+            {% endif %}
+            <a href="{{ url_for('reports') }}">דיווחים<img src="{{ url_for('static', filename='report_ico.png') }}"
+                                                           alt="דיווחים"></a>
+            <a class="not_allowed" href="#">לוח הישגים<img src="{{ url_for('static', filename='leaderboard.png') }}"
+                                                           alt="לוח הישגים"></a>
+            <a href="{{ url_for('about_org') }}">על הארגון<img src="{{ url_for('static', filename='about_org.png') }}"
+                                                               alt="על הארגון"></a>
+            <hr>
+            <a href="{{ url_for('logout') }}">התנתקות<img src="{{ url_for('static', filename='dissconnect.png') }}"
+                                                          alt="התנתקות"></a>
+        </nav>
+    </aside>
+{% endif %}

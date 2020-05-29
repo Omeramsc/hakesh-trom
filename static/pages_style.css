@@ -336,7 +336,19 @@ ul {
 }
 
 
-/*----------- First steps ------------*/
+/*-----------My Team------------------*/
+.team_info_box {
+    margin-top: 10px;
+    border-radius: 10px 10px 10px 10px;
+    width: 30%;
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px outset gray;
+    padding: 4px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/*----------- About org ------------*/
 .slide-container {
     display: none;
     width: 100%;
@@ -1066,6 +1078,11 @@ hr {
         background: rgba(255, 255, 255, 0.8);
         width: 90%;
         border: 2px outset gray;
+    }
+
+    /* my team */
+    .team_info_box {
+        width: 90%;
     }
 
     /* first steps */

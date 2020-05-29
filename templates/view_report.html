@@ -13,8 +13,18 @@
                     {% endif %}
                     <li><b>קטגוריה:</b> {{ report.category }}</li>
                     <li><b>תיאור:</b> {{ report.description }}</li>
-                    <li><b>כותב הדיווח:</b> {{ "צוות %s" % (report.team_id) if report.team_id else "אחראי ארצי" }}</li>
-                    {# replace with team name + link to page #}
+                    <li><b>כותב הדיווח:</b>
+                        {% if report.team_id %}
+                            <a class="hide_link"
+                               href="{{ url_for('view_team', team_id=report.team_id) }}">{{ "צוות %s" % (report.team_id) }}
+                                {% if report.team.name %}
+                                    - {{ report.team.name }}
+                                {% endif %}
+                            </a>
+                        {% else %}
+                            "אחראי ארצי"
+                        {% endif %}
+                    </li>
                     <li><b>מועד יצירה:</b> {{ report.creation_time.replace(microsecond=0) }}</li>
                     <li><b>סטטוס: </b> {{ "פתוח" if report.is_open else "סגור" }}</li>
                 </ul>
