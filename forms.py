@@ -1,11 +1,11 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FloatField, SelectField, RadioField, PasswordField, BooleanField, \
-    IntegerField, TextAreaField, HiddenField
+    IntegerField, TextAreaField
 from wtforms.fields.html5 import DateField
-from wtforms.validators import DataRequired, Length, ValidationError, NumberRange, Email, Regexp
+from wtforms.validators import DataRequired, Length, NumberRange, Email, Regexp
 from models import Campaign
 from utils.consts import INVOICE_REF_LENGTH, BIT_ACCOUNT_NUM
-from utils.forms_helpers import report_categories, read_cities
+from utils.forms_helpers import report_categories, search_report_categories, read_cities
 
 
 def validate_name(name, current_name=None):
@@ -117,7 +117,9 @@ class RespondReportForm(FlaskForm):
 
 
 class SearchReportForm(FlaskForm):
-    category = SelectField('סוג הדיווח:', choices=[(value, value) for value in report_categories], default="")
+    category = SelectField('סוג הדיווח:',
+                           choices=([(value, value) for value in search_report_categories]),
+                           default="")
     status = RadioField(choices=[("all", "הכל"), ("open", "פתוח"), ("closed", "סגור")], default="all")
     submit = SubmitField('בצע חיפוש')
 

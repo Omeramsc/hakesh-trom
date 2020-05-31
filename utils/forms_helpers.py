@@ -3,6 +3,10 @@ import json
 report_categories = ["", "אין גישה", "בניין נעול", "הצפה", "כלב משוחרר", "מפגע", "רחוב חסום", "תקלה באפליקציה",
                      "אחר"]
 
+search_report_categories = ["", "אין גישה", "בניין נעול", "דיווח מהיר", "הצפה", "כלב משוחרר", "מפגע", "רחוב חסום",
+                            "תקלה באפליקציה",
+                            "אחר"]
+
 
 def memoize_dropdown(func):
     """Checks if the dropdown list has already been created.

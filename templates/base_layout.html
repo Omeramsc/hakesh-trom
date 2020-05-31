@@ -8,14 +8,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <link href="https://www.cssscript.com/wp-includes/css/sticky.css" rel="stylesheet" type="text/css">
     <link href="https://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.9/themes/blitzer/jquery-ui.css" rel="stylesheet"
           type="text/css"/>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
     <link href="{{ url_for('static', filename='pages_style.css') }}" rel="stylesheet" type="text/css"/>
     <link href="{{ url_for('static', filename='main_page.css') }}" rel="stylesheet" type="text/css"/>
-
+    <script src="{{ url_for('static', filename='scripts/fast_reports.js') }}"></script>
     {% block header %}{% endblock %}
 
 </head>

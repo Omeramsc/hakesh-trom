@@ -6,10 +6,12 @@
     <main id="main_layout" class="unified_layout">
         <section class="options flex_me center_text">
             <div class="option_button">
-                <a class="hide_link not_allowed" href=#><img src="{{ url_for('static', filename='contact_us.png') }}"
-                                                             alt="לא פעיל"><br>
-                    צור קשר
-                </a>
+                <div class="speech">
+                    <img class="reco_icon" id="reco_icon report_record"
+                         onclick="createFastReport('{{ csrf_token() }}', '{{ url_for('save_quick_report') }}')"
+                         src={{ url_for('static', filename='fast_report.png') }}/><br>
+                    דיווח מהיר
+                </div>
             </div>
             <div class="option_button">
                 <a class="hide_link" href="{{ url_for('create_report') }}"><img
