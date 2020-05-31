@@ -822,6 +822,18 @@ ul {
     background-color: rgba(255, 255, 255, 0.5);
 }
 
+#route-builder-map-multiselect {
+    position: absolute;
+    right: calc(20% + 28px);
+    padding: 5px;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+#route-builder-map-multiselect__button {
+    background: rgba(255, 255, 255, 0.7);
+}
+
 .route-builder-map-legend__color {
     height: 1em;
     width: 1em;
