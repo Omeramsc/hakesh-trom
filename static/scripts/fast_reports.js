@@ -21,8 +21,7 @@ async function handleCurrentPosition(position, resolve) {
 
         if (response.ok) {
             const responseJson = await response.json();
-            let address = (responseJson.results[0].formatted_address);
-            address = address.substring(0, address.indexOf(','))
+            const address = responseJson.results[0].formatted_address.split(",")[0].trim();
             resolve(address);
         }
         resolve('לא ניתן לאתר מיקום');
