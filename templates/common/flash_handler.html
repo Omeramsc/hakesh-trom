@@ -1,4 +1,4 @@
-{% if session['awaiting_notifications']['have_notification'] %}
+{% if session.get('awaiting_notifications', {}).get('have_notification') %}
     <div class="push_notification center_text">
         <a class="hide_link" href="{{ url_for('notifications') }}"><strong>
             {% if session['awaiting_notifications']['amount'] > 1 %}

@@ -35,7 +35,7 @@ def before_request():
             session['awaiting_notifications'] = {'have_notification': True, 'amount': len(pending_notifications)}
             for notification in pending_notifications:
                 notification.notified = True
-                db.session.commit()
+            db.session.commit()
         session['awaiting_notifications']['badge_notifications'] = current_user.get_num_of_new_notifications() or 0
 
 
