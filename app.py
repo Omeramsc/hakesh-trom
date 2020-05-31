@@ -184,7 +184,9 @@ def manage_campaign():
             elif form.status.data == "future":
                 campaigns_query = campaigns_query.filter(Campaign.start_date > today)
     # Preforming the fetch from the DB now
-    return render_template('/manage_campaign.html', campaigns=campaigns_query.all(), get_icon=get_campaign_icon,
+    return render_template('/manage_campaign.html',
+                           campaigns=campaigns_query.order_by(Campaign.start_date.desc()).all(),
+                           get_icon=get_campaign_icon,
                            form=form)
 
 
@@ -492,7 +494,7 @@ def send_invoice():
 @login_required
 @user_access
 def donation_end():
-    if session['current_donation']:
+    if session.get('current_donation'):
         session.pop('current_donation')
     return render_template('/donation_end.html')
 
@@ -517,7 +519,8 @@ def reports():
                 reports_query = reports_query.filter(Report.is_open == False)  # 'is false' or 'not' are not working.
 
     # Preforming the fetch from the DB now
-    return render_template('/reports.html', reports=reports_query.all(), get_icon=get_report_status_icon, form=form)
+    return render_template('/reports.html', reports=reports_query.order_by(Report.creation_time.desc()).all(),
+                           get_icon=get_report_status_icon, form=form)
 
 
 @app.route('/reports/quick', methods=['POST'])
