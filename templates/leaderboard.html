@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% if current_user.is_admin %}
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+            google.charts.load('current', {'packages': ['bar']});
+            google.charts.setOnLoadCallback(drawChart);
+
+            function drawChart() {
+                if (getComputedStyle(document.getElementById('leaderboard_stats')).display != 'none') {
+                    var data = new google.visualization.arrayToDataTable({{ neighborhoods_graph_info | tojson }});
+
+                    var options = {
+                        legend: {position: 'none'},
+                        bars: 'vertical',
+                        axes: {
+                            x: {
+                                0: {side: 'bottom', label: 'שכונות משתתפות'}
+                            },
+                            y: {
+                                0: {side: 'top', label: 'סכום שנאסף'}
+                            }
+                        }
+                    };
+
+                    var chart = new google.charts.Bar(document.getElementById('top_x_div'));
+                    chart.draw(data, options);
+                }
+                ;
+            }
+
+            window.addEventListener('resize', drawChart, false);
+        </script>
+    {% endif %}
+    <main id="main_layout" class="quick_trans center_text">
+        {% if current_user.is_admin %}
+            <section id="leaderboard_stats" class="leaderboard_stats">
+                <div id="top_x_div"></div>
+            </section>
+        {% else %}
+            <section class="user_info">
+                <div class="user">
+                    <img class="flex_me" src="{{ url_for('static', filename='default_team.png') }}" alt="Team photo">
+                </div>
+                {% if not current_user.is_admin %}
+                    <div class="usernames flex_me">
+                        <div>סכום שנאסף: ₪{{ current_team_money }}</div>
+                    </div>
+                {% endif %}
+            </section>
+        {% endif %}
+        <div class="tabs_container flex_me"
+                {% if not current_user.is_admin %}
+             id="user_tabs_container"
+                {% endif %}
+        >
+            {% for team in teams %}
+                <div class="leaderboard_tabs">
+                    <span class="lb_team">
+                        {% if loop.index==1 %}
+                            <i id="trophy_icn" class="fas fa-trophy" style="color:gold"></i>
+                        {% elif loop.index==2 %}
+                            <i id="trophy_icn" class="fas fa-trophy" style="color:silver"></i>
+                        {% elif loop.index==3 %}
+                            <i id="trophy_icn" class="fas fa-trophy" style="color:sandybrown"></i>
+                        {% else %}
+                            <span style="margin:3px; font-weight: bold">{{ loop.index }}.</span>
+                        {% endif %}
+                        {% if team.name %}
+                            {{ team.name }}
+                        {% else %}
+                            צוות {{ team.id }}
+                        {% endif %}
+                    </span>
+                    <span class="lb_money">
+                        ₪{{ team.total_earnings }}
+                    </span>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+{% endblock content %}

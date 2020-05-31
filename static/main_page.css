@@ -153,11 +153,17 @@ html {
     .icon {
         padding: 4%;
         margin: auto 0px;
+        flex-grow: 1;
     }
 
     .usernames {
         font-size: 21px;
     }
+
+    .icon img {
+        height: 60px;
+    }
+
 }
 
 @media screen and (max-width: 360px) {

@@ -899,6 +899,63 @@ ul {
     cursor: pointer;
 }
 
+/*------------------------- Leaderbored -------------------------*/
+.leaderboard_stats {
+    height: 55%;
+    width: 80%;
+    margin: auto;
+    display: flex;
+}
+
+#top_x_div {
+    height: 95%;
+    width: 80%;
+    margin: 5px auto;
+    border: 1px solid black;
+    padding: 10px;
+    background-color: white;
+}
+
+.tabs_container {
+    width: 90%;
+    height: 40%;
+    margin: 1% auto;
+    direction: rtl;
+    flex-direction: column;
+    flex-wrap: wrap;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.5);
+    padding: 20px 5px;
+    border: 1px solid black;
+    border-radius: 20px;
+}
+
+.leaderboard_tabs {
+    height: 30px;
+    border: 1px solid #dddddd;
+    border-radius: 7px;
+    background-color: rgba(255, 255, 255, 0.3);
+    margin: 0 4px -1px;
+    padding-bottom: 1px;
+    min-width: 200px;
+}
+
+.lb_team {
+    direction: rtl;
+    float: right;
+    margin: 3px;
+}
+
+.trophy {
+    height: 30px;
+}
+
+.lb_money {
+    text-align: center;
+    float: left;
+    margin: 3px;
+}
+
 /*------------------------- Errors -------------------------*/
 .error_pic {
     width: 35%;
@@ -1120,6 +1177,25 @@ hr {
         margin: 10% auto;
     }
 
+    .tabs_container {
+        height: 95%;
+        flex-wrap: nowrap;
+    }
+
+    .leaderboard_tabs {
+        width: 95%;
+        height: 35px;
+        margin: 0px auto;
+        margin: 0 auto -1px;
+    }
+
+    .leaderboard_stats {
+        display: none;
+    }
+
+    #user_tabs_container {
+        height: 45%;
+    }
 }
 
 
@@ -1199,5 +1275,15 @@ hr {
     .error_pic {
         width: 80%;
         margin: 10% auto;
+    }
+
+    .tabs_container {
+        height: 90%;
+        overflow-y: auto;
+        flex-wrap: nowrap;
+    }
+
+    #user_tabs_container {
+        height: 72%;
     }
 }

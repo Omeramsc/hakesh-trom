@@ -21,8 +21,9 @@
             {% endif %}
             <a href="{{ url_for('reports') }}">דיווחים<img src="{{ url_for('static', filename='report_ico.png') }}"
                                                            alt="דיווחים"></a>
-            <a class="not_allowed" href="#">לוח הישגים<img src="{{ url_for('static', filename='leaderboard.png') }}"
-                                                           alt="לוח הישגים"></a>
+            <a href="{{ url_for('leaderboard') }}">לוח הישגים<img
+                    src="{{ url_for('static', filename='leaderboard.png') }}"
+                    alt="לוח הישגים"></a>
             <a href="{{ url_for('about_org') }}">על הארגון<img src="{{ url_for('static', filename='about_org.png') }}"
                                                                alt="על הארגון"></a>
             <hr>
