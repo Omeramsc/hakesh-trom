@@ -166,6 +166,7 @@ class User(db.Model, UserMixin):
     creation_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     team_id = db.Column(db.Integer, db.ForeignKey('teams.id'))
     team = db.relationship("Team", back_populates="users")
+    notifications = db.relationship("Notification", back_populates="recipient")
 
     def __init__(self, username, password, is_admin=False, is_active=False):
         self.username = username
@@ -186,6 +187,9 @@ class User(db.Model, UserMixin):
         for user in users:
             user.set_password(DEFAULT_TEAM_USER_PASSWORD)
 
+    def get_num_of_new_notifications(self):
+        return Notification.query.filter_by(recipient=self).filter(Notification.was_read == False).count()
+
     def __repr__(self):
         return f'id: {self.id}\nusername: {self.username}\nis_active: {self.is_active}\nis_admin: {self.is_admin}\n ' \
                f'creation_date: {self.creation_date} '
@@ -202,6 +206,25 @@ class User(db.Model, UserMixin):
             'type': 'Admin' if self.is_admin else 'User',
             'creation_date': self.creation_date
         }
+
+
+class Notification(db.Model):
+    __tablename__ = 'notifications'
+
+    id = db.Column(db.Integer, primary_key=True)
+    recipient_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    recipient = db.relationship("User", back_populates="notifications")
+    description = db.Column(db.String, nullable=False)
+    creation_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    was_read = db.Column(db.Boolean, default=False, nullable=False)
+    report_id = db.Column(db.Integer, db.ForeignKey('reports.id'), nullable=False)
+    report = db.relationship("Report", back_populates="notification")
+    notified = db.Column(db.Boolean, default=False, nullable=False)
+
+    def __init__(self, recipient_id, description, report_id=None):
+        self.recipient_id = recipient_id
+        self.description = description
+        self.report_id = report_id
 
 
 class Donation(db.Model):
@@ -269,6 +292,7 @@ class Report(db.Model):
     response_time = db.Column(db.DateTime, nullable=True)
     team_id = db.Column(db.Integer, db.ForeignKey('teams.id'))
     team = db.relationship("Team", back_populates="reports")
+    notification = db.relationship("Notification", back_populates="report")
 
     def __init__(self, category, description, address="ללא כתובת"):
         self.address = address

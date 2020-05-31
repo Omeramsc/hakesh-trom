@@ -3,10 +3,11 @@ from flask_login import login_user, current_user, logout_user, login_required
 from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood, DonationForm, PaperInvoiceForm, \
     DigitalInvoiceForm, BitForm, ReportForm, SearchReportForm, RespondReportForm, validate_name, TeamForm
 from app_init import app, bcrypt
-from models import Campaign, User, Neighborhood, Team, Donation, Invoice, Building, Report
+from models import Campaign, User, Neighborhood, Team, Donation, Invoice, Building, Report, Notification
 from db import db
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users, export_neighborhood_to_excel
 from utils.teams import delete_team_dependencies, get_team_progress
+from utils.notifications import update_notification_status_to_read
 from utils.ui_helpers import get_campaign_icon, get_report_status_icon
 from utils.app_decorators import admin_access, user_access
 from utils.consts import INVOICE_TYPES, HOST_URL, ORGANIZATION_NAME
@@ -21,6 +22,21 @@ import json
 @app.context_processor
 def inject_content_to_all_routes():
     return dict(HOST_URL=HOST_URL, ORGANIZATION_NAME=ORGANIZATION_NAME)
+
+
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        session['awaiting_notifications'] = {'have_notification': False, 'amount': 0}
+        push_notifications_query = Notification.query.filter(Notification.recipient_id == current_user.id).filter(
+            Notification.notified == False)
+        pending_notifications = push_notifications_query.all()
+        if pending_notifications:
+            session['awaiting_notifications'] = {'have_notification': True, 'amount': len(pending_notifications)}
+            for notification in pending_notifications:
+                notification.notified = True
+                db.session.commit()
+        session['awaiting_notifications']['badge_notifications'] = current_user.get_num_of_new_notifications() or 0
 
 
 @app.errorhandler(403)
@@ -530,6 +546,12 @@ def create_report():
             report.team_id = current_user.team_id
         db.session.add(report)
         db.session.commit()
+        if not current_user.is_admin:
+            notification = Notification(recipient_id=1,
+                                        description=f'דיווח חדש מסוג "{report.category}" התקבל מאת צוות {current_user.team_id}',
+                                        report_id=report.id)
+            db.session.add(notification)
+            db.session.commit()
         flash('!הדיווח נוצר בהצלחה', 'success')
         return redirect(url_for('reports'))
     return render_template('/create_report.html', form=form, legend="יצירת דיווח")
@@ -569,6 +591,8 @@ def delete_report(report_id):
     report = Report.query.get_or_404(report_id)
     if report.team_id != current_user.team_id and not current_user.is_admin:
         abort(403)
+    for notification in report.notification:
+        db.session.delete(notification)
     db.session.delete(report)
     db.session.commit()
     # CAN ADD HERE A "CANCEL" OPTION FOR NORMAL USERS
@@ -588,6 +612,10 @@ def respond_to_report(report_id):
         report.is_open = False
         report.response = form.response.data
         report.response_time = datetime.datetime.utcnow()
+        notification = Notification(recipient_id=report.team.users[0].id,
+                                    description='הדיווח שהזנתם קיבל מענה מהאחראי',
+                                    report_id=report.id)
+        db.session.add(notification)
         db.session.commit()
         flash('!הדיווח נענה בהצלחה', 'success')
         return redirect(url_for('reports'))
@@ -605,6 +633,10 @@ def edit_response(report_id):
     if form.validate_on_submit():
         report.response = form.response.data
         report.response_time = datetime.datetime.utcnow()
+        notification = Notification(recipient_id=report.team.users[0].id,
+                                    description='המענה לדיווח עודכן ע"י האחראי',
+                                    report_id=report.id)
+        db.session.add(notification)
         db.session.commit()
         flash('!המענה לדיווח עודכן בהצלחה', 'success')
         return redirect(url_for('view_report', report_id=report.id))
@@ -688,6 +720,21 @@ def leaderboard():
 
     return render_template('/leaderboard.html', teams=campaign_teams, current_team_money=current_team_money,
                            neighborhoods_graph_info=neighborhoods_graph_info)
+
+
+@app.route('/notifications')
+@login_required
+def notifications():
+    # Query all the user notifications
+    notifications_query = Notification.query.filter(Notification.recipient_id == current_user.id).order_by(
+        Notification.creation_date.desc()).all()
+    notification_list = []
+    for notification in notifications_query:
+        notification_list.append(
+            {'notification_details_obj': notification,
+             'status_icon': get_report_status_icon(not notification.was_read)})
+    update_notification_status_to_read()
+    return render_template('/notifications.html', notifications=notification_list)
 
 
 if __name__ == '__main__':

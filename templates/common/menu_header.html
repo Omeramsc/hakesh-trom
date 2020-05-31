@@ -41,6 +41,12 @@
             src="{{ url_for('static', filename='header_logo.png') }}"
             alt="חזור לעמוד הראשי"></a>
     {% if current_user.is_authenticated %}
+        <div>
+            {% if session['awaiting_notifications'].get('badge_notifications') %}
+                <span class="badge badge-pill badge-danger"
+                      style="position:fixed;">{{ session['awaiting_notifications']['badge_notifications'] }}</span>
+            {% endif %}
+        </div>
         <button class="nav_btn" onclick="toggleSideNav()"><i class="fa fa-bars"></i></button>
     {% endif %}
 </header>
