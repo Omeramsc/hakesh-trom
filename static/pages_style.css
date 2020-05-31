@@ -472,7 +472,7 @@ ul {
     height: 30%;
     width: 15%;
     font-size: 350%;
-    margin: 1% auto;
+    margin: 0 auto 1%;
     border: 1px solid black;
 }
 
@@ -582,9 +582,6 @@ ul {
     padding: 10px;
 }
 
-.finish_btn button {
-    width: 20%;
-}
 
 /*------------------------- bit donation -------------------------*/
 
@@ -622,6 +619,13 @@ ul {
 
 .size_box {
     width: 30%;
+}
+
+/*------------------------- Donation end -------------------------*/
+.end_img {
+    width: 35%;
+    display: block;
+    margin: 0.5% auto;
 }
 
 /*------------------------- Manage Campaign -------------------------*/
@@ -1022,6 +1026,11 @@ hr {
         font-size: 13px;
     }
 
+    .end_img {
+        width: 50%;
+        margin: 0 auto;
+    }
+
     /* Invoice */
     .paper_inv {
         width: 70%;
@@ -1052,6 +1061,10 @@ hr {
     }
 
     .form-row {
+        width: 80%;
+    }
+
+    .end_img {
         width: 80%;
     }
 
@@ -1104,6 +1117,16 @@ hr {
         margin: 0px 4px;
     }
 
+
+    .camp_box {
+        width: 80%;
+        background: rgba(255, 255, 255, 0.8);
+        border: 2px outset gray;
+        padding: 19px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
     .report_info_box {
         width: 100%;
     }
@@ -1129,6 +1152,10 @@ hr {
 
     #mail {
         width: 100%;
+    }
+
+    .end_img {
+        width: 90%;
     }
 
     /* invoice */
@@ -1182,6 +1209,7 @@ hr {
         margin: 10% auto;
     }
 
+
     .tabs_container {
         height: 95%;
         flex-wrap: nowrap;
@@ -1201,6 +1229,11 @@ hr {
     #user_tabs_container {
         height: 45%;
     }
+
+    .option_button img {
+        height: 50px;
+    }
+
 }
 
 
@@ -1223,15 +1256,15 @@ hr {
         font-weight: bold;
     }
 
-    .option_button img {
-        height: 50px;
-    }
-
     .boxes_container {
         height: 80%;
     }
 
-    h3 {
+    .campaign_boxes {
+        height: 60%;
+    }
+
+    #subtitle_container {
         display: none;
     }
 
@@ -1260,7 +1293,7 @@ hr {
     }
 
     .finish_btn button {
-        width: 50%;
+        width: 60%;
     }
 
     /* invoice */
