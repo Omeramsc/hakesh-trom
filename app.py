@@ -534,6 +534,12 @@ def save_quick_report():
         report.team_id = current_user.team_id
     db.session.add(report)
     db.session.commit()
+    if not current_user.is_admin:
+        notification = Notification(recipient_id=1,
+                                    description=f'דיווח חדש מסוג "{report.category}" התקבל מאת צוות {current_user.team_id}',
+                                    report_id=report.id)
+        db.session.add(notification)
+        db.session.commit()
     return jsonify({'id': report.id})
 
 
