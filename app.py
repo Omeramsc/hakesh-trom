@@ -10,7 +10,7 @@ from utils.teams import delete_team_dependencies, get_team_progress
 from utils.notifications import update_notification_status_to_read, create_new_notification
 from utils.ui_helpers import get_campaign_icon, get_report_status_icon
 from utils.app_decorators import admin_access, user_access
-from utils.consts import INVOICE_TYPES, HOST_URL, ORGANIZATION_NAME
+from utils.consts import INVOICE_TYPES, HOST_URL, ORGANIZATION_NAME, ESTIMATE_MINUTES_PER_FLOOR
 from utils.automate_report import generate_automate_report
 from sqlalchemy import func
 import utils.green_invoice as gi
@@ -230,6 +230,7 @@ def manage_neighborhood_route(campaign_id, neighborhood_id):
 
     return render_template('/neighborhood_route_builder.html', neighborhood_teams=serialized_neighborhood_teams,
                            neighborhood_data=neighborhood.serialize(), campaign_id=campaign_id,
+                           ESTIMATE_MINUTES_PER_FLOOR=ESTIMATE_MINUTES_PER_FLOOR,
                            neighborhood_id=neighborhood_id, neighborhood_buildings=serialized_neighborhood_buildings)
 
 
