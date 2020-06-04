@@ -7,7 +7,7 @@ from models import Campaign, User, Neighborhood, Team, Donation, Invoice, Buildi
 from db import db
 from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users, export_neighborhood_to_excel
 from utils.teams import delete_team_dependencies, get_team_progress
-from utils.notifications import update_notification_status_to_read
+from utils.notifications import update_notification_status_to_read, create_new_notification
 from utils.ui_helpers import get_campaign_icon, get_report_status_icon
 from utils.app_decorators import admin_access, user_access
 from utils.consts import INVOICE_TYPES, HOST_URL, ORGANIZATION_NAME
@@ -534,6 +534,8 @@ def save_quick_report():
         report.team_id = current_user.team_id
     db.session.add(report)
     db.session.commit()
+    if not current_user.is_admin:
+        create_new_notification(1, report)
     return jsonify({'id': report.id})
 
 
@@ -550,11 +552,7 @@ def create_report():
         db.session.add(report)
         db.session.commit()
         if not current_user.is_admin:
-            notification = Notification(recipient_id=1,
-                                        description=f'דיווח חדש מסוג "{report.category}" התקבל מאת צוות {current_user.team_id}',
-                                        report_id=report.id)
-            db.session.add(notification)
-            db.session.commit()
+            create_new_notification(1, report)
         flash('!הדיווח נוצר בהצלחה', 'success')
         return redirect(url_for('reports'))
     return render_template('/create_report.html', form=form, legend="יצירת דיווח")
@@ -615,11 +613,7 @@ def respond_to_report(report_id):
         report.is_open = False
         report.response = form.response.data
         report.response_time = datetime.datetime.utcnow()
-        notification = Notification(recipient_id=report.team.users[0].id,
-                                    description='הדיווח שהזנתם קיבל מענה מהאחראי',
-                                    report_id=report.id)
-        db.session.add(notification)
-        db.session.commit()
+        create_new_notification(report.team.users[0].id, report, 'הדיווח שהזנתם קיבל מענה מהאחראי')
         flash('!הדיווח נענה בהצלחה', 'success')
         return redirect(url_for('reports'))
     return render_template('/report_response.html', report=report, form=form, legend="מענה לדיווח")

@@ -10,3 +10,11 @@ def update_notification_status_to_read():
     for notification in notifications_query:
         notification.was_read = True
     db.session.commit()
+
+
+def create_new_notification(recipient_id, report, description=None):
+    notification = Notification(recipient_id=recipient_id,
+                                description=description or f'דיווח חדש מסוג "{report.category}" התקבל מאת צוות {current_user.team_id}',
+                                report_id=report.id)
+    db.session.add(notification)
+    db.session.commit()
