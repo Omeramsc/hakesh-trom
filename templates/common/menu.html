@@ -33,9 +33,9 @@
             <a href="{{ url_for('about_org') }}">על הארגון<img src="{{ url_for('static', filename='about_org.png') }}"
                                                                alt="על הארגון"></a>
             <hr>
-            <a href="#">דיווח מהיר<img class="reco_icon" id="reco_icon"
-                                       onclick="createFastReport('{{ csrf_token() }}', '{{ url_for('save_quick_report') }}')"
-                                       src={{ url_for('static', filename='fast_report.png') }}/></a>
+            <a href="#" onclick="createFastReport('{{ csrf_token() }}', '{{ url_for('save_quick_report') }}')">דיווח
+                מהיר<img class="reco_icon" id="reco_icon"
+                         src={{ url_for('static', filename='fast_report.png') }}/></a>
             <a href="{{ url_for('logout') }}">התנתקות<img src="{{ url_for('static', filename='dissconnect.png') }}"
                                                           alt="התנתקות"></a>
         </nav>
