@@ -25,6 +25,14 @@
                 <h3 class=center_text><u>חפש דיווחים:</u></h3>
                 <form method="POST">
                     {{ form.hidden_tag() }}
+                    {% if current_user.is_admin %}
+                        <div class="form-row">
+                            <div class="col-md-8 mb-3">
+                                {{ form.campaign.label() }}
+                                {{ form.campaign(class="form-control") }}
+                            </div>
+                        </div>
+                    {% endif %}
                     <div class="form-row">
                         <div class="col-md-8 mb-3">
                             {{ form.category.label() }}

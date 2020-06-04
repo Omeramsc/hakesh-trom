@@ -506,7 +506,17 @@ def reports():
     # Start with an empty query
     reports_query = Report.query
 
+    # If the user is a team, show only reports from the team's campaign
+    if not current_user.is_admin:
+        reports_query = reports_query.join(Report.team, aliased=True).filter_by(
+            campaign_id=current_user.team.campaign_id)
+
     if form.submit():
+        # If the user is an admin and he chose a specific campaign to show
+        if form.campaign.data:
+            reports_query = reports_query.join(Report.team, aliased=True).filter_by(
+                campaign_id=form.campaign.data)
+
         # If the user added category, add it to the query
         if form.category.data:
             reports_query = reports_query.filter(Report.category == form.category.data)

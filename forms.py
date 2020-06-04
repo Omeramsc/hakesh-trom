@@ -117,6 +117,9 @@ class RespondReportForm(FlaskForm):
 
 
 class SearchReportForm(FlaskForm):
+    campaign = SelectField('קמפיין:',
+                           choices=([("", "")] + [(campaign.id, campaign.name) for campaign in Campaign.query.all()]),
+                           default="")
     category = SelectField('סוג הדיווח:',
                            choices=([(value, value) for value in search_report_categories]),
                            default="")
