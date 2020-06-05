@@ -4,9 +4,10 @@ from app_init import login_manager, bcrypt
 from flask_login import UserMixin
 from sqlalchemy.dialects.postgresql import JSON
 from utils.neural_network import run_network
-from utils.consts import DEFAULT_TEAM_USER_PASSWORD
+from utils.consts import DEFAULT_TEAM_USER_PASSWORD, ESTIMATE_MINUTES_PER_FLOOR
 from utils.network_input import STANDARDIZE_TYPE_FLOORS, STANDARDIZE_TYPE_EARNINGS, STANDARDIZE_TYPE_HEIGHT, \
     STANDARDIZE_TYPE_NEIGHBORHOOD, encodeInput, decodeInput
+from utils.ui_helpers import pretty_time
 
 buildings_teams_association_table = db.Table('buildings_teams', db.Model.metadata,
                                              db.Column('building_id', db.Integer, db.ForeignKey('buildings.id')),
@@ -48,6 +49,7 @@ class Building(db.Model):
         return float("{:.2f}".format(decodeInput(encoded_prediction, STANDARDIZE_TYPE_EARNINGS)))
 
     def serialize(self):
+        total_minutes = int(self.attributes.get('ms_komot', 0)) * ESTIMATE_MINUTES_PER_FLOOR
         return {
             'id': self.id,
             'address': self.address,
@@ -55,7 +57,8 @@ class Building(db.Model):
             'center_point': self.center_point,
             'last_campaign_earnings': self.last_campaign_earnings,
             'predicted_earnings': self.predict_earnings(),
-            'number_of_floors': self.attributes.get('ms_komot', 0)
+            'number_of_floors': self.attributes.get('ms_komot', 0),
+            'estimated_minutes': total_minutes
         }
 
 
@@ -85,11 +88,14 @@ class Team(db.Model):
     def serialize(self):
         serialized_buildings = list(map(lambda building: building.serialize(), self.buildings))
         predicted_total = sum(map(lambda building: building['predicted_earnings'], serialized_buildings))
+        total_minutes = sum(
+            map(lambda building: int(building['number_of_floors']), serialized_buildings)) * ESTIMATE_MINUTES_PER_FLOOR
 
         return {
             'id': self.id,
             'buildings': serialized_buildings,
-            'predicted_total': float("{:.2f}".format(predicted_total))
+            'predicted_total': float("{:.2f}".format(predicted_total)),
+            'pretty_total_minutes': pretty_time(total_minutes)
         }
 
 

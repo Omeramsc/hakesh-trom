@@ -5,6 +5,8 @@ from sqlalchemy import func, distinct
 import xlsxwriter
 from io import BytesIO
 
+from .ui_helpers import pretty_time
+
 
 def serialize_campaign_neighborhoods(neighborhood, campaign_teams):
     """
@@ -106,15 +108,16 @@ def generate_teams_data(teams):
     :param teams:
     :return:
     """
-    rows = [['צוות', 'כתובות', 'קומות', 'צפי רווח']]
+    rows = [['צוות', 'כתובות', 'קומות', 'צפי רווח', 'זמן משוער (דקות)', 'זמן משוער']]
 
     for team in teams:
         team_name = team.name or "צוות {}".format(team.id)
 
         for building in team.buildings:
             serialized_building = building.serialize()
-            row = [team_name, serialized_building['address'], serialized_building['number_of_floors'],
-                   serialized_building['predicted_earnings']]
+            row = [team_name, serialized_building['address'], int(serialized_building['number_of_floors']),
+                   serialized_building['predicted_earnings'], serialized_building['estimated_minutes'],
+                   pretty_time(serialized_building['estimated_minutes'])]
             rows.append(row)
 
     return rows

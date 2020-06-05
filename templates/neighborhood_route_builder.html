@@ -42,13 +42,20 @@
                                 <ul>
                                     {% for building in team['buildings'] %}
                                         <li>
-                                            {{ building['address'] }} - צפי: {{ building['predicted_earnings'] }}
+                                            {{ building['address'].split(',')[0] }} -
+                                            צפי: {{ "₪{:.2f}".format(building['predicted_earnings']) }}
                                         </li>
                                     {% endfor %}
                                 </ul>
-                                <span><b>סה"כ צפי רווח</b>:
-                            {{ "₪{:.2f}".format(team['predicted_total']) }}
-                            </span>
+                                <span>
+                                  <b>סה"כ צפי רווח</b>:
+                                  {{ "₪{:.2f}".format(team['predicted_total']) }}
+                                </span>
+                                <br/>
+                                <span>
+                                    <b>סה"כ זמן מוערך</b>:
+                                    {{ team['pretty_total_minutes'] }}
+                                </span>
                             {% else %}
                                 לא נבחר מסלול
                             {% endif %}
@@ -90,6 +97,9 @@
         const BULK_SELECTED_COLOR = '#000';
         const AVG_BIAS = 5;
 
+        // Consts
+        const ESTIMATE_MINUTES_PER_FLOOR = {{ ESTIMATE_MINUTES_PER_FLOOR }};
+
         const teamELms = document.getElementsByClassName('route-builder-team-panel__team');
         const saveButtonElm = document.getElementById('save-button');
         const deleteButtonElm = document.getElementById('remove-button');
@@ -119,6 +129,32 @@
         let selectedTeamBuildings = [];
         let selectionBox;
         let map;
+
+        function calculateTime(minutes) {
+            if (minutes < 60) {
+                return `${minutes} דקות`
+            }
+
+            let parsedHours = Math.floor(minutes / 60);
+            if (parsedHours === 1) {
+                parsedHours = "שעה"
+            } else if (parsedHours === 2) {
+                parsedHours = "שעתיים"
+            } else {
+                parsedHours = `${parsedHours} שעות`
+            }
+
+            let parsedMinutes = minutes % 60;
+            if (parsedMinutes === 0) {
+                parsedMinutes = ""
+            } else if (parsedMinutes === 1) {
+                parsedMinutes = "ודקה"
+            } else {
+                parsedMinutes = ` ו-${parsedMinutes} דקות`
+            }
+
+            return `${parsedHours} ${parsedMinutes}`.trim();
+        }
 
         function updateTeamId(newTeamId) {
             if (!buildingLayerByTeamId[newTeamId]) buildingLayerByTeamId[newTeamId] = [];
@@ -361,6 +397,10 @@
             document.getElementById('totalPredicted').innerText = `סה"כ: ${petrifyPredictedEarnings(totalPredicted)}`;
         }
 
+        function cleaAddress(address) {
+            return address.split(',')[0]
+        }
+
         function renderTeamRoute(team) {
             const teamDiv = document.getElementById(`team-${team.id}`);
             const teamRouteDiv = teamDiv.getElementsByClassName("route-builder-team-panel__team_route")[0];
@@ -380,7 +420,7 @@
 
             for (const building of team.buildings) {
                 const buildingLi = document.createElement('li');
-                buildingLi.innerText = `${building.address} - צפי: ${petrifyPredictedEarnings(building.predicted_earnings)}`;
+                buildingLi.innerText = `${cleaAddress(building.address)} - צפי: ${petrifyPredictedEarnings(building.predicted_earnings)}`;
                 routeUL.appendChild(buildingLi)
                 totalPredictedEarnings += building.predicted_earnings;
             }
@@ -410,6 +450,15 @@
             const totalPredictedEarningsSpan = document.createElement('span');
             totalPredictedEarningsSpan.innerHTML = `<b>סה"כ צפי רווח</b>: ${prettyTotalPredictedEarnings}`;
             teamRouteDiv.appendChild(totalPredictedEarningsSpan);
+
+            const newLine = document.createElement('br');
+            teamRouteDiv.appendChild(newLine);
+
+            // Adding total predicted time
+            const totalPredictedTimeSpan = document.createElement('span');
+            const totalMinutes = team.buildings.reduce((a, c) => a + parseInt(c.number_of_floors, 10), 0) * ESTIMATE_MINUTES_PER_FLOOR;
+            totalPredictedTimeSpan.innerHTML = `<b>סה"כ זמן מוערך</b>: ${calculateTime(totalMinutes)}`;
+            teamRouteDiv.appendChild(totalPredictedTimeSpan);
         }
 
         function createAddBuildingToRouteButton(building, polygon, infoWindow) {
@@ -482,7 +531,7 @@
             contentDiv.classList.add('route-builder-map__info_window');
 
             const addressSpan = document.createElement('span');
-            addressSpan.innerHTML = `<u><b>כתובת</b></u>:${building.address}`;
+            addressSpan.innerHTML = `<u><b>כתובת</b></u>:${cleaAddress(building.address)}`;
             contentDiv.appendChild(addressSpan);
 
             const numberOfFloorsSpan = document.createElement('span');
@@ -492,6 +541,10 @@
             const predictedEarningsSpan = document.createElement('span');
             predictedEarningsSpan.innerHTML = `<u><b>צפי רווח</b></u>: ${building.predicted_earnings}`;
             contentDiv.appendChild(predictedEarningsSpan);
+
+            const estimateMinutesPerBuildingSpan = document.createElement('span');
+            estimateMinutesPerBuildingSpan.innerHTML = `<u><b>זמן מעורך</b></u>: ${calculateTime(parseInt(building.number_of_floors, 10) * ESTIMATE_MINUTES_PER_FLOOR)}`;
+            contentDiv.appendChild(estimateMinutesPerBuildingSpan);
 
             const teamIdOfBuildingInRoute = (teams.find(t => t.buildingIds.includes(building.id)) || {}).id;
             if (teamIdOfBuildingInRoute) {
@@ -777,6 +830,11 @@
             const prettyTotalPredictedEarnings = petrifyPredictedEarnings(selectedBuildings.reduce((a, c) => a + c.predicted_earnings, 0));
             predictedEarningsSpan.innerHTML = `<u><b>צפי רווח</b></u>: ${prettyTotalPredictedEarnings}`;
             contentDiv.appendChild(predictedEarningsSpan);
+
+            const estimateMinutesPerBuildingSpan = document.createElement('span');
+            const totalMinutes = selectedBuildings.reduce((a, c) => a + parseInt(c.number_of_floors, 10), 0) * ESTIMATE_MINUTES_PER_FLOOR;
+            estimateMinutesPerBuildingSpan.innerHTML = `<u><b>זמן מעורך</b></u>: ${calculateTime(totalMinutes)}`;
+            contentDiv.appendChild(estimateMinutesPerBuildingSpan);
 
             const addBuildingsToRoute = document.createElement('button');
             addBuildingsToRoute.innerText = "הוסף למסלול";
