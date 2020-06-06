@@ -802,5 +802,12 @@ def reset_model():
     return redirect(url_for("home"))
 
 
+@app.route('/admin/force_train/<int:campaign_id>', methods=['GET'])
+def force_train(campaign_id):
+    Campaign.query.get_or_404(campaign_id)
+    train_model(campaign_id)
+    return jsonify({"status": "OK"})
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
