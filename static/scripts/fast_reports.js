@@ -46,25 +46,44 @@ function ChangeRecordIconToInProgress() {
 
 function recordAndPostQuickReport(address, csrfToken, createUrl) {
     if (window.hasOwnProperty('webkitSpeechRecognition')) { // WHEN I DIDN'T USE WEBKIT IT RETURNED FALSE!
-        const recognition = new webkitSpeechRecognition();
+        const recognition = window.currentRecognition || new webkitSpeechRecognition();
+
+        if (window.isUserRecording) {
+            // The user is already recording, aborting the recording
+            recognition.abort();
+            ChangeRecordIconToStopped();
+            window.isUserRecording = false;
+            return;
+        }
+
+        window.currentRecognition = recognition;
 
         recognition.continuous = false;
         recognition.interimResults = false;
 
         recognition.lang = "he-IL"; // spoken language: hebrew
         ChangeRecordIconToInProgress();
+        window.isUserRecording = true;
         recognition.start();
 
         // If voice recognition succeeded
         recognition.onresult = function (e) {
+            window.isUserRecording = false;
             const {transcript} = e.results[0][0];
             recognition.stop();
             ChangeRecordIconToStopped()
+            showLoading(transcript);
             submitQuickReport(transcript, address, csrfToken, createUrl);
         };
 
         // If voice recognition failed (for example: no voice at all)
         recognition.onerror = function (e) {
+            window.isUserRecording = false;
+            if (e.error === "aborted") {
+                // Not a problem at all!
+                return;
+            }
+
             recognition.stop();
             handleTextToSpeechError();
         }
@@ -111,6 +130,16 @@ function handleTextToSpeechError() {
     $('#modal-content').modal({
         escapeClose: true,
         clickClose: true,
+        showClose: false
+    })
+}
+
+function showLoading(transcript) {
+    const parent = document.getElementsByClassName('hidden')[0];
+    parent.innerHTML = `<div id="modal-content" style="text-align: center;direction: rtl; height:20%"><h3>שולח דיווח</h3>שולח את הדיווח הבא: <br/><p>${transcript}</p></div>`;
+    $('#modal-content').modal({
+        escapeClose: false,
+        clickClose: false,
         showClose: false
     })
 }
