@@ -4,6 +4,7 @@ from .consts import DEFAULT_TEAM_USER_PASSWORD
 from sqlalchemy import func, distinct
 import xlsxwriter
 from io import BytesIO
+from flask import abort
 
 from .ui_helpers import pretty_time
 
@@ -173,3 +174,8 @@ def export_neighborhood_to_excel(campaign_id, neighborhood_id, users):
     output.seek(0)
 
     return output
+
+
+def validate_campaign_status(campaign):
+    if not campaign.is_active:
+        abort(403)

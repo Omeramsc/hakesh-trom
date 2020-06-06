@@ -81,6 +81,7 @@ body {
 
 .hidden {
     visibility: hidden;
+    display: none;
 }
 
 .disabledSelect {
@@ -963,6 +964,22 @@ ul {
     text-align: center;
     float: left;
     margin: 3px;
+}
+
+.campaign-control-panel__modal {
+    direction: rtl !important;
+    text-align: right !important;
+    height: unset;
+}
+
+.campaign-control-panel__modal h3 {
+    text-align: center;
+}
+
+.campaign-control-panel__modal img {
+    height: 100px;
+    margin: auto;
+    display: block;
 }
 
 /*------------------------- Errors -------------------------*/
