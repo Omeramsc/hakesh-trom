@@ -94,7 +94,7 @@
                 {% if teams_users_data_raw %}
                     {% with teams_users_data = loads_json(teams_users_data_raw) %}
                         <div class="display-none">
-                            <div id="team-user-dialog" onload="">
+                            <div id="team-user-dialog" onload="" style="height: unset">
                                 להלן פרטי התחברות לצוותים:
                                 <div class="container">
                                     {% for team_user_data in teams_users_data %}
@@ -111,16 +111,23 @@
                                         </div>
                                     {% endfor %}
                                 </div>
+                                <div style="text-align: center;">
+                                    <a href='#close' rel='modal:close' class="hide_link">
+                                        <button type="button" class="btn btn-secondary">
+                                            סגור
+                                        </button>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                         <script type="application/javascript">
                             const jqueryLoadInterval = setInterval(() => {
                                 if (window.jQuery) {
                                     try {
-                                        $("#team-user-dialog").dialog({
-                                            modal: true,
-                                            autoOpen: true,
-                                            title: "<span style='direction: rtl;'>הצוותים נוצרו בהצלחה</span>",
+                                        $("#team-user-dialog").modal({
+                                            escapeClose: true,
+                                            clickClose: true,
+                                            showClose: false
                                         });
                                     } catch (e) {
                                         console.error(e);
@@ -134,11 +141,15 @@
                 {% endif %}
             {% endwith %}
         </div>
-        <div class="hidden" id="are-you-sure">
+        <div class="hidden" id="are-you-sure" style="height: unset;">
             האם את/ה בטוח/ה שברצונך להסיר את השכונה מהקמפיין?
             <div class="are-you-sure__btn-wrapper">
                 <button type="button" class="btn btn-danger" onclick="preformDelete()">מחק</button>
-                <button type="button" class="btn btn-light" onclick="$('#are-you-sure').dialog('close')">בטל</button>
+                <a href='#close' rel='modal:close' class="hide_link">
+                    <button type="button" class="btn btn-light">
+                        בטל
+                    </button>
+                </a>
             </div>
         </div>
     </main>
@@ -149,10 +160,10 @@
         function deleteNeighborhood(neighborhoodId) {
             neighborhoodIdToDelete = neighborhoodId;
             if (window.jQuery) {
-                $("#are-you-sure").dialog({
-                    modal: true,
-                    autoOpen: true,
-                    title: "<span style='direction: rtl; text-align: center;'>האם את/ה בטוח/ה?</span>",
+                $("#are-you-sure").modal({
+                    escapeClose: true,
+                    clickClose: true,
+                    showClose: false
                 });
                 document.getElementById('are-you-sure').classList.remove('hidden')
             }
