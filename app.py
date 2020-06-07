@@ -229,6 +229,26 @@ def manage_campaign_neighborhoods(campaign_id):
                            form=form, campaign_id=campaign_id, loads_json=json.loads)
 
 
+@app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>/team/<int:team_id>', methods=['DELETE'])
+@admin_access
+@login_required
+def delete_team_route(campaign_id, neighborhood_id, team_id):
+    # Safe guards
+    campaign = Campaign.query.get_or_404(campaign_id)
+    Neighborhood.query.get_or_404(neighborhood_id)
+    team = Team.query.get_or_404(team_id)
+
+    validate_campaign_status(campaign)
+
+    delete_team_dependencies(team)
+
+    db.session.commit()
+    db.session.delete(team)
+    db.session.commit()
+
+    return jsonify({'status': 'OK'})
+
+
 @app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>', methods=['GET', 'POST'])
 @admin_access
 @login_required
@@ -263,26 +283,6 @@ def create_new_team_for_route(campaign_id, neighborhood_id):
         User.username == new_team_user_data['username']).first().serialize()
 
     return jsonify({'user': new_team_user_data, 'team': new_team_data})
-
-
-@app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>/team/<int:team_id>', methods=['DELETE'])
-@admin_access
-@login_required
-def delete_team_route(campaign_id, neighborhood_id, team_id):
-    # Safe guards
-    campaign = Campaign.query.get_or_404(campaign_id)
-    Neighborhood.query.get_or_404(neighborhood_id)
-    team = Team.query.get_or_404(team_id)
-
-    validate_campaign_status(campaign)
-
-    delete_team_dependencies(team)
-
-    db.session.commit()
-    db.session.delete(team)
-    db.session.commit()
-
-    return jsonify({'status': 'OK'})
 
 
 @app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>', methods=['DELETE'])
