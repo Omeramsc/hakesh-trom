@@ -25,13 +25,22 @@ def delete_team_dependencies(team):
     team.buildings = []
 
     for user in team.users:
+        for notification in user.notifications:
+            db.session.delete(notification)
+        user.notifications = []
         db.session.delete(user)
     team.users = []
 
     for donation in team.donations:
+        for invoice in donation.invoice:
+            db.session.delete(invoice)
+        donation.invoice = []
         db.session.delete(donation)
     team.donations = []
 
     for report in team.reports:
+        for notification in report.notification:
+            db.session.delete(notification)
+        report.notification = []
         db.session.delete(report)
     team.reports = []
