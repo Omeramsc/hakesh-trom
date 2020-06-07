@@ -526,43 +526,125 @@
             return deleteBuildingFromRoute;
         }
 
-        function generateInfoWindowContent(building, polygon, infoWindow) {
-            const contentDiv = document.createElement('div');
-            contentDiv.classList.add('route-builder-map__info_window');
 
-            const addressSpan = document.createElement('span');
-            addressSpan.innerHTML = `<u><b>כתובת</b></u>:${cleaAddress(building.address)}`;
-            contentDiv.appendChild(addressSpan);
+        function rerenderTeams() {
+            const teamPanel = document.getElementsByClassName('route-builder-team-panel__routes')[0];
+            teamPanel.innerHTML = '';
 
-            const numberOfFloorsSpan = document.createElement('span');
-            numberOfFloorsSpan.innerHTML = `<u><b>מספר קומות</b></u>: ${building.number_of_floors}`;
-            contentDiv.appendChild(numberOfFloorsSpan);
-
-            const predictedEarningsSpan = document.createElement('span');
-            predictedEarningsSpan.innerHTML = `<u><b>צפי רווח</b></u>: ${building.predicted_earnings}`;
-            contentDiv.appendChild(predictedEarningsSpan);
-
-            const estimateMinutesPerBuildingSpan = document.createElement('span');
-            estimateMinutesPerBuildingSpan.innerHTML = `<u><b>זמן מעורך</b></u>: ${calculateTime(parseInt(building.number_of_floors, 10) * ESTIMATE_MINUTES_PER_FLOOR)}`;
-            contentDiv.appendChild(estimateMinutesPerBuildingSpan);
-
-            const teamIdOfBuildingInRoute = (teams.find(t => t.buildingIds.includes(building.id)) || {}).id;
-            if (teamIdOfBuildingInRoute) {
-                const teamNameSpan = document.createElement('span');
-                teamNameSpan.innerHTML = `<u><b>משויך</b></u>: לצוות ${teamIdOfBuildingInRoute}`;
-                contentDiv.appendChild(teamNameSpan);
+            for (const team of teams) {
+                appendTeam(team)
             }
 
-            if (selectedTeamId) {
-                if (selectedTeamId === teamIdOfBuildingInRoute) {
-                    // The selected team is the ones who have this building in the route
-                    contentDiv.appendChild(createDeleteBuildingFromRouteButton(building, polygon, infoWindow))
-                } else if (polygon.strokeColor !== NOT_AVAILABLE_COLOR) {
-                    contentDiv.appendChild(createAddBuildingToRouteButton(building, polygon, infoWindow));
+        }
+
+        function appendTeam(newTeam) {
+            const newTeamDiv = document.createElement('div');
+            newTeamDiv.id = `team-${newTeam.id}`;
+            newTeamDiv.classList.add('route-builder-team-panel__team');
+            newTeamDiv.setAttribute('data-id', newTeam.id);
+            newTeamDiv.innerHTML = `
+                <span class="route-builder-team-panel__team_title">
+                    <span class="h3">
+                        צוות ${newTeam.id} - ${petrifyPredictedEarnings(getTotalPredictedEarnings(newTeam.buildings))}
+                    </span>
+                </span>
+                <div class="route-builder-team-panel__team_route collapse">
+                    לא נבחר מסלול
+                </div>
+            `;
+            newTeamDiv.addEventListener('click', handleTeamClick);
+
+
+            const teamPanel = document.getElementsByClassName('route-builder-team-panel__routes')[0];
+            teamPanel.appendChild(newTeamDiv);
+
+            renderTeamRoute(newTeam)
+        }
+
+        function renderDrawingManager() {
+            const drawingManager = new google.maps.drawing.DrawingManager({
+                drawingControl: true,
+                drawingControlOptions: {
+                    position: google.maps.ControlPosition.TOP_RIGHT,
+                    drawingModes: ['rectangle']
+                },
+                map
+            });
+
+            google.maps.event.addListener(drawingManager, 'rectanglecomplete', function (rectangle) {
+                const buildingsInRect = buildings.filter(b => rectangle.bounds.contains(convertPointToLatLng(b.center_point)))
+                const center = rectangle.bounds.getCenter();
+                rectangle.setMap(null);
+
+                // Clear prev selection
+                for (const building of buildings) {
+                    if (building.polygon.fillColor === BULK_SELECTED_COLOR) {
+                        const teamForBuilding = teams.find(t => t.buildingIds.includes(building.id));
+                        building.polygon.setOptions({
+                            fillColor: calculatePolygonColor(building, teamForBuilding),
+                            strokeColor: calculatePolygonColor(building, teamForBuilding)
+                        });
+                    }
                 }
+
+                // No team is selected, exiting
+                if (!selectedTeamId) {
+                    return;
+                }
+
+                const freeSelectedBuildings = buildingsInRect.filter(b => b.polygon.fillColor !== NOT_AVAILABLE_COLOR && b.polygon.fillColor !== PICKED_TEAM_COLOR);
+
+                // No free buildings, exiting
+                if (freeSelectedBuildings.length === 0) {
+                    return;
+                }
+
+                // Color the building
+                for (const building of freeSelectedBuildings) {
+                    building.polygon.setOptions({fillColor: BULK_SELECTED_COLOR, strokeColor: BULK_SELECTED_COLOR});
+                }
+
+                infoWindow.setPosition(center);
+                infoWindow.open(map);
+
+                infoWindow.setContent(generateBulkSelectionInfoWindow(freeSelectedBuildings));
+            });
+
+        }
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 16,
+                center: convertPointToLatLng(neighborhood.center_point),
+                mapTypeId: "terrain",
+                fullscreenControl: false
+            });
+
+            const neighborhoodPolygon = new google.maps.Polygon({
+                map,
+                paths: neighborhood.geometry.map(convertPointToLatLng),
+                fillOpacity: 0,
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                strokeColor: "#FF0000",
+                fillColor: "#FF0000"
+            });
+
+            const infoWindow = new google.maps.InfoWindow({
+                size: new google.maps.Size(150, 50)
+            });
+
+            window.infoWindow = infoWindow;
+
+            google.maps.event.addListener(map, "click", function () {
+                infoWindow.close();
+            });
+
+            for (const building of buildings) {
+                addPolygon(map, infoWindow, building);
             }
 
-            return contentDiv;
+            renderDrawingManager();
         }
 
         function addPolygon(map, infoWindow, building) {
@@ -610,75 +692,6 @@
             }
 
             return BELLOW_AVG_COLOR;
-        }
-
-        function initMap() {
-            map = new google.maps.Map(document.getElementById("map"), {
-                zoom: 16,
-                center: convertPointToLatLng(neighborhood.center_point),
-                mapTypeId: "terrain",
-                fullscreenControl: false
-            });
-
-            const neighborhoodPolygon = new google.maps.Polygon({
-                map,
-                paths: neighborhood.geometry.map(convertPointToLatLng),
-                fillOpacity: 0,
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                strokeColor: "#FF0000",
-                fillColor: "#FF0000"
-            });
-
-            const infoWindow = new google.maps.InfoWindow({
-                size: new google.maps.Size(150, 50)
-            });
-
-            window.infoWindow = infoWindow;
-
-            google.maps.event.addListener(map, "click", function () {
-                infoWindow.close();
-            });
-
-            for (const building of buildings) {
-                addPolygon(map, infoWindow, building);
-            }
-
-            renderDrawingManager();
-        }
-
-        function rerenderTeams() {
-            const teamPanel = document.getElementsByClassName('route-builder-team-panel__routes')[0];
-            teamPanel.innerHTML = '';
-
-            for (const team of teams) {
-                appendTeam(team)
-            }
-
-        }
-
-        function appendTeam(newTeam) {
-            const newTeamDiv = document.createElement('div');
-            newTeamDiv.id = `team-${newTeam.id}`;
-            newTeamDiv.classList.add('route-builder-team-panel__team');
-            newTeamDiv.setAttribute('data-id', newTeam.id);
-            newTeamDiv.innerHTML = `
-                <span class="route-builder-team-panel__team_title">
-                    <span class="h3">
-                        צוות ${newTeam.id} - ${petrifyPredictedEarnings(getTotalPredictedEarnings(newTeam.buildings))}
-                    </span>
-                </span>
-                <div class="route-builder-team-panel__team_route collapse">
-                    לא נבחר מסלול
-                </div>
-            `;
-            newTeamDiv.addEventListener('click', handleTeamClick);
-
-
-            const teamPanel = document.getElementsByClassName('route-builder-team-panel__routes')[0];
-            teamPanel.appendChild(newTeamDiv);
-
-            renderTeamRoute(newTeam)
         }
 
         async function createTeam() {
@@ -767,55 +780,43 @@
             }
         }
 
-        function renderDrawingManager() {
-            const drawingManager = new google.maps.drawing.DrawingManager({
-                drawingControl: true,
-                drawingControlOptions: {
-                    position: google.maps.ControlPosition.TOP_RIGHT,
-                    drawingModes: ['rectangle']
-                },
-                map
-            });
+        function generateInfoWindowContent(building, polygon, infoWindow) {
+            const contentDiv = document.createElement('div');
+            contentDiv.classList.add('route-builder-map__info_window');
 
-            google.maps.event.addListener(drawingManager, 'rectanglecomplete', function (rectangle) {
-                const buildingsInRect = buildings.filter(b => rectangle.bounds.contains(convertPointToLatLng(b.center_point)))
-                const center = rectangle.bounds.getCenter();
-                rectangle.setMap(null);
+            const addressSpan = document.createElement('span');
+            addressSpan.innerHTML = `<u><b>כתובת</b></u>:${cleaAddress(building.address)}`;
+            contentDiv.appendChild(addressSpan);
 
-                // Clear prev selection
-                for (const building of buildings) {
-                    if (building.polygon.fillColor === BULK_SELECTED_COLOR) {
-                        const teamForBuilding = teams.find(t => t.buildingIds.includes(building.id));
-                        building.polygon.setOptions({
-                            fillColor: calculatePolygonColor(building, teamForBuilding),
-                            strokeColor: calculatePolygonColor(building, teamForBuilding)
-                        });
-                    }
+            const numberOfFloorsSpan = document.createElement('span');
+            numberOfFloorsSpan.innerHTML = `<u><b>מספר קומות</b></u>: ${building.number_of_floors}`;
+            contentDiv.appendChild(numberOfFloorsSpan);
+
+            const predictedEarningsSpan = document.createElement('span');
+            predictedEarningsSpan.innerHTML = `<u><b>צפי רווח</b></u>: ${building.predicted_earnings}`;
+            contentDiv.appendChild(predictedEarningsSpan);
+
+            const estimateMinutesPerBuildingSpan = document.createElement('span');
+            estimateMinutesPerBuildingSpan.innerHTML = `<u><b>זמן מעורך</b></u>: ${calculateTime(parseInt(building.number_of_floors, 10) * ESTIMATE_MINUTES_PER_FLOOR)}`;
+            contentDiv.appendChild(estimateMinutesPerBuildingSpan);
+
+            const teamIdOfBuildingInRoute = (teams.find(t => t.buildingIds.includes(building.id)) || {}).id;
+            if (teamIdOfBuildingInRoute) {
+                const teamNameSpan = document.createElement('span');
+                teamNameSpan.innerHTML = `<u><b>משויך</b></u>: לצוות ${teamIdOfBuildingInRoute}`;
+                contentDiv.appendChild(teamNameSpan);
+            }
+
+            if (selectedTeamId) {
+                if (selectedTeamId === teamIdOfBuildingInRoute) {
+                    // The selected team is the ones who have this building in the route
+                    contentDiv.appendChild(createDeleteBuildingFromRouteButton(building, polygon, infoWindow))
+                } else if (polygon.strokeColor !== NOT_AVAILABLE_COLOR) {
+                    contentDiv.appendChild(createAddBuildingToRouteButton(building, polygon, infoWindow));
                 }
+            }
 
-                // No team is selected, exiting
-                if (!selectedTeamId) {
-                    return;
-                }
-
-                const freeSelectedBuildings = buildingsInRect.filter(b => b.polygon.fillColor !== NOT_AVAILABLE_COLOR && b.polygon.fillColor !== PICKED_TEAM_COLOR);
-
-                // No free buildings, exiting
-                if (freeSelectedBuildings.length === 0) {
-                    return;
-                }
-
-                // Color the building
-                for (const building of freeSelectedBuildings) {
-                    building.polygon.setOptions({fillColor: BULK_SELECTED_COLOR, strokeColor: BULK_SELECTED_COLOR});
-                }
-
-                infoWindow.setPosition(center);
-                infoWindow.open(map);
-
-                infoWindow.setContent(generateBulkSelectionInfoWindow(freeSelectedBuildings));
-            });
-
+            return contentDiv;
         }
 
         function generateBulkSelectionInfoWindow(selectedBuildings) {
@@ -867,6 +868,8 @@
 
             return contentDiv;
         }
+
+
     </script>
 
     <script
