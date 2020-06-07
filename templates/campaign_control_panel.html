@@ -38,12 +38,59 @@
                     <li><b>מספר צוותי תרומה:</b> {{ total.get('teams', 0) }}</li>
                     <li><b>תרומות שהתקבלו:</b> {{ "₪{:,.0f}".format(total.get('donations', 0)) }}</li>
                     <li><b>מועד יצירה:</b> {{ campaign.creation_date.replace(microsecond=0) }}</li>
+                    <li><b>סטאטוס:</b> {{ "פעיל" if campaign.is_active else "לא פעיל" }}</li>
                 </ul>
                 </p>
             </section>
         </section>
-        <a class="finish_btn flex_me" href="{{ url_for('manage_campaign') }}">
-            <button type=submit class="btn btn-secondary btn-lg" type="button">חזרה</button>
-        </a>
+        <div class="flex-me finish_btn center_text">
+            <a class="finish_btn hide_link" href="{{ url_for('manage_campaign') }}">
+                <button type=submit class="btn btn-secondary btn-lg" type="button">חזרה</button>
+            </a>
+            <button type=submit class="btn btn-danger btn-lg" type="button" onclick="showConfirmationWindow()"
+                    {{ "" if campaign.is_active else "disabled" }}>סגור קמפיין
+            </button>
+        </div>
     </main>
+    <div class="hidden">
+        <div id='modal-content' class='campaign-control-panel__modal'>
+            <h3>סגירת קמפיין</h3>
+            <div>
+                <span><strong>שים לב!</strong></span><br/>
+                בעת סגירת קמפיין המערכת תעדכן את הנתונים ולא ניתן להכניס נתונים נוספים לקמפיין זה.<br/>האם את/ה
+                בטוח/ה שברצונך לסגור קמפיין זה?
+            </div>
+            <div class="center_text">
+                <a href='{{ url_for('close_campaign', campaign_id=campaign.id) }}' class="hide_link">
+                    <button class='btn btn-primary' id='confirm'>כן</button>
+                </a>
+                <a href='#close' rel='modal:close' class="hide_link">
+                    <button class='btn btn-secondary'>לא</button>
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function showConfirmationWindow() {
+            const parent = document.getElementsByClassName('hidden')[0];
+            parent.innerHTML = "";
+            $('#modal-content').modal({
+                escapeClose: true,
+                clickClose: true,
+                showClose: false
+            })
+
+            document.getElementById('confirm').addEventListener('click', function () {
+                $.modal.getCurrent().$elm[0].innerHTML = "<h3>מאמן מודל...</h3><div><img src={{ url_for('static', filename='train.gif') }} alt='training'/></div>"
+                $('#modal-content').modal({
+                    escapeClose: false,
+                    clickClose: false,
+                    showClose: false
+                })
+            })
+        }
+    </script>
 {% endblock content %}
+

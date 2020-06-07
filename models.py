@@ -1,9 +1,10 @@
 import datetime
+
+from neural_network_runner import run_network
 from db import db
 from app_init import login_manager, bcrypt
 from flask_login import UserMixin
 from sqlalchemy.dialects.postgresql import JSON
-from utils.neural_network import run_network
 from utils.consts import DEFAULT_TEAM_USER_PASSWORD, ESTIMATE_MINUTES_PER_FLOOR
 from utils.network_input import STANDARDIZE_TYPE_FLOORS, STANDARDIZE_TYPE_EARNINGS, STANDARDIZE_TYPE_HEIGHT, \
     STANDARDIZE_TYPE_NEIGHBORHOOD, encodeInput, decodeInput
@@ -134,12 +135,14 @@ class Campaign(db.Model):
     goal = db.Column(db.Float())
     creation_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     teams = db.relationship("Team", back_populates="campaign")
+    is_active = db.Column(db.Boolean, default=True)
 
-    def __init__(self, name, city, start_date, goal):
+    def __init__(self, name, city, start_date, goal, is_active):
         self.name = name
         self.city = city
         self.start_date = start_date
         self.goal = goal
+        self.is_active = is_active
 
     def __repr__(self):
         return f'id: {self.id}\nname: {self.name}\ncity: {self.city}\ndate: {self.start_date}\n goal: {self.goal}'
@@ -317,3 +320,10 @@ class Report(db.Model):
             'response_time': self.response_time,
             'team_id': self.team_id,
         }
+
+
+class NeuralNetwork(db.Model):
+    __tablename__ = 'neural_networks'
+
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.Text)

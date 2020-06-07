@@ -38,6 +38,13 @@
                          src={{ url_for('static', filename='fast_report.png') }}/></a>
             <a href="{{ url_for('logout') }}">התנתקות<img src="{{ url_for('static', filename='dissconnect.png') }}"
                                                           alt="התנתקות"></a>
+            {% if current_user.is_admin %}
+                <hr>
+                <a href="{{ url_for('reset_model') }}">
+                    איפוס מודל
+                    <img src="{{ url_for('static', filename='revert.png') }}" alt="איפוס מודל">
+                </a>
+            {% endif %}
         </nav>
     </aside>
 {% endif %}

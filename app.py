@@ -1,11 +1,16 @@
 from flask import render_template, jsonify, flash, redirect, url_for, request, session, abort, send_file
 from flask_login import login_user, current_user, logout_user, login_required
+
+from neural_network_runner import DEFAULT_NETWORK
+from neural_network_runner.cache_manager import set_network_cache, update_network_code
 from forms import CreateCampaignForm, SearchCampaignForm, LoginForm, AddNeighborhood, DonationForm, PaperInvoiceForm, \
     DigitalInvoiceForm, BitForm, ReportForm, SearchReportForm, RespondReportForm, validate_name, TeamForm
 from app_init import app, bcrypt
 from models import Campaign, User, Neighborhood, Team, Donation, Invoice, Building, Report, Notification
 from db import db
-from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users, export_neighborhood_to_excel
+from neural_network_runner.train import train_model
+from utils.campaign import get_response_campaign_neighborhoods, create_teams_and_users, export_neighborhood_to_excel, \
+    validate_campaign_status
 from utils.teams import delete_team_dependencies, get_team_progress
 from utils.notifications import update_notification_status_to_read, create_new_notification
 from utils.ui_helpers import get_campaign_icon, get_report_status_icon
@@ -18,6 +23,8 @@ import utils.paypal as pp
 import datetime
 import json
 
+set_network_cache()
+
 
 @app.context_processor
 def inject_content_to_all_routes():
@@ -27,6 +34,8 @@ def inject_content_to_all_routes():
 @app.before_request
 def before_request():
     if current_user.is_authenticated:
+        if not current_user.is_active:
+            return abort(403)
         session['awaiting_notifications'] = {'have_notification': False, 'amount': 0}
         push_notifications_query = Notification.query.filter(Notification.recipient_id == current_user.id).filter(
             Notification.notified == False)
@@ -61,6 +70,7 @@ def campaigns_test():
 @app.route('/admin/campaigns/<int:campaign_id>', methods=["DELETE"])
 def delete_campaign(campaign_id):
     campaign = Campaign.query.get_or_404(campaign_id)
+    validate_campaign_status(campaign)
 
     for team in campaign.teams:
         for user in team.users:
@@ -92,7 +102,7 @@ def login():
         return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = User.query.filter_by(is_active=True, username=form.username.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
@@ -124,6 +134,7 @@ def create_campaign():
             campaign = Campaign(name=form.name.data,
                                 city=form.city.data,
                                 start_date=form.start_date.data,
+                                is_active=True,
                                 goal=form.goal.data)
             flash(f'!קמפיין "{campaign.name}" נוצר בהצלחה', 'success')
             db.session.add(campaign)
@@ -142,6 +153,7 @@ def edit_campaign(campaign_id):
     city = campaign.city
     del form.city
     if form.validate_on_submit():
+        validate_campaign_status(campaign)
         if validate_name(form.name.data, campaign.name):
             campaign.name = form.name.data
             campaign.start_date = form.start_date.data
@@ -199,6 +211,7 @@ def manage_campaign_neighborhoods(campaign_id):
 
     # Calling `validate` for the specific field due to flask forms not liking dynamic loaded selection field
     if form.is_submitted() and form.neighborhood_id.data and form.number_of_teams.validate(form):
+        validate_campaign_status(campaign)
         teams_users_data = create_teams_and_users(campaign_id, int(form.neighborhood_id.data),
                                                   int(form.number_of_teams.data))
         flash(json.dumps(teams_users_data), 'users_data')
@@ -239,8 +252,10 @@ def manage_neighborhood_route(campaign_id, neighborhood_id):
 @login_required
 def create_new_team_for_route(campaign_id, neighborhood_id):
     # Safe guards
-    Campaign.query.get_or_404(campaign_id)
+    campaign = Campaign.query.get_or_404(campaign_id)
     Neighborhood.query.get_or_404(neighborhood_id)
+
+    validate_campaign_status(campaign)
 
     # Create 1 new team
     new_team_user_data = create_teams_and_users(campaign_id, neighborhood_id, 1)[0]
@@ -255,9 +270,12 @@ def create_new_team_for_route(campaign_id, neighborhood_id):
 @login_required
 def delete_team_route(campaign_id, neighborhood_id, team_id):
     # Safe guards
-    Campaign.query.get_or_404(campaign_id)
+    campaign = Campaign.query.get_or_404(campaign_id)
     Neighborhood.query.get_or_404(neighborhood_id)
     team = Team.query.get_or_404(team_id)
+
+    validate_campaign_status(campaign)
+
     delete_team_dependencies(team)
 
     db.session.commit()
@@ -272,8 +290,10 @@ def delete_team_route(campaign_id, neighborhood_id, team_id):
 @login_required
 def delete_neighborhood(campaign_id, neighborhood_id):
     # Safe guards
-    Campaign.query.get_or_404(campaign_id)
+    campaign = Campaign.query.get_or_404(campaign_id)
     neighborhood = Neighborhood.query.get_or_404(neighborhood_id)
+
+    validate_campaign_status(campaign)
 
     for team in neighborhood.teams:
         delete_team_dependencies(team)
@@ -291,8 +311,10 @@ def delete_neighborhood(campaign_id, neighborhood_id):
 @login_required
 def export_user_data(campaign_id, neighborhood_id):
     # Safe guards
-    Campaign.query.get_or_404(campaign_id)
+    campaign = Campaign.query.get_or_404(campaign_id)
     Neighborhood.query.get_or_404(neighborhood_id)
+
+    validate_campaign_status(campaign)
 
     users = db.session.query(User).join(Team).join(Campaign).join(Neighborhood).filter(
         Campaign.id == campaign_id).filter(Neighborhood.id == neighborhood_id)
@@ -311,9 +333,11 @@ def export_user_data(campaign_id, neighborhood_id):
 @login_required
 def upsert_routes(campaign_id, neighborhood_id):
     # Validate the parameters
-    Campaign.query.get_or_404(campaign_id)
+    campaign = Campaign.query.get_or_404(campaign_id)
     Neighborhood.query.get_or_404(neighborhood_id)
     body = request.get_json()
+
+    validate_campaign_status(campaign)
 
     for team_id in body.keys():
         team = Team.query.get_or_404(team_id)
@@ -384,6 +408,7 @@ def get_donation():
 
     form = DonationForm()
     conn_error = request.args.get('conn_error')
+    validate_campaign_status(current_user.team.campaign)
     if form.validate_on_submit():
         session['current_donation'] = {"amount": form.amount.data,
                                        "payment_type": form.payment_type.data,
@@ -414,6 +439,7 @@ def bit_donation():
 
     form = BitForm()
     if form.validate_on_submit():
+        validate_campaign_status(current_user.team.campaign)
         session['current_donation']['transaction_id'] = form.transaction_id.data
         session.modified = True
         return redirect(url_for('send_invoice'))
@@ -425,6 +451,8 @@ def bit_donation():
 @user_access
 def pp_execute():
     """ This route gets the payment authorization and execute the transaction itself via paypal's api """
+    validate_campaign_status(current_user.team.campaign)
+
     pp_req = request.args.to_dict()
     if pp.execute_payment(pp_req):
         session['current_donation']['transaction_id'] = pp_req['paymentId']
@@ -446,6 +474,7 @@ def send_invoice():
     # first we'll check if the forms are validated, so we won't commit the donation with an invoice error.
     if paper_form.submit_p.data and paper_form.validate_on_submit() or \
             digital_form.submit_d.data and digital_form.validate_on_submit():
+        validate_campaign_status(current_user.team.campaign)
         # create donation object:
         donation = Donation(amount=session['current_donation']['amount'],
                             payment_type=session['current_donation']['payment_type'],
@@ -743,6 +772,41 @@ def notifications():
              'status_icon': get_report_status_icon(not notification.was_read)})
     update_notification_status_to_read()
     return render_template('/notifications.html', notifications=notification_list)
+
+
+@app.route('/campaign/<int:campaign_id>/close', methods=['GET'])
+@admin_access
+@login_required
+def close_campaign(campaign_id):
+    campaign = Campaign.query.get_or_404(campaign_id)
+    if not campaign.is_active:
+        return abort(403)
+
+    train_model(campaign_id)
+    campaign.is_active = False
+
+    campaign_users = db.session.query(User).join(Team).filter(Team.campaign_id == campaign_id).all()
+    for user in campaign_users:
+        user.is_active = False
+
+    db.session.commit()
+
+    return redirect(url_for("campaign_control_panel", campaign_id=campaign_id))
+
+
+@app.route('/admin/reset_model', methods=['GET'])
+@admin_access
+@login_required
+def reset_model():
+    update_network_code(DEFAULT_NETWORK)
+    return redirect(url_for("home"))
+
+
+@app.route('/admin/force_train/<int:campaign_id>', methods=['GET'])
+def force_train(campaign_id):
+    Campaign.query.get_or_404(campaign_id)
+    train_model(campaign_id)
+    return jsonify({"status": "OK"})
 
 
 if __name__ == '__main__':
