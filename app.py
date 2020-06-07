@@ -782,16 +782,19 @@ def close_campaign(campaign_id):
     if not campaign.is_active:
         return abort(403)
 
-    train_model(campaign_id)
-    campaign.is_active = False
+    try:
+        train_model(campaign_id)
+        campaign.is_active = False
 
-    campaign_users = db.session.query(User).join(Team).filter(Team.campaign_id == campaign_id).all()
-    for user in campaign_users:
-        user.is_active = False
+        campaign_users = db.session.query(User).join(Team).filter(Team.campaign_id == campaign_id).all()
+        for user in campaign_users:
+            user.is_active = False
 
-    db.session.commit()
-
-    return redirect(url_for("campaign_control_panel", campaign_id=campaign_id))
+        db.session.commit()
+    except:
+        flash('אימון המודל נכשל, אנה נסה שנית', 'danger')
+    finally:
+        return redirect(url_for("campaign_control_panel", campaign_id=campaign_id))
 
 
 @app.route('/admin/reset_model', methods=['GET'])
