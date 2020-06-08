@@ -125,7 +125,7 @@ function handleTextToSpeechSuccess(responseJson) {
 function handleTextToSpeechError(errorInfo = "התרחשה שגיאה, אנא נסה/י שוב במועד מאוחר יותר") {
     ChangeRecordIconToStopped()
     const parent = document.getElementsByClassName('hidden')[0];
-    parent.innerHTML = '<div id="modal-content" class="report_modal" style="text-align: center;direction: rtl;"><h3>אופס...</h3><div>התרחשה שגיאה, אנא נסה/י שוב במועד מאוחר יותר</div><a href="#close" rel="modal:close"><button class="btn btn-secondary">סגור</button></a></div>';
+    parent.innerHTML = '<div id="modal-content" class="report_modal" style="text-align: center;direction: rtl;"><h3>אופס...</h3><div>' + errorInfo + '</div><a href="#close" rel="modal:close"><button class="btn btn-secondary">סגור</button></a></div>';
     $('#modal-content').modal({
         escapeClose: true,
         clickClose: true,
