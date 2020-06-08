@@ -4,7 +4,8 @@
         <h3>תרומה</h3>
     </div>
     <main id="main_layout" class="unified_layout">
-        <button class="guide_btn" id="btnShow"><i class="far fa-question-circle"></i></button>
+        <button class="guide_btn" id="btnShow" onclick="show_donation_guidance_box()"><i
+                class="far fa-question-circle"></i></button>
         {% include "donation_guidance.html" %}
         <h2 class="center_text" style="padding-top: 15px;"> תודה רבה על תרומתך! </h2>
         <img class="end_img" src="{{ url_for('static', filename='fund_thanks.png') }}">

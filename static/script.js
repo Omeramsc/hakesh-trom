@@ -121,3 +121,14 @@ function donation() {
     var controls = new ctrls();
     document.addEventListener('DOMContentLoaded', controls.ready);
 }
+
+function ShowPayPalSuccessMessage() {
+    const parent = document.getElementsByClassName('hidden')[0];
+    parent.innerHTML = '<div id="modal-content" class="report_modal" style="text-align: center;direction: rtl;"><h3>PayPal</h3><div>תשלום ה-PayPal התקבל בהצלחה!</div><a href="#close" rel="modal:close"><button class="btn btn-secondary">סגור</button></a></div>';
+    $('#modal-content').modal({
+        escapeClose: true,
+        clickClose: true,
+        showClose: false
+    })
+}
+

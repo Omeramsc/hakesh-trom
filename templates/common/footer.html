@@ -1,8 +1,16 @@
 <footer id="unified_footer" class="quick_trans center_text">
     <hr>
     <a href="#" onClick="location.reload()">רענן עמוד</a> | <a href="{{ url_for('home') }}">דף הבית</a><br>
+    <span data-href="{{ HOST_URL }}">
+        <a target="_blank"
+           href="https://www.facebook.com/sharer/sharer.php?u={{ HOST_URL }}'&amp;src=sdkpreparse"
+           class="fb-xfbml-parse-ignore">
+            <img src="{{ url_for('static', filename='fb_share.png') }}" height="30px" alt="שתף בפייסבוק">
+        </a>
+    </span>
     <a href="https://www.mta.ac.il"> <img src="{{ url_for('static', filename='mta.png') }}" alt="אתר המכללה"
                                           height="25px" width="70px"></a><a href="#"><img
-        src="{{ url_for('static', filename='otr.png') }}"></a><br>
+        src="{{ url_for('static', filename='otr.png') }}"></a>
+    <br>
     © כל הזכויות שמורות: רותם, עומר ותומר
 </footer>
