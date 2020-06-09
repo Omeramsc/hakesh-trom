@@ -2,7 +2,7 @@
 This project aims to technologize the knock-on-the-door fund-raising practice!
 
 
-![Architecture](documentation/Architecture - FINAL.png)
+![Architecture](documentation/Architecture.png)
 ## Run locally
 
 ### Prerequisite
