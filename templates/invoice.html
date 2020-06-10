@@ -4,7 +4,8 @@
         <h3>תרומה</h3>
     </div>
     <main id="main_layout" class="unified_layout">
-        <button class="guide_btn" id="btnShow"><i class="far fa-question-circle"></i></button>
+        <button class="guide_btn" id="btnShow" onclick="show_donation_guidance_box()"><i
+                class="far fa-question-circle"></i></button>
         {% include "donation_guidance.html" %}
         <section class='ctrl flex_me center_text'>
             <div class='ctrl__counter'>
@@ -24,9 +25,9 @@
                 <span>ישנה תקלה בשרת החשבונית הירוקה,דיווח בנושא נוצר עבור האחראי הארצי. אנא הנפק חשבונית נייר ופנה לאחראי הארצי</span>
             </div>
         {% elif session['current_donation']['payment_type'] == "PayPal" %}
-            <div class="text-success d-block center_text">
-                <span>תשלום ה-PayPal התקבל בהצלחה!</span>
-            </div>
+            <script>
+                ShowPayPalSuccessMessage();
+            </script>
         {% endif %}
         <form id="paper" class="hide_inv" method="post">
             {{ paper_form.hidden_tag() }}

@@ -54,8 +54,9 @@
              id="user_tabs_container"
                 {% endif %}
         >
-            {% for team in teams %}
-                <div class="leaderboard_tabs">
+            {% if teams %}
+                {% for team in teams %}
+                    <div class="leaderboard_tabs">
                     <span class="lb_team">
                         {% if loop.index==1 %}
                             <i id="trophy_icn" class="fas fa-trophy" style="color:gold"></i>
@@ -72,11 +73,14 @@
                             צוות {{ team.id }}
                         {% endif %}
                     </span>
-                    <span class="lb_money">
+                        <span class="lb_money">
                         ₪{{ team.total_earnings }}
                     </span>
-                </div>
-            {% endfor %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                לא נמצאו צוותים פעילים להציג
+            {% endif %}
         </div>
     </main>
 {% endblock content %}

@@ -15,7 +15,8 @@
                     <a target="_blank"
                        href="https://www.facebook.com/sharer/sharer.php?u={{ HOST_URL }}'&amp;src=sdkpreparse"
                        class="fb-xfbml-parse-ignore"><img
-                            class="flex_me" src="{{ url_for('static', filename='fb_share.png') }}" alt="Share"></a>
+                            class="flex_me" src="{{ url_for('static', filename='fb_share.png') }}"
+                            alt="שתף בפייסבוק"></a>
                 </div>
             {% endif %}
             {% if current_user.team_id == team.id or current_user.is_admin %}

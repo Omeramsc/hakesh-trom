@@ -89,7 +89,7 @@ function recordAndPostQuickReport(address, csrfToken, createUrl) {
         }
         // If voice recognition is not available on the device
     } else {
-        handleTextToSpeechError();
+        handleTextToSpeechError("שירותי ההקלטה אינם מאושרים או קיימים במכשיר זה, או שהינך משתמש בדפדפן שאינו נתמך.");
     }
 }
 
@@ -107,26 +107,25 @@ async function submitQuickReport(transcript, address, csrfToken, createUrl) {
         handleTextToSpeechSuccess(responseJson);
     } else {
         //error in SENDING the report
-        handleTextToSpeechError();
+        handleTextToSpeechError("התרחשה שגיאה במהלך שליחת הדיווח. אנא נסה/י שוב במועד מאוחר יותר");
     }
 }
 
 function handleTextToSpeechSuccess(responseJson) {
     const parent = document.getElementsByClassName('hidden')[0];
     const report_url = "/reports/view_report/-1".replace('-1', responseJson['id']);
-    parent.innerHTML = '<div id="modal-content" style="text-align: center;direction: rtl;height:20%"><h3>הדיווח נשמר!</h3><div>הדיווח הקולי נשמר בהצלחה!</div><div><a href="' + report_url + '"><button class="btn btn-primary" style="margin: 2px;">צפייה בדיווח</button></a><a href="#close" rel="modal:close"><button class="btn btn-secondary">סגור</button></a>';
+    parent.innerHTML = '<div id="modal-content" class="report_modal" style="text-align: center;direction: rtl;"><h3>הדיווח נשמר!</h3><div>הדיווח הקולי נשמר בהצלחה!</div><div><a href="' + report_url + '"><button class="btn btn-primary" style="margin: 2px;">צפייה בדיווח</button></a><a href="#close" rel="modal:close"><button class="btn btn-secondary">סגור</button></a></div>';
     $('#modal-content').modal({
         escapeClose: true,
         clickClose: true,
         showClose: false
     })
-
 }
 
-function handleTextToSpeechError() {
+function handleTextToSpeechError(errorInfo = "התרחשה שגיאה, אנא נסה/י שוב במועד מאוחר יותר") {
     ChangeRecordIconToStopped()
     const parent = document.getElementsByClassName('hidden')[0];
-    parent.innerHTML = '<div id="modal-content" style="text-align: center;direction: rtl; height:20%"><h3>אופס...</h3><div>התרחשה שגיאה, אנא נסה/י שוב במועד מאוחר יותר</div><a href="#close" rel="modal:close"><button class="btn btn-secondary">סגור</button></a>';
+    parent.innerHTML = '<div id="modal-content" class="report_modal" style="text-align: center;direction: rtl;"><h3>אופס...</h3><div>' + errorInfo + '</div><a href="#close" rel="modal:close"><button class="btn btn-secondary">סגור</button></a></div>';
     $('#modal-content').modal({
         escapeClose: true,
         clickClose: true,
@@ -136,7 +135,7 @@ function handleTextToSpeechError() {
 
 function showLoading(transcript) {
     const parent = document.getElementsByClassName('hidden')[0];
-    parent.innerHTML = `<div id="modal-content" style="text-align: center;direction: rtl; height:20%"><h3>שולח דיווח</h3>שולח את הדיווח הבא: <br/><p>${transcript}</p></div>`;
+    parent.innerHTML = `<div id="modal-content" class="report_modal" style="text-align: center;direction: rtl;"><h3>שולח דיווח</h3>שולח את הדיווח הבא: <br/><p>${transcript}</p></div>`;
     $('#modal-content').modal({
         escapeClose: false,
         clickClose: false,
