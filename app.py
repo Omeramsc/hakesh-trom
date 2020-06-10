@@ -229,6 +229,48 @@ def manage_campaign_neighborhoods(campaign_id):
                            form=form, campaign_id=campaign_id, loads_json=json.loads)
 
 
+@app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>/team/<int:team_id>', methods=['DELETE'])
+@admin_access
+@login_required
+def delete_team_route(campaign_id, neighborhood_id, team_id):
+    # Safe guards
+    campaign = Campaign.query.get_or_404(campaign_id)
+    Neighborhood.query.get_or_404(neighborhood_id)
+    team = Team.query.get_or_404(team_id)
+
+    validate_campaign_status(campaign)
+
+    delete_team_dependencies(team)
+
+    db.session.commit()
+    db.session.delete(team)
+    db.session.commit()
+
+    return jsonify({'status': 'OK'})
+
+
+@app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>/export_user_data', methods=['GET'])
+@admin_access
+@login_required
+def export_user_data(campaign_id, neighborhood_id):
+    # Safe guards
+    campaign = Campaign.query.get_or_404(campaign_id)
+    Neighborhood.query.get_or_404(neighborhood_id)
+
+    validate_campaign_status(campaign)
+
+    users = db.session.query(User).join(Team).join(Campaign).join(Neighborhood).filter(
+        Campaign.id == campaign_id).filter(Neighborhood.id == neighborhood_id)
+
+    # Rest the users' passwords before exporting the file
+    User.reset_passwords(users)
+    db.session.commit()
+
+    excel_data = export_neighborhood_to_excel(campaign_id, neighborhood_id, users)
+
+    return send_file(excel_data, attachment_filename="output.xlsx", as_attachment=True)
+
+
 @app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>', methods=['GET', 'POST'])
 @admin_access
 @login_required
@@ -265,26 +307,6 @@ def create_new_team_for_route(campaign_id, neighborhood_id):
     return jsonify({'user': new_team_user_data, 'team': new_team_data})
 
 
-@app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>/team/<int:team_id>', methods=['DELETE'])
-@admin_access
-@login_required
-def delete_team_route(campaign_id, neighborhood_id, team_id):
-    # Safe guards
-    campaign = Campaign.query.get_or_404(campaign_id)
-    Neighborhood.query.get_or_404(neighborhood_id)
-    team = Team.query.get_or_404(team_id)
-
-    validate_campaign_status(campaign)
-
-    delete_team_dependencies(team)
-
-    db.session.commit()
-    db.session.delete(team)
-    db.session.commit()
-
-    return jsonify({'status': 'OK'})
-
-
 @app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>', methods=['DELETE'])
 @admin_access
 @login_required
@@ -304,28 +326,6 @@ def delete_neighborhood(campaign_id, neighborhood_id):
     db.session.commit()
 
     return jsonify({'status': 'OK'})
-
-
-@app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>/export_user_data', methods=['GET'])
-@admin_access
-@login_required
-def export_user_data(campaign_id, neighborhood_id):
-    # Safe guards
-    campaign = Campaign.query.get_or_404(campaign_id)
-    Neighborhood.query.get_or_404(neighborhood_id)
-
-    validate_campaign_status(campaign)
-
-    users = db.session.query(User).join(Team).join(Campaign).join(Neighborhood).filter(
-        Campaign.id == campaign_id).filter(Neighborhood.id == neighborhood_id)
-
-    # Rest the users' passwords before exporting the file
-    User.reset_passwords(users)
-    db.session.commit()
-
-    excel_data = export_neighborhood_to_excel(campaign_id, neighborhood_id, users)
-
-    return send_file(excel_data, attachment_filename="output.xlsx", as_attachment=True)
 
 
 @app.route('/campaign/<int:campaign_id>/neighborhoods/<int:neighborhood_id>/routes', methods=['POST'])
