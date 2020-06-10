@@ -576,16 +576,7 @@
                 const center = rectangle.bounds.getCenter();
                 rectangle.setMap(null);
 
-                // Clear prev selection
-                for (const building of buildings) {
-                    if (building.polygon.fillColor === BULK_SELECTED_COLOR) {
-                        const teamForBuilding = teams.find(t => t.buildingIds.includes(building.id));
-                        building.polygon.setOptions({
-                            fillColor: calculatePolygonColor(building, teamForBuilding),
-                            strokeColor: calculatePolygonColor(building, teamForBuilding)
-                        });
-                    }
-                }
+                cleanBulkSelection();
 
                 // No team is selected, exiting
                 if (!selectedTeamId) {
@@ -667,6 +658,8 @@
                 infoWindow.setPosition(event.latLng);
                 infoWindow.open(map);
 
+                cleanBulkSelection();
+
                 infoWindow.setContent(generateInfoWindowContent(building, polygon, infoWindow));
             });
 
@@ -675,6 +668,18 @@
                 if (!buildingLayerByTeamId[teamForBuilding.id]) buildingLayerByTeamId[teamForBuilding.id] = []
 
                 buildingLayerByTeamId[teamForBuilding.id].push(polygon)
+            }
+        }
+
+        function cleanBulkSelection() {
+            for (const building of buildings) {
+                if (building.polygon.fillColor === BULK_SELECTED_COLOR) {
+                    const teamForBuilding = teams.find(t => t.buildingIds.includes(building.id));
+                    building.polygon.setOptions({
+                        fillColor: calculatePolygonColor(building, teamForBuilding),
+                        strokeColor: calculatePolygonColor(building, teamForBuilding)
+                    });
+                }
             }
         }
 
