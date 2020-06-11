@@ -1,10 +1,10 @@
 # hakesh-trom
 This project aims to technologize the knock-on-the-door fund-raising practice!
 
-Architecture #
+Architecture ## 
 ![Architecture](documentation/Architecture.png)
 
-Marketing video #
+Marketing video ## 
 ![marketing](documentation/QrMarketingVideo.png)
 
 ## Run locally
