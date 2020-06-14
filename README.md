@@ -10,9 +10,6 @@ This project aims to technologize the knock-on-the-door fund-raising practice!
 ## technical-video
 ![technical](documentation/QrTechnicalVideo.png)
 
-## poster
-![poster](documentation/poster.jpg)
-
 ## Run locally
 
 ### Prerequisite
