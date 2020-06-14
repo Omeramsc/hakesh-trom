@@ -24,19 +24,26 @@
                     </button>
                 </div>
             </div>
-            <div class="form-group">
-                {{ form.category.label(class="form-control-label") }}
-                {% if form.category.errors %}
-                    {{ form.category(class="form-control is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.city.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {{ form.category(class="form-control") }}
-                {% endif %}
-            </div>
+            {% if form.category.data == 'דיווח מהיר' %}
+                <div class="form-group">
+                    <span class=" form-control-label"> סוג הדיווח:</span>
+                    <span class="form-control disabledSelect">{{ form.category.data }}</span>
+                </div>
+            {% else %}
+                <div class="form-group">
+                    {{ form.category.label(class="form-control-label") }}
+                    {% if form.category.errors %}
+                        {{ form.category(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.city.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.category(class="form-control") }}
+                    {% endif %}
+                </div>
+            {% endif %}
             <div class="form-group">
                 {{ form.description.label(class="form-control-label") }}
                 {% if form.description.errors %}
@@ -52,7 +59,7 @@
             </div>
             <div class="control_buttons">
                 {{ form.submit(class="btn btn-primary btn-lg btn-block") }}
-                <a href="{{ url_for('reports') }}">
+                <a href="{{ return_url }}">
                     <button type="button" class="btn btn-secondary btn-lg btn-block">חזור</button>
                 </a>
             </div>

@@ -582,6 +582,7 @@ def save_quick_report():
 @app.route('/reports/create_report', methods=['GET', 'POST'])
 @login_required
 def create_report():
+    return_url = request.referrer or '/'
     form = ReportForm()
     if form.validate_on_submit():
         report = Report(category=form.category.data,
@@ -595,7 +596,7 @@ def create_report():
             create_new_notification(1, report)
         flash('!הדיווח נוצר בהצלחה', 'success')
         return redirect(url_for('reports'))
-    return render_template('/create_report.html', form=form, legend="יצירת דיווח")
+    return render_template('/create_report.html', form=form, legend="יצירת דיווח", return_url=return_url)
 
 
 @app.route('/reports/view_report/<int:report_id>')
@@ -604,213 +605,206 @@ def view_report(report_id):
     report = Report.query.get_or_404(report_id)
     return render_template('/view_report.html', report=report)
 
+    @app.route('/reports/view_report/<int:report_id>/edit', methods=['GET', 'POST'])
+    @login_required
+    def edit_report(report_id):
+        return_url = request.referrer or '/'
+        report = Report.query.get_or_404(report_id)
+        if report.team_id != current_user.team_id and not current_user.is_admin:
+            abort(403)
+        form = ReportForm()
+        if form.validate_on_submit():
+            report.address = form.address.data
+            report.category = form.category.data
+            report.description = form.description.data
+            db.session.commit()
+            flash('!הדיווח עודכן בהצלחה', 'success')
+            return redirect(url_for('view_report', report_id=report.id))
+        elif request.method == 'GET':
+            form.address.data = report.address
+            form.category.data = report.category
+            form.description.data = report.description
+        return render_template('/create_report.html', form=form, legend="עריכת דיווח", return_url=return_url)
 
-@app.route('/reports/view_report/<int:report_id>/edit', methods=['GET', 'POST'])
-@login_required
-def edit_report(report_id):
-    report = Report.query.get_or_404(report_id)
-    if report.team_id != current_user.team_id and not current_user.is_admin:
-        abort(403)
-    form = ReportForm()
-    if form.validate_on_submit():
-        report.address = form.address.data
-        report.category = form.category.data
-        report.description = form.description.data
+    @app.route('/reports/view_report/<int:report_id>/delete', methods=['POST'])
+    @login_required
+    def delete_report(report_id):
+        report = Report.query.get_or_404(report_id)
+        if report.team_id != current_user.team_id and not current_user.is_admin:
+            abort(403)
+        for notification in report.notification:
+            db.session.delete(notification)
+        db.session.delete(report)
         db.session.commit()
-        flash('!הדיווח עודכן בהצלחה', 'success')
-        return redirect(url_for('view_report', report_id=report.id))
-    elif request.method == 'GET':
-        form.address.data = report.address
-        form.category.data = report.category
-        form.description.data = report.description
-    return render_template('/create_report.html', form=form, legend="עריכת דיווח")
-
-
-@app.route('/reports/view_report/<int:report_id>/delete', methods=['POST'])
-@login_required
-def delete_report(report_id):
-    report = Report.query.get_or_404(report_id)
-    if report.team_id != current_user.team_id and not current_user.is_admin:
-        abort(403)
-    for notification in report.notification:
-        db.session.delete(notification)
-    db.session.delete(report)
-    db.session.commit()
-    # CAN ADD HERE A "CANCEL" OPTION FOR NORMAL USERS
-    flash('!הדיווח נמחק בהצלחה', 'success')
-    return redirect(url_for('reports'))
-
-
-@app.route('/reports/view_report/<int:report_id>/respond', methods=['GET', 'POST'])
-@login_required
-@admin_access
-def respond_to_report(report_id):
-    report = Report.query.get_or_404(report_id)
-    if not report.is_open:
-        return redirect(url_for('edit_respond', report_id=report.id))
-    form = RespondReportForm()
-    if form.validate_on_submit():
-        report.is_open = False
-        report.response = form.response.data
-        report.response_time = datetime.datetime.utcnow()
-        create_new_notification(report.team.users[0].id, report, 'הדיווח שהזנתם קיבל מענה מהאחראי')
-        flash('!הדיווח נענה בהצלחה', 'success')
+        # CAN ADD HERE A "CANCEL" OPTION FOR NORMAL USERS
+        flash('!הדיווח נמחק בהצלחה', 'success')
         return redirect(url_for('reports'))
-    return render_template('/report_response.html', report=report, form=form, legend="מענה לדיווח")
 
+    @app.route('/reports/view_report/<int:report_id>/respond', methods=['GET', 'POST'])
+    @login_required
+    @admin_access
+    def respond_to_report(report_id):
+        return_url = request.referrer or '/'
+        report = Report.query.get_or_404(report_id)
+        if not report.is_open:
+            return redirect(url_for('edit_respond', report_id=report.id))
+        form = RespondReportForm()
+        if form.validate_on_submit():
+            report.is_open = False
+            report.response = form.response.data
+            report.response_time = datetime.datetime.utcnow()
+            create_new_notification(report.team.users[0].id, report, 'הדיווח שהזנתם קיבל מענה מהאחראי')
+            flash('!הדיווח נענה בהצלחה', 'success')
+            return redirect(url_for('reports'))
+        return render_template('/report_response.html', report=report, form=form, legend="מענה לדיווח",
+                               return_url=return_url)
 
-@app.route('/reports/view_report/<int:report_id>/edit_response', methods=['GET', 'POST'])
-@login_required
-@admin_access
-def edit_response(report_id):
-    report = Report.query.get_or_404(report_id)
-    if not report.response:
-        abort(403)
-    form = RespondReportForm()
-    if form.validate_on_submit():
-        report.response = form.response.data
-        report.response_time = datetime.datetime.utcnow()
-        notification = Notification(recipient_id=report.team.users[0].id,
-                                    description='המענה לדיווח עודכן ע"י האחראי',
-                                    report_id=report.id)
-        db.session.add(notification)
-        db.session.commit()
-        flash('!המענה לדיווח עודכן בהצלחה', 'success')
-        return redirect(url_for('view_report', report_id=report.id))
-    elif request.method == 'GET':
-        form.response.data = report.response
-    return render_template('/report_response.html', report=report, form=form, legend="עריכת מענה")
+    @app.route('/reports/view_report/<int:report_id>/edit_response', methods=['GET', 'POST'])
+    @login_required
+    @admin_access
+    def edit_response(report_id):
+        return_url = request.referrer or '/'
+        report = Report.query.get_or_404(report_id)
+        if not report.response:
+            abort(403)
+        form = RespondReportForm()
+        if form.validate_on_submit():
+            report.response = form.response.data
+            report.response_time = datetime.datetime.utcnow()
+            notification = Notification(recipient_id=report.team.users[0].id,
+                                        description='המענה לדיווח עודכן ע"י האחראי',
+                                        report_id=report.id)
+            db.session.add(notification)
+            db.session.commit()
+            flash('!המענה לדיווח עודכן בהצלחה', 'success')
+            return redirect(url_for('view_report', report_id=report.id))
+        elif request.method == 'GET':
+            form.response.data = report.response
+        return render_template('/report_response.html', report=report, form=form, legend="עריכת מענה",
+                               return_url=return_url)
 
+    @app.route('/team/<int:team_id>', methods=['GET'])
+    @login_required
+    def view_team(team_id):
+        team = Team.query.get_or_404(team_id)
+        progress = get_team_progress(team)
+        return render_template('/view_team.html', team=team, progress=progress)
 
-@app.route('/team/<int:team_id>', methods=['GET'])
-@login_required
-def view_team(team_id):
-    team = Team.query.get_or_404(team_id)
-    progress = get_team_progress(team)
-    return render_template('/view_team.html', team=team, progress=progress)
+    @app.route('/team/<int:team_id>/edit', methods=['GET', 'POST'])
+    @login_required
+    def edit_team(team_id):
+        if not current_user.is_admin and not current_user.team_id == team_id:
+            abort(403)
+        team = Team.query.get_or_404(team_id)
+        form = TeamForm()
+        if form.validate_on_submit():
+            team.name = form.name.data
+            team.first_teammate_name = form.first_teammate_name.data
+            team.second_teammate_name = form.second_teammate_name.data
+            db.session.commit()
+            flash('!פרטי הצוות עודכנו בהצלחה', 'success')
+            return redirect(url_for('view_team', team_id=team.id))
+        elif request.method == 'GET':
+            form.name.data = team.name
+            form.first_teammate_name.data = team.first_teammate_name
+            form.second_teammate_name.data = team.second_teammate_name
+        return render_template('/edit_team.html', form=form, team_id=team_id)
 
+    @app.route('/leaderboard', methods=['GET', 'POST'])
+    @login_required
+    def leaderboard():
+        campaign_id = request.args.get('campaign_id', None)
+        team_query = Team.query
+        current_team_money = 0
+        neighborhoods_earnings = {}
 
-@app.route('/team/<int:team_id>/edit', methods=['GET', 'POST'])
-@login_required
-def edit_team(team_id):
-    if not current_user.is_admin and not current_user.team_id == team_id:
-        abort(403)
-    team = Team.query.get_or_404(team_id)
-    form = TeamForm()
-    if form.validate_on_submit():
-        team.name = form.name.data
-        team.first_teammate_name = form.first_teammate_name.data
-        team.second_teammate_name = form.second_teammate_name.data
-        db.session.commit()
-        flash('!פרטי הצוות עודכנו בהצלחה', 'success')
-        return redirect(url_for('view_team', team_id=team.id))
-    elif request.method == 'GET':
-        form.name.data = team.name
-        form.first_teammate_name.data = team.first_teammate_name
-        form.second_teammate_name.data = team.second_teammate_name
-    return render_template('/edit_team.html', form=form, team_id=team_id)
+        # USE CASE 1: USER = TEAM => show only teams within the same campaign and neighborhood
+        if not current_user.is_admin:
+            team_query = team_query.filter(
+                Team.campaign_id == current_user.team.campaign_id and Team.neighborhood_id == current_user.team.neighborhood_id)
 
+        # USE CASE 2: USER = ADMIN => SPECIFIC CAMPAIGN => show only teams within the specific campaign
+        elif campaign_id:
+            team_query = team_query.filter(Team.campaign_id == campaign_id)
 
-@app.route('/leaderboard', methods=['GET', 'POST'])
-@login_required
-def leaderboard():
-    campaign_id = request.args.get('campaign_id', None)
-    team_query = Team.query
-    current_team_money = 0
-    neighborhoods_earnings = {}
+        # USE CASE 3: USER = ADMIN => ALL CAMPAIGNS => query all teams to a dict
+        campaign_teams = [t.__dict__ for t in team_query.all()]
 
-    # USE CASE 1: USER = TEAM => show only teams within the same campaign and neighborhood
-    if not current_user.is_admin:
-        team_query = team_query.filter(
-            Team.campaign_id == current_user.team.campaign_id and Team.neighborhood_id == current_user.team.neighborhood_id)
+        # Calculate total earned money for each team on the leaderboard and insert to the teams dict
+        for team in campaign_teams:
+            total_earnings = db.session.query(func.sum(Donation.amount)).join(Team).filter(
+                Team.id == team['id']).scalar()
+            team['total_earnings'] = total_earnings or 0
+            # Get the current team earnings to display on the top of the page.
+            if not current_user.is_admin and current_user.team_id == team['id']:
+                current_team_money = team['total_earnings']
 
-    # USE CASE 2: USER = ADMIN => SPECIFIC CAMPAIGN => show only teams within the specific campaign
-    elif campaign_id:
-        team_query = team_query.filter(Team.campaign_id == campaign_id)
+            # If the user has a graph (admin), get neighborhood's earnings information for the graph.
+            if current_user.is_admin:
+                neighborhood_name = Neighborhood.query.get(team['neighborhood_id']).name
+                if neighborhoods_earnings.get(neighborhood_name):
+                    neighborhoods_earnings[neighborhood_name] += team['total_earnings']
+                else:
+                    neighborhoods_earnings[neighborhood_name] = team['total_earnings']
+        campaign_teams = sorted(campaign_teams, key=lambda k: k['total_earnings'], reverse=True)
 
-    # USE CASE 3: USER = ADMIN => ALL CAMPAIGNS => query all teams to a dict
-    campaign_teams = [t.__dict__ for t in team_query.all()]
-
-    # Calculate total earned money for each team on the leaderboard and insert to the teams dict
-    for team in campaign_teams:
-        total_earnings = db.session.query(func.sum(Donation.amount)).join(Team).filter(
-            Team.id == team['id']).scalar()
-        team['total_earnings'] = total_earnings or 0
-        # Get the current team earnings to display on the top of the page.
-        if not current_user.is_admin and current_user.team_id == team['id']:
-            current_team_money = team['total_earnings']
-
-        # If the user has a graph (admin), get neighborhood's earnings information for the graph.
+        # Create the list for the graph information.
+        neighborhoods_graph_info = [['שכונה', 'סכום שנאסף']]
         if current_user.is_admin:
-            neighborhood_name = Neighborhood.query.get(team['neighborhood_id']).name
-            if neighborhoods_earnings.get(neighborhood_name):
-                neighborhoods_earnings[neighborhood_name] += team['total_earnings']
-            else:
-                neighborhoods_earnings[neighborhood_name] = team['total_earnings']
-    campaign_teams = sorted(campaign_teams, key=lambda k: k['total_earnings'], reverse=True)
+            for key, value in neighborhoods_earnings.items():
+                neighborhoods_graph_info.append([key, value])
 
-    # Create the list for the graph information.
-    neighborhoods_graph_info = [['שכונה', 'סכום שנאסף']]
-    if current_user.is_admin:
-        for key, value in neighborhoods_earnings.items():
-            neighborhoods_graph_info.append([key, value])
+        return render_template('/leaderboard.html', teams=campaign_teams, current_team_money=current_team_money,
+                               neighborhoods_graph_info=neighborhoods_graph_info)
 
-    return render_template('/leaderboard.html', teams=campaign_teams, current_team_money=current_team_money,
-                           neighborhoods_graph_info=neighborhoods_graph_info)
+    @app.route('/notifications')
+    @login_required
+    def notifications():
+        # Query all the user notifications
+        notifications_query = Notification.query.filter(Notification.recipient_id == current_user.id).order_by(
+            Notification.creation_date.desc()).all()
+        notification_list = []
+        for notification in notifications_query:
+            notification_list.append(
+                {'notification_details_obj': notification,
+                 'status_icon': get_report_status_icon(not notification.was_read)})
+        update_notification_status_to_read()
+        return render_template('/notifications.html', notifications=notification_list)
 
+    @app.route('/campaign/<int:campaign_id>/close', methods=['GET'])
+    @admin_access
+    @login_required
+    def close_campaign(campaign_id):
+        campaign = Campaign.query.get_or_404(campaign_id)
+        if not campaign.is_active:
+            return abort(403)
 
-@app.route('/notifications')
-@login_required
-def notifications():
-    # Query all the user notifications
-    notifications_query = Notification.query.filter(Notification.recipient_id == current_user.id).order_by(
-        Notification.creation_date.desc()).all()
-    notification_list = []
-    for notification in notifications_query:
-        notification_list.append(
-            {'notification_details_obj': notification,
-             'status_icon': get_report_status_icon(not notification.was_read)})
-    update_notification_status_to_read()
-    return render_template('/notifications.html', notifications=notification_list)
+        try:
+            train_model(campaign_id)
+            campaign.is_active = False
 
+            campaign_users = db.session.query(User).join(Team).filter(Team.campaign_id == campaign_id).all()
+            for user in campaign_users:
+                user.is_active = False
 
-@app.route('/campaign/<int:campaign_id>/close', methods=['GET'])
-@admin_access
-@login_required
-def close_campaign(campaign_id):
-    campaign = Campaign.query.get_or_404(campaign_id)
-    if not campaign.is_active:
-        return abort(403)
+            db.session.commit()
+        except:
+            flash('אימון המודל נכשל, אנה נסה שנית', 'danger')
+        finally:
+            return redirect(url_for("campaign_control_panel", campaign_id=campaign_id))
 
-    try:
+    @app.route('/admin/reset_model', methods=['GET'])
+    @admin_access
+    @login_required
+    def reset_model():
+        update_network_code(DEFAULT_NETWORK)
+        return redirect(url_for("home"))
+
+    @app.route('/admin/force_train/<int:campaign_id>', methods=['GET'])
+    def force_train(campaign_id):
+        Campaign.query.get_or_404(campaign_id)
         train_model(campaign_id)
-        campaign.is_active = False
+        return jsonify({"status": "OK"})
 
-        campaign_users = db.session.query(User).join(Team).filter(Team.campaign_id == campaign_id).all()
-        for user in campaign_users:
-            user.is_active = False
-
-        db.session.commit()
-    except:
-        flash('אימון המודל נכשל, אנה נסה שנית', 'danger')
-    finally:
-        return redirect(url_for("campaign_control_panel", campaign_id=campaign_id))
-
-
-@app.route('/admin/reset_model', methods=['GET'])
-@admin_access
-@login_required
-def reset_model():
-    update_network_code(DEFAULT_NETWORK)
-    return redirect(url_for("home"))
-
-
-@app.route('/admin/force_train/<int:campaign_id>', methods=['GET'])
-def force_train(campaign_id):
-    Campaign.query.get_or_404(campaign_id)
-    train_model(campaign_id)
-    return jsonify({"status": "OK"})
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    if __name__ == '__main__':
+        app.run(host='0.0.0.0', debug=True)
