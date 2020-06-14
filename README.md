@@ -7,6 +7,9 @@ This project aims to technologize the knock-on-the-door fund-raising practice!
 ## marketing-video
 ![marketing](documentation/QrMarketingVideo.png)
 
+## technical-video
+![marketing](documentation/QrTechnicalVideo.png)
+
 ## Run locally
 
 ### Prerequisite
