@@ -128,6 +128,7 @@ def about_org():
 @login_required
 @admin_access
 def create_campaign():
+    return_url = request.referrer or '/'
     form = CreateCampaignForm()
     if form.validate_on_submit():
         if validate_name(form.name.data):
@@ -141,13 +142,14 @@ def create_campaign():
             db.session.commit()
             return redirect(url_for('home'))
         form.name.errors.append('קמפיין בשם הזה כבר קיים, אנא בחר שם אחר.')
-    return render_template('/create_campaign.html', form=form, legend="יצירת קמפיין")
+    return render_template('/create_campaign.html', form=form, legend="יצירת קמפיין", return_url=return_url)
 
 
 @app.route('/manage_campaign/campaign_control_panel/<int:campaign_id>/edit_campaign', methods=['GET', 'POST'])
 @login_required
 @admin_access
 def edit_campaign(campaign_id):
+    return_url = request.referrer or '/'
     campaign = Campaign.query.get_or_404(campaign_id)
     form = CreateCampaignForm()
     city = campaign.city
@@ -166,7 +168,7 @@ def edit_campaign(campaign_id):
         form.name.data = campaign.name
         form.start_date.data = campaign.start_date
         form.goal.data = campaign.goal
-    return render_template('/create_campaign.html', form=form, city=city, legend="עריכת קמפיין")
+    return render_template('/create_campaign.html', form=form, city=city, legend="עריכת קמפיין", return_url=return_url)
 
 
 @app.route('/manage_campaign', methods=['GET', 'POST'])
@@ -582,6 +584,7 @@ def save_quick_report():
 @app.route('/reports/create_report', methods=['GET', 'POST'])
 @login_required
 def create_report():
+    return_url = request.referrer or '/'
     form = ReportForm()
     if form.validate_on_submit():
         report = Report(category=form.category.data,
@@ -595,19 +598,23 @@ def create_report():
             create_new_notification(1, report)
         flash('!הדיווח נוצר בהצלחה', 'success')
         return redirect(url_for('reports'))
-    return render_template('/create_report.html', form=form, legend="יצירת דיווח")
+    return render_template('/create_report.html', form=form, legend="יצירת דיווח", return_url=return_url)
 
 
 @app.route('/reports/view_report/<int:report_id>')
 @login_required
 def view_report(report_id):
     report = Report.query.get_or_404(report_id)
-    return render_template('/view_report.html', report=report)
+    return_url = request.referrer or '/'
+    if return_url.endswith(('edit', 'respond', 'close')):
+        return_url = url_for('reports')
+    return render_template('/view_report.html', report=report, return_url=return_url)
 
 
 @app.route('/reports/view_report/<int:report_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_report(report_id):
+    return_url = request.referrer or '/'
     report = Report.query.get_or_404(report_id)
     if report.team_id != current_user.team_id and not current_user.is_admin:
         abort(403)
@@ -623,10 +630,10 @@ def edit_report(report_id):
         form.address.data = report.address
         form.category.data = report.category
         form.description.data = report.description
-    return render_template('/create_report.html', form=form, legend="עריכת דיווח")
+    return render_template('/create_report.html', form=form, legend="עריכת דיווח", return_url=return_url)
 
 
-@app.route('/reports/view_report/<int:report_id>/delete', methods=['POST'])
+@app.route('/reports/view_report/<int:report_id>/delete', methods=['GET', 'POST'])
 @login_required
 def delete_report(report_id):
     report = Report.query.get_or_404(report_id)
@@ -636,15 +643,30 @@ def delete_report(report_id):
         db.session.delete(notification)
     db.session.delete(report)
     db.session.commit()
-    # CAN ADD HERE A "CANCEL" OPTION FOR NORMAL USERS
     flash('!הדיווח נמחק בהצלחה', 'success')
     return redirect(url_for('reports'))
+
+
+@app.route('/reports/view_report/<int:report_id>/close', methods=['GET', 'POST'])
+@login_required
+@admin_access
+def close_report(report_id):
+    report = Report.query.get_or_404(report_id)
+    if report.team_id and not current_user.is_admin:
+        abort(403)
+    report.is_open = False
+    report.response = 'לא רלוונטי, נסגר.'
+    report.response_time = datetime.datetime.utcnow()
+    db.session.commit()
+    flash('!הדיווח נסגר בהצלחה', 'success')
+    return redirect(url_for('view_report', report_id=report_id))
 
 
 @app.route('/reports/view_report/<int:report_id>/respond', methods=['GET', 'POST'])
 @login_required
 @admin_access
 def respond_to_report(report_id):
+    return_url = request.referrer or '/'
     report = Report.query.get_or_404(report_id)
     if not report.is_open:
         return redirect(url_for('edit_respond', report_id=report.id))
@@ -656,13 +678,15 @@ def respond_to_report(report_id):
         create_new_notification(report.team.users[0].id, report, 'הדיווח שהזנתם קיבל מענה מהאחראי')
         flash('!הדיווח נענה בהצלחה', 'success')
         return redirect(url_for('reports'))
-    return render_template('/report_response.html', report=report, form=form, legend="מענה לדיווח")
+    return render_template('/report_response.html', report=report, form=form, legend="מענה לדיווח",
+                           return_url=return_url)
 
 
 @app.route('/reports/view_report/<int:report_id>/edit_response', methods=['GET', 'POST'])
 @login_required
 @admin_access
 def edit_response(report_id):
+    return_url = request.referrer or '/'
     report = Report.query.get_or_404(report_id)
     if not report.response:
         abort(403)
@@ -679,7 +703,8 @@ def edit_response(report_id):
         return redirect(url_for('view_report', report_id=report.id))
     elif request.method == 'GET':
         form.response.data = report.response
-    return render_template('/report_response.html', report=report, form=form, legend="עריכת מענה")
+    return render_template('/report_response.html', report=report, form=form, legend="עריכת מענה",
+                           return_url=return_url)
 
 
 @app.route('/team/<int:team_id>', methods=['GET'])

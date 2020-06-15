@@ -44,9 +44,15 @@
             <div class="control_buttons control_buttons_watch">
                 {% if report.is_open %}
                     {% if current_user.is_admin %}
-                        <a href="{{ url_for('respond_to_report', report_id=report.id) }}">
-                            <button type="button" class="btn btn-primary btn-lg btn-block">ענה לדיווח</button>
-                        </a>
+                        {% if report.team_id %}
+                            <a href="{{ url_for('respond_to_report', report_id=report.id) }}">
+                                <button type="button" class="btn btn-primary btn-lg btn-block">ענה לדיווח</button>
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('close_report', report_id=report.id) }}">
+                                <button type="button" class="btn btn-primary btn-lg btn-block">סגור דיווח</button>
+                            </a>
+                        {% endif %}
                     {% endif %}
                     {% if current_user.team_id == report.team_id or current_user.is_admin %}
                         <a href="{{ url_for('edit_report', report_id=report.id) }}">
@@ -66,7 +72,7 @@
                         <input type="submit" class="btn btn-danger btn-lg btn-block" name="" value="מחק דיווח">
                     </form>
                 {% endif %}
-                <a href="{{ url_for('reports') }}">
+                <a href="{{ return_url }}">
                     <button type="button" class="btn btn-secondary btn-lg btn-block">חזור</button>
                 </a>
             </div>

@@ -61,12 +61,13 @@
                 </div>
             {% elif city %}
                 <div class="form-group">
-                    <b>עיר:</b> <span class="form-control disabledSelect">{{ city }}</span>
+                    <span class=" form-control-label">עיר:</span>
+                    <span class="form-control disabledSelect">{{ city }}</span>
                 </div>
             {% endif %}
             <div class="control_buttons">
                 {{ form.submit(class="btn btn-primary btn-lg btn-block") }}
-                <a href="{{ url_for('manage_campaign') }}">
+                <a href="{{ return_url }}">
                     <button type="button" class="btn btn-secondary btn-lg btn-block">בטל</button>
                 </a>
             </div>
