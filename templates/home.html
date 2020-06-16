@@ -1,6 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
     <main id="main_layout" class="quick_trans center_text">
+        {% if show_welcome_msg %}
+            <script>
+                ShowWelcomeMessage('{{ url_for('view_team', team_id=current_user.team_id) }}', '{{ current_user.team_id }}');
+            </script>
+        {% endif %}
         <section class="user_info">
             <div class="user">
                 {% if current_user.is_admin %}

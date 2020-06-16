@@ -91,9 +91,15 @@ def delete_campaign(campaign_id):
 @login_required
 def home():
     progress = {}
+    show_welcome_msg = False
     if not current_user.is_admin:
+        if not current_user.team.login_before:
+            show_welcome_msg = True
+            team = Team.query.get_or_404(current_user.team_id)
+            team.login_before = True
+            db.session.commit()
         progress = get_team_progress(current_user.team)
-    return render_template('/home.html', progress=progress)
+    return render_template('/home.html', progress=progress, show_welcome_msg=show_welcome_msg)
 
 
 @app.route('/login', methods=['GET', 'POST'])
