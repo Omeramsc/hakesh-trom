@@ -17,6 +17,7 @@ from utils.ui_helpers import get_campaign_icon, get_report_status_icon
 from utils.app_decorators import admin_access, user_access
 from utils.consts import INVOICE_TYPES, HOST_URL, ORGANIZATION_NAME, ESTIMATE_MINUTES_PER_FLOOR
 from utils.automate_report import generate_automate_report
+from utils.forms_helpers import search_report_categories
 from sqlalchemy import func
 import utils.green_invoice as gi
 import utils.paypal as pp
@@ -625,6 +626,12 @@ def edit_report(report_id):
     if report.team_id != current_user.team_id and not current_user.is_admin:
         abort(403)
     form = ReportForm()
+
+    # Quick fix for editing quick reports while It's not a valid option on a normal report:
+    if report.category == "דיווח מהיר":
+        form.category.render_kw = {'disabled': ""}
+        form.category.choices = [(value, value) for value in search_report_categories]
+        form.category.data = "דיווח מהיר"
     if form.validate_on_submit():
         report.address = form.address.data
         report.category = form.category.data
