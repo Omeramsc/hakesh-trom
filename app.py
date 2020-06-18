@@ -96,7 +96,7 @@ def home():
     if not current_user.is_admin:
         if not current_user.team.login_before:
             show_welcome_msg = True
-            team = Team.query.get_or_404(current_user.team_id)
+            team = current_user.team
             team.login_before = True
             db.session.commit()
         progress = get_team_progress(current_user.team)
