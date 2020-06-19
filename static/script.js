@@ -132,3 +132,12 @@ function ShowPayPalSuccessMessage() {
     })
 }
 
+function ShowWelcomeMessage(team_url, team_id) {
+    const parent = document.getElementsByClassName('hidden')[0];
+    parent.innerHTML = '<div id="modal-content" class="report_modal" style="text-align: center;direction: rtl;"><h3>ברוכים הבאים צוות ' + team_id + '</h3><div>אנו מזמינים אתכם לעדכן את פרטי הצוות ולבחור לעצמכם כינוי!</div><a href="' + team_url + '"><button class="btn btn-primary" style="margin: 2px;">לעמוד הצוות</button></a><a href="#close" rel="modal:close"><button class="btn btn-secondary">סגור</button></a></div>';
+    $('#modal-content').modal({
+        escapeClose: true,
+        clickClose: true,
+        showClose: false
+    })
+}

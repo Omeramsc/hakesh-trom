@@ -70,6 +70,7 @@ class Team(db.Model):
     name = db.Column(db.Text, nullable=True)
     first_teammate_name = db.Column(db.String, nullable=True)
     second_teammate_name = db.Column(db.String, nullable=True)
+    login_before = db.Column(db.Boolean, default=False, nullable=True)
     users = db.relationship("User", back_populates="team")
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'))
     campaign = db.relationship("Campaign", back_populates="teams")

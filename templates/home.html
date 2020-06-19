@@ -1,15 +1,18 @@
 {% extends "layout.html" %}
 {% block content %}
     <main id="main_layout" class="quick_trans center_text">
+        {% if show_welcome_msg %}
+            <script>
+                ShowWelcomeMessage('{{ url_for('view_team', team_id=current_user.team_id) }}', '{{ current_user.team_id }}');
+            </script>
+        {% endif %}
         <section class="user_info">
             <div class="user">
                 {% if current_user.is_admin %}
                     <img class="flex_me" src="{{ url_for('static', filename='default_admin.png') }}" alt="Admin photo">
                 {% else %}
-                    <a class="hide_link" href="{{ url_for('view_team', team_id=current_user.team_id) }}">
-                        <img class="flex_me" src="{{ url_for('static', filename='default_team.png') }}"
-                             alt="Team photo">
-                    </a>
+                    <img class="flex_me" src="{{ url_for('static', filename='default_team.png') }}"
+                         alt="Team photo">
                 {% endif %}
             </div>
             <div class="usernames flex_me">
