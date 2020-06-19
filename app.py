@@ -58,35 +58,6 @@ def error_403(error):
 def error_404(error):
     return render_template('errors/404.html'), 404
 
-
-@app.route('/admin/campaigns', methods=["GET"])
-def campaigns_test():
-    try:
-        campaigns = Campaign.query.all()
-        return jsonify([e.serialize() for e in campaigns])
-    except Exception as e:
-        return str(e)
-
-
-@app.route('/admin/campaigns/<int:campaign_id>', methods=["DELETE"])
-def delete_campaign(campaign_id):
-    campaign = Campaign.query.get_or_404(campaign_id)
-    validate_campaign_status(campaign)
-
-    for team in campaign.teams:
-        for user in team.users:
-            db.session.delete(user)
-        for donation in team.donations:
-            for invoice in donation.invoice:
-                db.session.delete(invoice)
-            db.session.delete(donation)
-        db.session.delete(team)
-
-    db.session.delete(campaign)
-    db.session.commit()
-    return '', 204
-
-
 @app.route('/')
 @app.route('/home')
 @login_required
@@ -840,10 +811,12 @@ def close_campaign(campaign_id):
 @login_required
 def reset_model():
     update_network_code(DEFAULT_NETWORK)
-    return redirect(url_for("home"))
+    return redirect(request.referrer or '/')
 
 
 @app.route('/admin/force_train/<int:campaign_id>', methods=['GET'])
+@login_required
+@admin_access
 def force_train(campaign_id):
     Campaign.query.get_or_404(campaign_id)
     train_model(campaign_id)
