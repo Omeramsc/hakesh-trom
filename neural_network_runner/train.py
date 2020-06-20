@@ -4,6 +4,7 @@ from sqlalchemy import func
 from db import db
 from models import Donation, Team, Building
 from neural_network_runner.cache_manager import update_network_code
+from utils.network_input import encodeInput, STANDARDIZE_TYPE_EARNINGS
 
 TRAINER_INTEGRATION_TOKEN = os.environ.get("TRAINER_INTEGRATION_TOKEN", "local")
 TRAINER_HOST = os.environ.get("TRAINER_HOST", "http://localhost:5001")
@@ -21,7 +22,7 @@ def train_model(campaign_id):
     for building_id, total_donation in total_donations_per_building:
         building = building_by_id[building_id]
         neural_network_input = building.get_encoded_input()
-        neural_network_input['currentYearEarnings'] = total_donation
+        neural_network_input['currentYearEarnings'] = encodeInput(total_donation, STANDARDIZE_TYPE_EARNINGS)
 
         new_model_data.append(neural_network_input)
 
