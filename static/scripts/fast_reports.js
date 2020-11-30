@@ -15,7 +15,7 @@ function getCurrentAddress() {
 
 async function handleCurrentPosition(position, resolve) {
     const {latitude, longitude} = position.coords;
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyCeQSgOmTLHNxGk4Vg3JlTNCGD8BEO992Y&language=iw`;
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyB8k9cPqYxYcm-6RjRlB0BJnCsPaFDQAAY&language=iw`;
     try {
         const response = await fetch(url, {method: 'GET'});
 
